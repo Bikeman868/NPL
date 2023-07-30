@@ -4,17 +4,17 @@ This project aims to introduce a new programming language that provides a more m
 
 # Feature Overview
 
-The full [Language Specification](LANGUAGE.md) and [Architecture Guide](ARCHITECTURE.md)should be studied to fully understand the capabilities of NPL. To whet your appetite here are some of the more high level important features.
+The full [Language Handbook](LANGUAGE.md) and [Architecture Guide](ARCHITECTURE.md)should be studied to fully understand the capabilities of NPL. To whet your appetite here are some of the more high level important features.
 
 1. **Elicits good code.** In NPL the easiest way to solve programming problems is also the most flexible, robust and scalable way to write the code. NPL code is easy to write, easy to understand, and very easy to maintain.
 
 1. **Modern.** There are many features of NPL that make it modern. For example it directly integrates with Kubernetes, and manages the network partitioning of your application with trivial configuration. It also builds on lessons of past programming languages that complicated code unnecessarily, and made maintenence expensive. NPL is simple, powerful, modular, scaleable and intuitive.
 
-1. **Message oriented.** The original promise of OOP was described as passing messages to objects, but in reality, OOP is just functions with encapsulated data. Having state and logic rolled up together like this is now known to be a bad idea, as is polymorthism and inhertance. NPL is truly message oriented and functional by definition, and this is what allows it to flexibly partition the application across compute nodes.
+1. **Message oriented.** The original promise of OOP was described as passing messages to objects, but in reality, OOP is just functions with encapsulated data. Having state and logic rolled up together like this is now known to be a bad idea, as is polymorthism and inhertance. NPL is truly message oriented and functional by definition, and this is what allows it to scale vertically as well as horizontally.
 
 1. **Flexible.** Because the NPL compiler can produce bytecode for the JVM, IL for the .Net Framework, or TypeScript for Node. This also makes the application operating system independant. We are planning to release cross-compilers for Go and Rust for those that don't like garbage collection.
 
-1. **Scaleable** both in terms of runtime, and also in terms of the size of the engineering organization. Packaging, sharing and reusing code is similar to what you are used to in Go, but the separation of code by the rols it plays in the application is a unique feature that really helps multiple teams to work together seamlessly.
+1. **Scaleable** both in terms of runtime, and also in terms of the size of the engineering organization. Packaging, sharing and reusing code is similar to what you are used to in Go, but the separation of code by the roles it plays in the application is a unique feature that really helps multiple teams to work together seamlessly.
 
 1. **Observable** because the messages that flow through the system can be observed and analysed to understand how the application works, and to identify subtle bugs in the code.
 
@@ -36,7 +36,7 @@ Messages do not support encapsulation, or inheritance, but composisiton is a fir
 
 This is not to be confused with an OS process. Processes in NPL are functional logic that has no state, accepts messages, and produces zero or more messages as a result.
 
-The original message can be mutated by the process. The process can emit zero or more messages as the result of its processing. These emitted messages are routed by the pipes that are connected to the process. The routing can direct some messages back to the sender, or forward them to other processes for further processing.
+The original message can not be mutated by the process. The process can emit zero or more messages as the result of its processing. These emitted messages are routed by the pipes that are connected to the process. The routing can direct some messages back to the sender, or forward them to other processes for further processing.
 
 For example if a process performs some transformation task, it might take in a message and emit a transformed version of it. This process can be plugged into the network in a variety of ways without it being aware of how it is being used. In one instance a process might send a message to it and route the transformed message back to itself. In another scenario, a process might send a message to it, and attach routing information that sends the transformed message to another process.
 
