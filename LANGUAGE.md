@@ -1,4 +1,4 @@
-# NPL Language Handbook
+# NPL Handbook
 
 This is not a format definition of the NPL language, but a practical handbook that will get you up and running, then allow you to explore language features.
 
