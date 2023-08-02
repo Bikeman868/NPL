@@ -4,7 +4,7 @@ This project aims to introduce a new programming language that provides a more m
 
 # Feature Overview
 
-The full [Language Handbook](LANGUAGE.md) and [Architecture Guide](ARCHITECTURE.md)should be studied to fully understand the capabilities of NPL. To whet your appetite here are some of the more high level important features.
+The [Language Handbook](LANGUAGE.md) and [Architecture Guide](ARCHITECTURE.md) provide more depth on the capabilities and characteristics of NPL. To whet your appetite here are some feature highlights.
 
 1. **Elicits good code.** In NPL the easiest way to solve programming problems is also the most flexible, robust and scalable way to write the code. NPL code is easy to write, easy to understand, and very easy to maintain.
 
