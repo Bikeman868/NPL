@@ -1,6 +1,6 @@
 # NPL Handbook
 
-This is not a format definition of the NPL language, but a practical handbook that will get you up and running, then allow you to explore language features.
+This is not a formal definition of [the language syntax](SYNTAX.md), but a practical handbook that will get you writing code quickly.
 
 # Hello World
 
@@ -21,7 +21,9 @@ namespace App {
 
         process Responder {
             accept * {
-                emit Response { text 'Hello, world' }
+                emit Response { 
+                    data { text 'Hello, world' }
+                }
             }
         }
     }
@@ -94,7 +96,9 @@ The process declaration:
 ```npl
 process Responder {
     accept * {
-        emit Response { text 'Hello, world' }
+        emit Response { 
+            data { text 'Hello, world' }
+        }
     }
 }
 ```
