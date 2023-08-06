@@ -19,221 +19,221 @@ Note that this document defines the syntax. It is possible for code to be syntac
 
 Each source code file must conform to the following syntax.
 
-**source-file** = _using_* _namespace_?
+_source-file_ = _using_* _namespace_?
 
-**using** = _whitespace_ `using` _separator_ qualified-identifier_ _new-line_
+_using_ = _whitespace_ `using` _separator_ qualified-identifier_ _new-line_
 
-**namespace** = _whitespace_ `namespace` _separator_ _qualified-identifier_ _open-scope_ _namespace-definition_ _close-scope_
+_namespace_ = _whitespace_ `namespace` _separator_ _qualified-identifier_ _open-scope_ _namespace-definition_ _close-scope_
 
-**qualified-identifier** = _identifier_ (_decimal_ _idendifier_)*
+_qualified-identifier_ = _identifier_ (_decimal_ _idendifier_)*
 
-**namespace-definition** = (_whitespace_ | _application_ | _network_ | _message_ | _enum_)*
+_namespace-definition_ = (_whitespace_ | _application_ | _network_ | _message_ | _enum_)*
 
 ## Type Definitions
 
-**application** = `application` _separator_ _identifier_ [_open-scope_ _application-definition_ _close-scope_] _new-line_
+_application_ = `application` _separator_ _identifier_ [_open-scope_ _application-definition_ _close-scope_] _new-line_
 
-**message** = `message` _separator_ _identifier_ [_open-scope_ _message-definition_ _close-scope_] _new-line_
+_message_ = `message` _separator_ _identifier_ [_open-scope_ _message-definition_ _close-scope_] _new-line_
 
-**network** = `network` _separator_ _identifier_ [_open-scope_ _network-definition_ _close-scope_] _new-line_
+_network_ = `network` _separator_ _identifier_ [_open-scope_ _network-definition_ _close-scope_] _new-line_
 
-**process** = `process` _separator_ _identifier_ [_open-scope_ _process-definition_ _close-scope_] _new-line_
+_process_ = `process` _separator_ _identifier_ [_open-scope_ _process-definition_ _close-scope_] _new-line_
 
-**pipe** = `pipe` _separator_ _identifier_ [_open-scope_ pipe-definition_ _close-scope_] _new-line_
+_pipe_ = `pipe` _separator_ _identifier_ [_open-scope_ pipe-definition_ _close-scope_] _new-line_
 
-**enum** = `enum` _separator_ _identifier_ [_open-scope_ (_identifier_ _whitespace_)* _close-scope_] _new-line_
+_enum_ = `enum` _separator_ _identifier_ [_open-scope_ (_identifier_ _whitespace_)* _close-scope_] _new-line_
 
 ### Application definitions
 
-**application-definition** = (_whitespace_ | _connection_)*
+_application-definition_ = (_whitespace_ | _connection_)*
 
-**connection** = `connection` _separator_ _qualified-identifier_ [_open-scope_ _connection-definition_ _close-scope_] _new-line_
+_connection_ = `connection` _separator_ _qualified-identifier_ [_open-scope_ _connection-definition_ _close-scope_] _new-line_
 
-**connection-definition** = [_config_] (`ingress` | `egress`)? _qualified_identifier_ _new-line_
+_connection-definition_ = [_config_] (`ingress` | `egress`)? _qualified_identifier_ _new-line_
 
 ### Message definitions
 
-**message-definition** = (_whitespace_ | _message-field_)*
+_message-definition_ = (_whitespace_ | _message-field_)*
 
-**message-field** = _type_ _separator_ _identifier_ _new-line_
+_message-field_ = _type_ _separator_ _identifier_ _new-line_
 
 ### Network and Pipe definitions
 
-**network-definition** = [_config_] (_whitespace_ | _entry-point_ | _process_)*
+_network-definition_ = [_config_] (_whitespace_ | _entry-point_ | _process_)*
 
-**entry-point** = _entry-type_ [_separator_ _entry-type_] [_separator_ _entry-name_] [_open-scope_ _route_ _close_scope_] _new-line_
+_entry-point_ = _entry-type_ [_separator_ _entry-type_] [_separator_ _entry-name_] [_open-scope_ _route_ _close_scope_] _new-line_
 
-**entry-type** = `ingress` | `egress`
+_entry-type_ = `ingress` | `egress`
 
-**entry-name** = `default` | _identifier_
+_entry-name_ = `default` | _identifier_
 
-**route** = [_destination_] (_new-line_ _destination_)*
+_route_ = [_destination_] (_new-line_ _destination_)*
 
-**destintion** = (`process` | `pipe` | `network`) _separator_ _qualified-identifier_ [_open-scope_ _route_definition_ _close_scope_]  _new-line_
+_destintion_ = (`process` | `pipe` | `network`) _separator_ _qualified-identifier_ [_open-scope_ _route_definition_ _close_scope_]  _new-line_
 
-**route-definition** = [_route-command_] (_new-line_ _route-command_)*
+_route-definition_ = [_route-command_] (_new-line_ _route-command_)*
 
-**route-command** = _routing-logic_ | _prepend-command_ | _append-command_ | _clone-command_ | _clear-command_ | _remove-command_ | _capture-command_
+_route-command_ = _routing-logic_ | _prepend-command_ | _append-command_ | _clone-command_ | _clear-command_ | _remove-command_ | _capture-command_
 
-**routing-logic** = _routing-if_ | _routing-else_ | _routing-else-if_ | _routing-while_ | _routing-for_
+_routing-logic_ = _routing-if_ | _routing-else_ | _routing-else-if_ | _routing-while_ | _routing-for_
 
-**routing-if** = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-if_ = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-**routing-else-if** = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-else-if_ = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-**routing-else** = `else` _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-else_ = `else` _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-**routing-while** = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-while_ = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-**routing-for** = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-for_ = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-**prepend-command** = `route.prepend` _open-scope_ _route_ _close_scope_ _new-line_
+_prepend-command_ = `route.prepend` _open-scope_ _route_ _close_scope_ _new-line_
 
-**append-command** = `route.append` _open-scope_ _route_ _close_scope_ _new-line_
+_append-command_ = `route.append` _open-scope_ _route_ _close_scope_ _new-line_
 
-**clear-command** = `route.clear` _new-line_
+_clear-command_ = `route.clear` _new-line_
 
-**remove-command** = `route.remove` _open-scope_ _route_ _close_scope_ _new-line_
+_remove-command_ = `route.remove` _open-scope_ _route_ _close_scope_ _new-line_
 
-**capture-command** = `route.capture` _separator_ _qualified-identifer_ [_open-scope_ _route_ _close_scope_] _new-line_
+_capture-command_ = `route.capture` _separator_ _qualified-identifer_ [_open-scope_ _route_ _close_scope_] _new-line_
 
-**clone-command** = `clone` _open-scope_ _route_ _close_scope_ _new-line_
+_clone-command_ = `clone` _open-scope_ _route_ _close_scope_ _new-line_
 
-**pipe-definition** = [_config_] [_pipe-route_] (_new-line_ _pipe-route_)*
+_pipe-definition_ = [_config_] [_pipe-route_] (_new-line_ _pipe-route_)*
 
-**pipe-route** = `route` _separator_ _message-type_ [_open-scope_ _route_ _close_scope_] _new-line_
+_pipe-route_ = `route` _separator_ _message-type_ [_open-scope_ _route_ _close_scope_] _new-line_
 
-**message-type** = `*` | `empty` | _qualified-identifier_
+_message-type_ = `*` | `empty` | _qualified-identifier_
 
 ### Process definitions
 
-**process-definition** = [_config_] [_message-processing_] (_new-line_ _message-processing_)*
+_process-definition_ = [_config_] [_message-processing_] (_new-line_ _message-processing_)*
 
-**message-processing** = `accept` _message-type_ [_open-scope_ _statements_ _close-scope_] _new-line_
+_message-processing_ = `accept` _message-type_ [_open-scope_ _statements_ _close-scope_] _new-line_
 
-**statements** = [_process-statement_] (_new-line_ _process-statement_)*
+_statements_ = [_process-statement_] (_new-line_ _process-statement_)*
 
-**process-statement** = _process-logic_ | _emit-command_ | _clone-command_ | _clear-command_
+_process-statement_ = _process-logic_ | _emit-command_ | _clone-command_ | _clear-command_
 
-**process-logic** = _process-if_ | _process-else_ | _process-else-if_ | _process-while_ | _process-for_
+_process-logic_ = _process-if_ | _process-else_ | _process-else-if_ | _process-while_ | _process-for_
 
-**emit-command** = `emit` _separator_ _qualified-identifier_ [_open-scope_ _message-init_ _close-scope_]
+_emit-command_ = `emit` _separator_ _qualified-identifier_ [_open-scope_ _message-init_ _close-scope_]
 
-**message-init** = (_message-data_ | _message-route_ | _message-context_)*
+_message-init_ = (_message-data_ | _message-route_ | _message-context_)*
 
-**message-data** = `data` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
+_message-data_ = `data` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
 
-**message-route** = `route` _open-scope_ [_route_] (_new-line_ _route_)* _close-scope_ _new-line_
+_message-route_ = `route` _open-scope_ [_route_] (_new-line_ _route_)* _close-scope_ _new-line_
 
-**message-context** = `context` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
+_message-context_ = `context` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
 
-**field-value** = _identifier_ _separator_ _expression_
+_field-value_ = _identifier_ _separator_ _expression_
 
-**process-if** = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+_process-if_ = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
 
-**process-else-if** = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+_process-else-if_ = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
 
-**process-else** = `else` _open-scope_ _statements_ _close_scope_ _new-line_
+_process-else_ = `else` _open-scope_ _statements_ _close_scope_ _new-line_
 
-**process-while** = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+_process-while_ = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
 
-**process-for** = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+_process-for_ = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
 
 ## Config
 
-**config** = _whitespace_ `config` _open-scope_ [_config-value_] (_new-line_ _config-value_)* _close_scope_ _new_line_
+_config_ = _whitespace_ `config` _open-scope_ [_config-value_] (_new-line_ _config-value_)* _close_scope_ _new_line_
 
-**config-value** = _whitespace_ _identifier_ _separator_ _constant-expression_
+_config-value_ = _whitespace_ _identifier_ _separator_ _constant-expression_
 
 ## Expressions
 
-**expression** = _constant-expression_ | _computed-expression_ | _array-expression_ | _map-expression_
+_expression_ = _constant-expression_ | _computed-expression_ | _array-expression_ | _map-expression_
 
-**constant-expression** = [_unary_operator_] [_open-paren_] [_unary_operator_] _constant-value_ [_whitespace_ _binary-operator_ _whitespace_ _constant-expression_] [_close-paren_]
+_constant-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _constant-value_ [_whitespace_ _binary-operator_ _whitespace_ _constant-expression_] [_close-paren_]
 
-**computed-expression** = [_unary_operator_] [_open-paren_] [_unary_operator_] _computed-value_ [_whitespace_ _binary-operator_ _whitespace_ _computed-expression_] [_close-paren_]
+_computed-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _computed-value_ [_whitespace_ _binary-operator_ _whitespace_ _computed-expression_] [_close-paren_]
 
-**array-expression** = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
+_array-expression_ = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
 
-**map-expression** = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
+_map-expression_ = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
 
-**computed-value** = _constant-value_ | _qualified-identifier_ | _method-call_
+_computed-value_ = _constant-value_ | _qualified-identifier_ | _method-call_
 
-**constant-value** = _number_ | _string_ | _enum-value_ | _env-value_
+_constant-value_ = _number_ | _string_ | _enum-value_ | _env-value_
 
-**enum-value** = _qualified-identifier_
+_enum-value_ = _qualified-identifier_
 
-**env-value** = `%` _identifier_ `%`
+_env-value_ = `%` _identifier_ `%`
 
-**method-call** = _qualified-identifier_ _open-paren_ [_expression_] (_comma-separator_ _expression_)* _close-paren_
+_method-call_ = _qualified-identifier_ _open-paren_ [_expression_] (_comma-separator_ _expression_)* _close-paren_
 
 
-**binary-operator** = `<` | `>` | `<=` | `>=` | `==` | `!=` | `===` | `!==` | `+` | `-` | `/` | `*` | `%` | `<<` | `>>` | `|` | `||` | `&` | `&&`
+_binary-operator_ = `<` | `>` | `<=` | `>=` | `==` | `!=` | `===` | `!==` | `+` | `-` | `/` | `*` | `%` | `<<` | `>>` | `|` | `||` | `&` | `&&`
 
 ## Types
 
-**type** = _primitive-type_ | _message-type_ | _array-type_ | _map-type_ | `any`
+_type_ = _primitive-type_ | _message-type_ | _array-type_ | _map-type_ | `any`
 
-**primitive-type** = `number` | `string` | `date`
+_primitive-type_ = `number` | `string` | `date`
 
-**message-type** = _qualified-identifier_
+_message-type_ = _qualified-identifier_
 
-**array-type** = _type_ _open-array_ _close-array_
+_array-type_ = _type_ _open-array_ _close-array_
 
-**map-type** = `map<` _primitive_type_ `,` _type_ `>`
+_map-type_ = `map<` _primitive_type_ `,` _type_ `>`
 
 ## The small stuff
 
-**linebreak** = `/0x0a`
+_linebreak_ = `/0x0a`
 
-**space** = `/0x20`
+_space_ = `/0x20`
 
-**tab** = `/0x09`
+_tab_ = `/0x09`
 
-**quote** = `/0x27`
+_quote_ = `/0x27`
 
-**decimal** = `/0x2e`
+_decimal_ = `/0x2e`
 
-**open-square** = `/0x5b`
+_open-square_ = `/0x5b`
 
-**close-square** = `/0x5d`
+_close-square_ = `/0x5d`
 
-**open_round** = `/0x28`
+_open_round_ = `/0x28`
 
-**close_round** = `/0x29`
+_close_round_ = `/0x29`
 
-**alpha** = `a` | `b` | ... | `Y` | `Z`
+_alpha_ = `a` | `b` | ... | `Y` | `Z`
 
-**numeric** = `0` | `1` | ... | `9`
+_numeric_ = `0` | `1` | ... | `9`
 
-**alphanumeric** = _alpha_ | _numeric
+_alphanumeric_ = _alpha_ | _numeric
 
-**punctuation** = ''
+_punctuation_ = ''
 
-**char** = _alphanumeric_ | _punctuation_
+_char_ = _alphanumeric_ | _punctuation_
 
-**number** = (_numeric_)? [ _decimal_ (_numeric_)* ]
+_number_ = (_numeric_)? [ _decimal_ (_numeric_)* ]
 
-**string** = _quote_ !(_quote_ | _linebreak_)* _quote_
+_string_ = _quote_ !(_quote_ | _linebreak_)* _quote_
 
-**identifier** = _alpha_ (_alphanumeric_)*
+_identifier_ = _alpha_ (_alphanumeric_)*
 
-**whitespace** = (_space_ | _tab_ | _linebreak_)*
+_whitespace_ = (_space_ | _tab_ | _linebreak_)*
 
-**separator** = (_space_ | _tab_)?
+_separator_ = (_space_ | _tab_)?
 
-**new-line** = _whitespace_ _linebreak_ _whitespace_
+_new-line_ = _whitespace_ _linebreak_ _whitespace_
 
-**open-paren** = (_space_ | _tab_)* _open_round_ (_space_ | _tab_)*
+_open-paren_ = (_space_ | _tab_)* _open_round_ (_space_ | _tab_)*
 
-**close_paren** = (_space_ | _tab_)* _close_round_ (_space_ | _tab_)*
+_close_paren_ = (_space_ | _tab_)* _close_round_ (_space_ | _tab_)*
 
-**open-array** = (_space_ | _tab_)* _open_square_ (_space_ | _tab_)*
+_open-array_ = (_space_ | _tab_)* _open_square_ (_space_ | _tab_)*
 
-**close_array** = (_space_ | _tab_)* _close_square_ (_space_ | _tab_)*
+_close_array_ = (_space_ | _tab_)* _close_square_ (_space_ | _tab_)*
 
-**open-scope** = _whitespace_ `{` _whitespace_
+_open-scope_ = _whitespace_ `{` _whitespace_
 
-**close-scope** = _whitespace_ `}`
+_close-scope_ = _whitespace_ `}`
 
-**comma-separator** = (_space_ | _tab_)* `,` (_space_ | _tab_)*
+_comma-separator_ = (_space_ | _tab_)* `,` (_space_ | _tab_)*
