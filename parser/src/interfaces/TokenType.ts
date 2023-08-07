@@ -1,10 +1,12 @@
 export type TokenType =
-  "Keyword" |
-  "String" |
-  "Number" |
-  "Boolean" |
-  "Operator" |
-  "ScopeStart" |
-  "ScopeEnd" |
-  "ParamStart" |
-  "ParamEnd"
+  | 'Keyword'
+  | 'Identifier'
+  | 'QualifiedIdentifier'
+  | 'String'
+  | 'Number'
+  | 'Boolean'
+  | 'Operator'
+  | 'ScopeStart'
+  | 'ScopeEnd'
+  | 'ParamStart'
+  | 'ParamEnd';

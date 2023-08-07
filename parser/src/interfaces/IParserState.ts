@@ -1,10 +1,15 @@
-export enum ParserStates {
-  Initial,
-  Using,
-  Application,
-  Network,
-}
+export type StateName =
+  | 'Initial'
+  | 'Using'
+  | 'Namespace'
+  | 'NamespaceDefinition'
+  | 'Application'
+  | 'ApplicationDefinition'
+  | 'Network'
+  | 'NetworkDefinition';
 
 export interface IParserState {
-  state: ParserStates;
+  state: StateName;
+
+  getDescription(): string;
 }

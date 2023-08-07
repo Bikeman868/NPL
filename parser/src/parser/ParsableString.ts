@@ -1,5 +1,11 @@
 import { IParsable, Position } from '#interfaces/IParsable.js';
 
+const whitespace = [' ', '\t', '\n', '\r'];
+const separator = [' ', '\t'];
+const eol = '\n';
+const openScope = '{';
+const closeScope = '}';
+
 export class ParsableString implements IParsable {
   private _buffer: string;
   private _position: Position;
@@ -16,7 +22,7 @@ export class ParsableString implements IParsable {
     const ch = this._buffer.charAt(this._position.offset);
     this._position.offset++;
 
-    if (ch == '\n') {
+    if (ch == eol) {
       this._position.column = 1;
       this._position.line++;
     } else {
@@ -44,7 +50,7 @@ export class ParsableString implements IParsable {
     return this._position.offset == this._buffer.length;
   }
 
-  skipAny(...chars: string[]) {
+  skipAny(chars: string[]) {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (!ch) return;
@@ -63,7 +69,7 @@ export class ParsableString implements IParsable {
     }
   }
 
-  skipUntil(...chars: string[]) {
+  skipUntil(chars: string[]) {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (!ch) return;
@@ -78,39 +84,58 @@ export class ParsableString implements IParsable {
       }
 
       if (matching) return;
-      this.next()
+      this.next();
     }
   }
 
   skipWhitespace() {
-    this.skipAny(' ', '\t', '\r', '\n');
+    this.skipAny(whitespace);
   }
 
   skipSepararator() {
-    this.skipAny(' ', '\t');
+    this.skipAny(separator);
   }
 
   skipToEol() {
-    this.skipAny('\n');
+    this.skipUntil([eol]);
   }
 
   skipCount(count: number) {
     for (var i = 0; i < count; i++) this.next();
   }
 
-  extractToAny(...chars: string[]): string {
-    const startOffset = this._position.offset;
-    this.skipUntil(...chars);
-    return startOffset === this._position.offset
+  private extract(start: number): string {
+    return start === this._position.offset
       ? ''
-      : this._buffer.slice(startOffset, this._position.offset);
+      : this._buffer.slice(start, this._position.offset);
+  }
+
+  extractToAny(chars: string[]): string {
+    const startOffset = this._position.offset;
+    this.skipUntil(chars);
+    return this.extract(startOffset);
   }
 
   extractToEol(): string {
-    return this.extractToAny('\n');
+    return this.extractToAny([eol]);
+  }
+
+  extractCount(count: number): string {
+    const startOffset = this._position.offset;
+    for (var i = 0; i < count; i++) this.next();
+    return this.extract(startOffset);
   }
 
   extractToWhitespace(): string {
-    return this.extractToAny(' ', '\t', '\r', '\n');
+    return this.extractToAny(whitespace);
+  }
+
+  extractToSeparator(): string {
+    return this.extractToAny(separator);
+  }
+
+  hasScope(): boolean {
+    this.skipUntil([eol, openScope]);
+    return this.current() == openScope;
   }
 }

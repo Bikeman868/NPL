@@ -1,13 +1,17 @@
-import { IParserState, ParserStates } from '#interfaces/IParserState.js';
+import { IParserState, StateName } from '#interfaces/IParserState.js';
 
 export class ParserState implements IParserState {
-  state: ParserStates;
+  state: StateName;
 
   constructor(other?: IParserState) {
     if (other) {
       this.state = other.state;
     } else {
-      this.state = ParserStates.Initial;
+      this.state = 'Initial';
     }
+  }
+
+  getDescription(): string {
+    return this.state as string;
   }
 }

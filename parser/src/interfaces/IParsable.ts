@@ -6,12 +6,19 @@ export interface IParsable {
 
   isEof(): boolean;
 
+  skipAny(chars: string[]): void;
+  skipUntil(chars: string[]): void;
+
   skipWhitespace(): void;
   skipSepararator(): void;
+  skipToEol(): void;
   skipCount(count: number): void;
-  skipAny(...chars: string[]): void;
 
-  extractToEol(): string;
   extractToWhitespace(): string;
-  extractToAny(...chars: string[]): string;
+  extractToSeparator(): string;
+  extractToEol(): string;
+  extractCount(count: number): string;
+  extractToAny(chars: string[]): string;
+
+  hasScope(): boolean;
 }
