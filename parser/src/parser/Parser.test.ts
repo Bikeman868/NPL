@@ -1,7 +1,7 @@
-import { describe, expect, test } from '@jest/globals';
-import { Parser } from '../Parser.js';
-import { Context } from '../Context.js';
-import { ParsableString } from '../ParsableString.js';
+import { expect, test } from 'vitest'
+import { Parser } from './Parser.js'
+import { Context } from './Context.js'
+import { ParsableString } from './ParsableString.js'
 
 const helloWorld = `using npl.connection
 
@@ -40,16 +40,14 @@ namespace App {
             egress Hello
         }
     }
-}`;
+}`
 
-describe('Parser module', () => {
-  test('Parses Hello World application', () => {
-    const buffer = new ParsableString(helloWorld);
-    const context = new Context(buffer);
-    const parser = new Parser();
-    do {
-      const token = parser.extractNextToken(context);
-      console.log(token.length + ':"' + token.text + '"');
-    } while (!buffer.isEof());
-  });
+test('Parses Hello World application', () => {
+const buffer = new ParsableString(helloWorld);
+const context = new Context(buffer);
+const parser = new Parser();
+do {
+    const token = parser.extractNextToken(context);
+    console.log(token.length + ':"' + token.text + '"');
+} while (!buffer.isEof());
 });

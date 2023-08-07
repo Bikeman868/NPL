@@ -9,6 +9,7 @@ export class ParsableString implements IParsable {
     this._position = { offset: 0, line: 1, column: 1 };
   }
 
+  // Returns the next character
   private next(): string | null {
     if (this._position.offset === this._buffer.length) return null;
 
@@ -25,6 +26,12 @@ export class ParsableString implements IParsable {
     return ch;
   }
 
+  // Returns the character underthe cursor
+  private current(): string | null {
+    if (this._position.offset === this._buffer.length) return null;
+    return this._buffer.charAt(this._position.offset);
+  }
+
   getPosition(): Position {
     return { ...this._position };
   }
@@ -39,7 +46,7 @@ export class ParsableString implements IParsable {
 
   skipAny(...chars: string[]) {
     while (this._position.offset < this._buffer.length) {
-      let ch = this.next();
+      let ch = this.current();
       if (!ch) return;
 
       let matching = false;
@@ -52,24 +59,26 @@ export class ParsableString implements IParsable {
       }
 
       if (!matching) return;
+      this.next();
     }
   }
 
   skipUntil(...chars: string[]) {
     while (this._position.offset < this._buffer.length) {
-      let ch = this.next();
+      let ch = this.current();
       if (!ch) return;
 
-      let matching = true;
+      let matching = false;
 
       for (let char of chars) {
         if (ch == char) {
-          matching = false;
+          matching = true;
           break;
         }
       }
 
       if (matching) return;
+      this.next()
     }
   }
 

@@ -38,6 +38,6 @@ export class Parser implements IParser {
   private parseInitial(context: IContext, updateContext: boolean): ParseResult {
     context.buffer.skipWhitespace();
     const text = context.buffer.extractToWhitespace();
-    return { text, tokenType: TokenType.Keyword };
+    return { text, tokenType: "Keyword" };
   }
 }
