@@ -7,8 +7,8 @@
     "paths": {
       "#exceptions/*": ["./exceptions/*"],
       "#interfaces/*": ["./interfaces/*"],
-      "#utils/*": ["./utils/*"],
+      "#utils/*": ["./utils/*"]
     }
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts"]
 }
