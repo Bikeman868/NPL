@@ -34,9 +34,10 @@ export class Context implements IContext {
     return this._syntaxErrors;
   }
 
-  pushState(newState?: StateName): IParserState {
+  pushState(state?: StateName, subState?: string): IParserState {
     this._stateStack.push(new ParserState(this._currentState));
-    if (newState) this._currentState.state = newState;
+    if (state) this._currentState.state = state;
+    if (subState) this._currentState.subState = subState;
     return this._currentState;
   }
 
@@ -56,8 +57,13 @@ export class Context implements IContext {
   }
 
   syntaxError(message: string): void {
+    this.debug(() => 'Syntax error "' + message + '"');
     let state = '';
-    this._stateStack.forEach((s) => (state += s.getDescription() + '\n'));
+    let stackDepth = '';
+    this._stateStack.forEach((s) => {
+      state += stackDepth + s.getDescription() + '\n';
+      stackDepth += '  ';
+    });
     state += this._currentState.getDescription();
     this._syntaxErrors.push({
       state,

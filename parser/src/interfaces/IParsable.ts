@@ -28,4 +28,5 @@ export interface IParsable {
   extractToAny(chars: string[]): string;
 
   hasScope(): boolean;
+  isEndScope(): boolean;
 }

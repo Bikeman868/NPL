@@ -12,7 +12,7 @@ export interface IContext {
   readonly position: Position;
   readonly syntaxErrors: SyntaxError[];
 
-  pushState(newState?: StateName): IParserState;
+  pushState(state?: StateName, subState?: string): IParserState;
   popState(): IParserState;
   capturePosition(): void;
   restorePosition(): void;

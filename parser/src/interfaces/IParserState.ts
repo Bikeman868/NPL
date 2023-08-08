@@ -1,20 +1,19 @@
 export type StateName =
-  | 'SourceFile'
-  | 'UsingIdentifier'
-  | 'NamespaceIdentifier'
-  | 'NamespaceDefinition'
-  | 'ApplicationIdentifier'
-  | 'ApplicationDefinition'
-  | 'NetworkIdentifier'
-  | 'NetworkDefinition'
-  | 'MessageIdentifier'
-  | 'MessageDefinition'
-  | 'ConfigDefinition'
-  | 'ConnectionIdentifier'
-  | 'ConnectionDefiition';
+  | 'sourcefile'
+  | 'using'
+  | 'namespace'
+  | 'application'
+  | 'network'
+  | 'message'
+  | 'connection'
+  | 'process'
+  | 'object'
+  | 'expression'
+  | 'constant';
 
 export interface IParserState {
   state: StateName;
+  subState: string;
 
   getDescription(): string;
 }

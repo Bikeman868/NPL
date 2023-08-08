@@ -6,12 +6,12 @@ import { ParsableString } from './ParsableString.js';
 const helloWorld = `using npl.connection
 
 namespace App {
-    /*
     message Response {
         string text
     }
 
     network Hello {
+        /*
         ingress egress default {
             process Responder
         }
@@ -23,26 +23,30 @@ namespace App {
                 }
             }
         }
+        */
     }
-    */
 }
-/*
+
 namespace App {
     application HelloWorld {
         connection emitter {
+            /*
             config { 
                 count 1 
                 interval 0
                 message empty
             }
             ingress Hello
+            */
         }
         connection console {
+            /*
             config { mode console.lines }
             egress Hello
+            */
         }
     }
-}*/`;
+}`;
 
 describe('Parser', () => {
   it('should extract keywords', () => {
@@ -55,7 +59,7 @@ describe('Parser', () => {
       .filter((token) => token.tokenType === 'Keyword');
     expect(keywords[0].text).toBe('using');
     expect(keywords[1].text).toBe('namespace');
-    // expect(keywords[2].text).toBe('message');
+    expect(keywords[2].text).toBe('message');
     // expect(keywords[3].text).toBe('string');
     // expect(keywords[4].text).toBe('network');
     // expect(keywords[5].text).toBe('ingress');

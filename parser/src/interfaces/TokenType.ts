@@ -1,7 +1,6 @@
 export type TokenType =
   | 'Keyword'
   | 'Identifier'
-  | 'QualifiedIdentifier'
   | 'String'
   | 'Number'
   | 'Boolean'
@@ -9,4 +8,6 @@ export type TokenType =
   | 'ScopeStart'
   | 'ScopeEnd'
   | 'ParamStart'
-  | 'ParamEnd';
+  | 'ParamEnd'
+  | 'Expression'
+  | 'Constant';

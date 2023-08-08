@@ -197,6 +197,19 @@ export class ParsableString implements IParsable {
 
   hasScope(): boolean {
     this.skipUntil([eol, openScope]);
-    return this.current() == openScope;
+    if (this.current() == openScope) {
+      this.skipCount(1);
+      return true;
+    }
+    return false;
+  }
+
+  isEndScope(): boolean {
+    this.skipWhitespace();
+    if (this.current() == closeScope) {
+      this.skipCount(1);
+      return true;
+    }
+    return false;
   }
 }
