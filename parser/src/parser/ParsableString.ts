@@ -1,10 +1,14 @@
-import { IParsable, Position } from '#interfaces/IParsable.js';
-
-const whitespace = [' ', '\t', '\n', '\r'];
-const separator = [' ', '\t'];
-const eol = '\n';
-const openScope = '{';
-const closeScope = '}';
+import {
+  IParsable,
+  Position,
+  whitespace,
+  separator,
+  eol,
+  openScope,
+  closeScope,
+  lineCommentDelimiter,
+  blockCommentDelimiter,
+} from '#interfaces/IParsable.js';
 
 export class ParsableString implements IParsable {
   private _buffer: string;
@@ -15,7 +19,7 @@ export class ParsableString implements IParsable {
     this._position = { offset: 0, line: 1, column: 1 };
   }
 
-  // Returns the next character
+  // Advances the cursor to the next character
   private next(): string | null {
     if (this._position.offset === this._buffer.length) return null;
 
@@ -32,10 +36,16 @@ export class ParsableString implements IParsable {
     return ch;
   }
 
-  // Returns the character underthe cursor
+  // Returns the character under the cursor
   private current(): string | null {
     if (this._position.offset === this._buffer.length) return null;
     return this._buffer.charAt(this._position.offset);
+  }
+
+  // Peeks at the next character without advancing the cursor
+  private lookAhead(): string | null {
+    if (this._position.offset + 1 >= this._buffer.length) return null;
+    return this._buffer.charAt(this._position.offset + 1);
   }
 
   getPosition(): Position {
@@ -52,13 +62,13 @@ export class ParsableString implements IParsable {
 
   skipAny(chars: string[]) {
     while (this._position.offset < this._buffer.length) {
-      let ch = this.current();
-      if (!ch) return;
+      const current = this.current();
+      if (!current) return;
 
       let matching = false;
 
       for (let char of chars) {
-        if (ch == char) {
+        if (current == char) {
           matching = true;
           break;
         }
@@ -89,7 +99,48 @@ export class ParsableString implements IParsable {
   }
 
   skipWhitespace() {
-    this.skipAny(whitespace);
+    while (this._position.offset < this._buffer.length) {
+      const current = this.current();
+      if (!current) return;
+
+      // Comment to end of line
+      if (current == lineCommentDelimiter) {
+        if (this.lookAhead() == lineCommentDelimiter) {
+          while (true) {
+            const next = this.next();
+            if (!next || next == eol) break;
+          }
+          continue;
+        }
+        if (this.lookAhead() == blockCommentDelimiter) {
+          this.next();
+          while (true) {
+            const next = this.next();
+            if (!next) break;
+            if (next == blockCommentDelimiter) {
+              if (this.lookAhead() == lineCommentDelimiter) {
+                this.next();
+                this.next();
+                break;
+              }
+            }
+          }
+          continue;
+        }
+      }
+
+      let matching = false;
+
+      for (let char of whitespace) {
+        if (current == char) {
+          matching = true;
+          break;
+        }
+      }
+
+      if (!matching) return;
+      this.next();
+    }
   }
 
   skipSepararator() {
@@ -97,7 +148,21 @@ export class ParsableString implements IParsable {
   }
 
   skipToEol() {
-    this.skipUntil([eol]);
+    while (this._position.offset < this._buffer.length) {
+      let ch = this.current();
+      if (!ch) return;
+      if (ch == eol) return;
+      if (ch == lineCommentDelimiter) {
+        if (this.lookAhead() == lineCommentDelimiter) {
+          while (true) {
+            const next = this.next();
+            if (!next || next == eol) break;
+          }
+          continue;
+        }
+      }
+      this.next();
+    }
   }
 
   skipCount(count: number) {
@@ -116,18 +181,14 @@ export class ParsableString implements IParsable {
     return this.extract(startOffset);
   }
 
-  extractToEol(): string {
-    return this.extractToAny([eol]);
-  }
-
   extractCount(count: number): string {
     const startOffset = this._position.offset;
     for (var i = 0; i < count; i++) this.next();
     return this.extract(startOffset);
   }
 
-  extractToWhitespace(): string {
-    return this.extractToAny(whitespace);
+  extractToEnd(...endChars: string[]): string {
+    return this.extractToAny([...whitespace, ...endChars]);
   }
 
   extractToSeparator(): string {

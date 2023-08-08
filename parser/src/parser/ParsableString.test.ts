@@ -13,7 +13,7 @@ describe('Parsable string', () => {
     expect(buffer.getPosition().line).toBe(1);
     expect(buffer.getPosition().column).toBe(3);
 
-    const hello = buffer.extractToWhitespace();
+    const hello = buffer.extractToEnd();
     expect(buffer.getPosition().offset).toBe(7);
     expect(buffer.getPosition().line).toBe(1);
     expect(buffer.getPosition().column).toBe(8);
@@ -24,7 +24,7 @@ describe('Parsable string', () => {
     expect(buffer.getPosition().line).toBe(1);
     expect(buffer.getPosition().column).toBe(12);
 
-    const there = buffer.extractToWhitespace();
+    const there = buffer.extractToEnd();
     expect(buffer.getPosition().offset).toBe(16);
     expect(buffer.getPosition().line).toBe(1);
     expect(buffer.getPosition().column).toBe(17);

@@ -7,7 +7,7 @@ export class ParserState implements IParserState {
     if (other) {
       this.state = other.state;
     } else {
-      this.state = 'Initial';
+      this.state = 'SourceFile';
     }
   }
 

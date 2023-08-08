@@ -3,6 +3,7 @@ import { IParser } from '#interfaces/IParser.js';
 import { IToken } from '#interfaces/IToken.js';
 import { Token } from './Token.js';
 import { TokenType } from '#interfaces/TokenType.js';
+import { StateName } from '#interfaces/IParserState.js';
 
 type ParseResult = { text: string; tokenType: TokenType };
 
@@ -44,29 +45,51 @@ export class Parser implements IParser {
   }
 
   private parseToken(context: IContext, updateContext: boolean): IToken {
-    context.debug(() => { 
+    context.debug(() => {
       const pos = context.buffer.getPosition();
       const state = context.currentState.getDescription();
-      return `Parsing token at offset ${pos.offset} (L${pos.line}:C${pos.column}) in ${state} state`});
+      return `Parsing token at offset ${pos.offset} (L${pos.line}:C${pos.column}) in ${state} state`;
+    });
 
     context.capturePosition();
 
     let result: ParseResult | undefined;
 
     switch (context.currentState.state) {
-      case 'Initial':
-        result = this.parseInitial(context, updateContext);
+      case 'SourceFile':
+        result = this.parseSourceFile(context, updateContext);
         break;
-      case 'Using':
+      case 'UsingIdentifier':
         result = this.parseUsing(context, updateContext);
         break;
-      case 'Namespace':
-        result = this.parseNamespace(context, updateContext);
+      case 'NamespaceIdentifier':
+        result = this.parseNamespaceIdentifier(context, updateContext);
         break;
-        case 'NamespaceDefinition':
-          result = this.parseNamespaceDefinition(context, updateContext);
-          break;
-      }
+      case 'NamespaceDefinition':
+        result = this.parseNamespaceDefinition(context, updateContext);
+        break;
+      case 'ApplicationIdentifier':
+        result = this.parseApplicationIdentifier(context, updateContext);
+        break;
+      case 'ApplicationDefinition':
+        result = this.parseApplicationDefinition(context, updateContext);
+        break;
+      case 'NetworkIdentifier':
+        result = this.parseNetworkIdentifier(context, updateContext);
+        break;
+      case 'NetworkDefinition':
+        result = this.parseNetworkDefinition(context, updateContext);
+        break;
+      case 'MessageIdentifier':
+        result = this.parseMessageIdentifier(context, updateContext);
+        break;
+      case 'MessageDefinition':
+        result = this.parseMessageDefinition(context, updateContext);
+        break;
+      case 'ConfigDefinition':
+        result = this.parseConfigDefinition(context, updateContext);
+        break;
+    }
     if (!result) throw new Error('Unknown state ' + context.currentState.state);
 
     const position = context.buffer.getPosition();
@@ -76,30 +99,9 @@ export class Parser implements IParser {
     return new Token(result.text, result.tokenType, length);
   }
 
-  private parseInitial(context: IContext, updateContext: boolean): ParseResult {
-    context.buffer.skipWhitespace();
-    const text = context.buffer.extractToWhitespace();
-    switch (text) {
-      case 'using':
-        if (updateContext) {
-          context.pushState('Using');
-        }
-        break;
-      case 'namespace':
-        if (updateContext) {
-          context.pushState('Namespace');
-        }
-        break;
-      default:
-        context.syntaxError('Expecting `using` or `namespace` keyword');
-        break;
-    }
-    return { text, tokenType: 'Keyword' };
-  }
-
   private parseUsing(context: IContext, updateContext: boolean): ParseResult {
     context.buffer.skipSepararator();
-    const text = context.buffer.extractToWhitespace();
+    const text = context.buffer.extractToEnd();
     context.buffer.skipToEol();
     if (updateContext) {
       if (!text)
@@ -111,30 +113,169 @@ export class Parser implements IParser {
     return { text, tokenType: 'QualifiedIdentifier' };
   }
 
-  private parseNamespace(
+  private parseNamedScope(
     context: IContext,
     updateContext: boolean,
+    keyword: string,
+    nextState: StateName,
   ): ParseResult {
     context.buffer.skipSepararator();
-    const text = context.buffer.extractToWhitespace();
+    const text = context.buffer.extractToEnd('{');
     if (updateContext) {
       if (context.buffer.hasScope()) {
-        context.pushState('NamespaceDefinition');
+        context.pushState(nextState);
       } else {
         context.popState();
       }
       if (!text)
         context.syntaxError(
-          'Namespace keyword must be followed by the name of a namespace',
+          'Keyword ' +
+            keyword +
+            ' must be followed by the name of a ' +
+            keyword,
         );
     }
     return { text, tokenType: 'QualifiedIdentifier' };
   }
 
-  parseNamespaceDefinition(context: IContext, updateContext: boolean): ParseResult  {
+  private parseNamespaceIdentifier(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseNamedScope(
+      context,
+      updateContext,
+      'namespace',
+      'NamespaceDefinition',
+    );
+  }
+
+  private parseApplicationIdentifier(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseNamedScope(
+      context,
+      updateContext,
+      'application',
+      'ApplicationDefinition',
+    );
+  }
+
+  private parseNetworkIdentifier(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseNamedScope(
+      context,
+      updateContext,
+      'network',
+      'NetworkDefinition',
+    );
+  }
+
+  private parseMessageIdentifier(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseNamedScope(
+      context,
+      updateContext,
+      'message',
+      'MessageDefinition',
+    );
+  }
+
+  private parseScopeDefinition(
+    context: IContext,
+    updateContext: boolean,
+    options: { keyword: string; nextState: StateName }[],
+  ): ParseResult {
+    context.buffer.skipWhitespace();
+    const text = context.buffer.extractToEnd();
+
     if (updateContext) {
-      context.popState();
+      if (text == 'config') {
+        if (context.buffer.hasScope()) context.pushState('ConfigDefinition');
+      } else {
+        let isValid = false;
+        for (let option of options) {
+          if (text == option.keyword) {
+            context.pushState(option.nextState);
+            isValid = true;
+            break;
+          }
+        }
+        if (!isValid) {
+          let msg = 'Expecting one of `config`, ';
+          for (var i = 0; i < options.length; i++) {
+            msg += ', `' + options[i].keyword + '`';
+          }
+          msg += ' but found `' + text + `'`;
+          context.syntaxError(msg);
+        }
+      }
     }
-    return { text: '', tokenType: 'Identifier' };
+
+    return { text, tokenType: 'Keyword' };
+  }
+
+  private parseSourceFile(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseScopeDefinition(context, updateContext, [
+      { keyword: 'using', nextState: 'UsingIdentifier' },
+      { keyword: 'namespace', nextState: 'NamespaceIdentifier' },
+    ]);
+  }
+
+  private parseNamespaceDefinition(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseScopeDefinition(context, updateContext, [
+      { keyword: 'application', nextState: 'ApplicationIdentifier' },
+      { keyword: 'message', nextState: 'MessageIdentifier' },
+      { keyword: 'network', nextState: 'NetworkIdentifier' },
+    ]);
+  }
+
+  private parseApplicationDefinition(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseScopeDefinition(context, updateContext, [
+      { keyword: 'connection', nextState: 'ConnectionIdentifier' },
+    ]);
+  }
+
+  private parseNetworkDefinition(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    return this.parseScopeDefinition(context, updateContext, [
+      { keyword: 'ingress', nextState: 'ApplicationIdentifier' },
+      { keyword: 'egress', nextState: 'MessageIdentifier' },
+      { keyword: 'process', nextState: 'NetworkIdentifier' },
+    ]);
+  }
+
+  private parseMessageDefinition(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    context.buffer.skipWhitespace();
+    const text = context.buffer.extractToEnd();
+    return { text, tokenType: 'Keyword' };
+  }
+
+  private parseConfigDefinition(
+    context: IContext,
+    updateContext: boolean,
+  ): ParseResult {
+    context.buffer.skipWhitespace();
+    const text = context.buffer.extractToEnd();
+    return { text, tokenType: 'Keyword' };
   }
 }

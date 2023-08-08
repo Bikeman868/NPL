@@ -1,12 +1,17 @@
 export type StateName =
-  | 'Initial'
-  | 'Using'
-  | 'Namespace'
+  | 'SourceFile'
+  | 'UsingIdentifier'
+  | 'NamespaceIdentifier'
   | 'NamespaceDefinition'
-  | 'Application'
+  | 'ApplicationIdentifier'
   | 'ApplicationDefinition'
-  | 'Network'
-  | 'NetworkDefinition';
+  | 'NetworkIdentifier'
+  | 'NetworkDefinition'
+  | 'MessageIdentifier'
+  | 'MessageDefinition'
+  | 'ConfigDefinition'
+  | 'ConnectionIdentifier'
+  | 'ConnectionDefiition';
 
 export interface IParserState {
   state: StateName;
