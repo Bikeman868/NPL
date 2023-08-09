@@ -18,6 +18,8 @@ export function parseScopeDefinition(
   options: { keyword: string; state?: StateName; subState?: string }[],
 ): ParseResult {
   if (context.buffer.isEndScope()) {
+    context.buffer.skipCount(1);
+    context.buffer.skipWhitespace();
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   }
@@ -35,7 +37,7 @@ export function parseScopeDefinition(
       if (keyword == option.keyword) {
         if (option.state) context.pushState(option.state, option.subState);
         else if (option.subState)
-          context.currentState.subState = option.subState;
+          context.setSubState(option.subState);
         isValid = true;
         break;
       }

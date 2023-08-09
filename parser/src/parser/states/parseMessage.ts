@@ -24,6 +24,8 @@ function parseMessageIdentifier(context: IContext): ParseResult {
 
 function parseMessageDefinition(context: IContext): ParseResult {
   if (context.buffer.isEndScope()) {
+    context.buffer.skipCount(1);
+    context.buffer.skipWhitespace();
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   } else {

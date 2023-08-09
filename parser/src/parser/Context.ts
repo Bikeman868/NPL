@@ -41,24 +41,32 @@ export class Context implements IContext {
   }
 
   pushState(state?: StateName, subState?: string): IParserState {
+    this.debug(() => `${this.getDebugIndent()}^ ${state}.${subState}`)
+
     if (!this._isDryRun) {
       this._stateStack.push(new ParserState(this._currentState));
       if (state) this._currentState.state = state;
       if (subState) this._currentState.subState = subState;
     }
+
     return this._currentState;
   }
 
   popState(): IParserState {
+    this.debug(() => `${this.getDebugIndent()}v ${this._currentState.state}.${this._currentState.subState}`)
+
     if (!this._isDryRun) {
       const state = this._stateStack.pop();
       if (!state) throw new Error('More pops than pushes');
       this._currentState = state;
     }
+
     return this._currentState;
   }
 
   setState(state?: StateName, subState?: string): IParserState {
+    this.debug(() => `${this.getDebugIndent()}State = ${state} ${subState}`)
+
     if (!this._isDryRun) {
       if (state) this._currentState.state = state;
       if (subState) this._currentState.subState = subState;
@@ -67,9 +75,12 @@ export class Context implements IContext {
   }
 
   setSubState(subState: string): IParserState {
+    this.debug(() => `${this.getDebugIndent()}Substate = ${subState}`)
+
     if (!this._isDryRun) {
       this._currentState.subState = subState;
     }
+
     return this._currentState;
   }
 
