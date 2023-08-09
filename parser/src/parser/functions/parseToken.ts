@@ -15,40 +15,49 @@ import { parseObject } from '../states/parseObject.js';
 import { parseExpression } from '../states/parseExpression.js';
 import { parseAccept } from '../states/parseAccept.js';
 import { parseRoute } from '../states/parseRoute.js';
+import { parseEmit } from '../states/parseEmit.js';
 
 // Performs one iteration of the token parsing state machine. Delagates to
 // a function that is specific to the current state
 
-const stateMachines: Map<StateName, (context: IContext, updateContext: boolean) => ParseResult> = new Map([
-  ['sourcefile', parseSourceFile],
-  ['using', parseUsing],
-  ['namespace', parseNamespace],
-  ['application', parseApplication],
-  ['network', parseNetwork],
-  ['message', parseMessage],
-  ['connection', parseConnection],
-  ['process', parseProcess],
-  ['accept', parseAccept],
-  ['object', parseObject],
-  ['expression', parseExpression],
-  ['route', parseRoute],
-]);
+const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
+  new Map([
+    ['sourcefile', parseSourceFile],
+    ['using', parseUsing],
+    ['namespace', parseNamespace],
+    ['application', parseApplication],
+    ['network', parseNetwork],
+    ['message', parseMessage],
+    ['connection', parseConnection],
+    ['process', parseProcess],
+    ['accept', parseAccept],
+    ['object', parseObject],
+    ['expression', parseExpression],
+    ['route', parseRoute],
+    ['emit', parseEmit],
+  ]);
 
-export function parseToken(context: IContext, updateContext: boolean): IToken {
+export function parseToken(context: IContext): IToken {
   const stateMachine = stateMachines.get(context.currentState.state);
-  if (!stateMachine) throw new Error('No state machine configured for ' + context.currentState.state + ' state');
+  if (!stateMachine)
+    throw new Error(
+      'No state machine configured for ' +
+        context.currentState.state +
+        ' state',
+    );
 
+  const indent = context.getDebugIndent();
   context.capturePosition();
-  const result = stateMachine(context, updateContext);
+  const result = stateMachine(context);
   const endPosition = context.buffer.getPosition();
   const length = endPosition.offset - context.position.offset;
 
   context.debug(() => {
     const state = context.currentState.getDescription();
     const startPos = context.position;
-    return `Parsed ${result?.tokenType} token "${result?.text}" at offset ${startPos.offset} (L${startPos.line}:C${startPos.column}). Expecting ${state} next`;
+    return `${indent}Parsed ${result?.tokenType} token "${result?.text}" at offset ${startPos.offset} (L${startPos.line}:C${startPos.column}). Expecting ${state} next`;
   });
 
-  if (!updateContext) context.restorePosition();
+  if (context.isDryRun) context.restorePosition();
   return new Token(result.text, result.tokenType, length);
 }

@@ -11,11 +11,17 @@ export interface IContext {
   readonly currentState: IParserState;
   readonly position: Position;
   readonly syntaxErrors: SyntaxError[];
+  readonly isDryRun: boolean;
 
   pushState(state?: StateName, subState?: string): IParserState;
   popState(): IParserState;
+  setState(state?: StateName, subState?: string): IParserState;
+  setSubState(subState: string): IParserState;
+
   capturePosition(): void;
   restorePosition(): void;
+
   syntaxError(message: string): void;
+  getDebugIndent(): string;
   debug(messageFunc: () => any): void;
 }

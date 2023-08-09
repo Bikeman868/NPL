@@ -5,17 +5,16 @@ import { parseToken } from './functions/parseToken.js';
 
 export class Parser implements IParser {
   extractNextToken(context: IContext): IToken {
-    return parseToken(context, true);
-  }
-
-  peekNextToken(context: IContext): IToken {
-    return parseToken(context, false);
+    return parseToken(context);
   }
 
   parseUntil(
     context: IContext,
     predicate: (token: IToken) => boolean,
   ): IToken[] {
+    if (context.isDryRun)
+      throw new Error('Dry run only works with `extractNextToken`');
+
     const tokens: IToken[] = [];
     while (!context.buffer.isEof()) {
       const token = this.extractNextToken(context);
@@ -29,6 +28,9 @@ export class Parser implements IParser {
     context: IContext,
     predicate: (token: IToken) => boolean,
   ): IToken | null {
+    if (context.isDryRun)
+      throw new Error('Dry run only works with `extractNextToken`');
+
     while (!context.buffer.isEof()) {
       const token = this.extractNextToken(context);
       if (predicate(token)) return token;
@@ -37,6 +39,9 @@ export class Parser implements IParser {
   }
 
   parse(context: IContext): IToken[] {
+    if (context.isDryRun)
+      throw new Error('Dry run only works with `extractNextToken`');
+
     return this.parseUntil(context, () => false);
   }
 }

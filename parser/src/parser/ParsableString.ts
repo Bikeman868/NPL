@@ -103,7 +103,6 @@ export class ParsableString implements IParsable {
       const current = this.current();
       if (!current) return;
 
-      // Comment to end of line
       if (current == lineCommentDelimiter) {
         if (this.lookAhead() == lineCommentDelimiter) {
           while (true) {
@@ -111,8 +110,7 @@ export class ParsableString implements IParsable {
             if (!next || next == eol) break;
           }
           continue;
-        }
-        if (this.lookAhead() == blockCommentDelimiter) {
+        } else if (this.lookAhead() == blockCommentDelimiter) {
           this.next();
           while (true) {
             const next = this.next();
@@ -195,22 +193,19 @@ export class ParsableString implements IParsable {
     return this.extractToAny(separator);
   }
 
+  /**
+   * For optional scope blocks, the opening { must be on the same line
+   * Moves the cursor to the opening { or eol. Retuns true if it is {
+   */
   hasScope(): boolean {
     this.skipUntil([eol, openScope]);
-    if (this.current() == openScope) {
-      this.skipCount(1);
-      this.skipWhitespace();
-      return true;
-    }
-    return false;
+    return this.current() == openScope;
   }
 
+  /**
+   * @returns true if there is no more definitions in this scope blosk
+   */
   isEndScope(): boolean {
-    if (this.current() == closeScope) {
-      this.skipCount(1);
-      this.skipWhitespace();
-      return true;
-    }
-    return false;
+    return this.current() == closeScope;
   }
 }

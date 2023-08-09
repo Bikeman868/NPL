@@ -3,37 +3,24 @@ import { ParseResult } from '../functions/ParseResult.js';
 import { parseNamedScope } from '../functions/parseNamedScope.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { openScope } from '#interfaces/IParsable.js'
+import { openScope } from '#interfaces/IParsable.js';
 
-export function parseNetwork(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
+export function parseNetwork(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseNetworkIdentifier(context, updateContext);
+      return parseNamedScope(context, 'network');
     case 'scope':
-      return parseScope(context, updateContext);
+      return parseScope(context);
     case 'definition':
-      return parseNetworkDefinition(context, updateContext);
+      return parseNetworkDefinition(context);
     case 'kind':
-      return parseNetworkKind(context, updateContext);
+      return parseNetworkKind(context);
   }
   throw new Error('Unknown network sub-state ' + context.currentState.subState);
 }
 
-function parseNetworkIdentifier(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseNamedScope(context, updateContext, 'network');
-}
-
-function parseNetworkDefinition(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseScopeDefinition(context, updateContext, [
+function parseNetworkDefinition(context: IContext): ParseResult {
+  return parseScopeDefinition(context, [
     { keyword: 'ingress', subState: 'kind' },
     { keyword: 'egress', subState: 'kind' },
     { keyword: 'default', subState: 'kind' },
@@ -41,23 +28,20 @@ function parseNetworkDefinition(
   ]);
 }
 
-function parseNetworkKind(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  const keyword = context.buffer.extractToEnd(openScope)
-  context.buffer.skipSepararator()
+function parseNetworkKind(context: IContext): ParseResult {
+  const keyword = context.buffer.extractToEnd(openScope);
+  context.buffer.skipSepararator();
 
   if (keyword == 'ingress' || keyword == 'egress' || keyword == 'default') {
-    return { text: keyword, tokenType: 'Keyword' }
+    return { text: keyword, tokenType: 'Keyword' };
   }
-  
-  if (updateContext) {
-    if (context.buffer.hasScope()) {
-      context.pushState('route', 'scope');
-    } else {
-      context.popState();
-    }
+
+  if (context.buffer.hasScope()) {
+    context.pushState('route', 'scope');
+  } else {
+    context.popState();
   }
-  return { text: keyword, tokenType: 'Identifier' }
+
+  if (keyword) return { text: keyword, tokenType: 'Identifier' };
+  else return { text: openScope, tokenType: 'ScopeStart' };
 }

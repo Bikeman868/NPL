@@ -4,35 +4,22 @@ import { parseNamedScope } from '../functions/parseNamedScope.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
-export function parseApplication(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
+export function parseApplication(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseApplicationIdentifier(context, updateContext);
+      return parseNamedScope(context, 'application');
     case 'scope':
-      return parseScope(context, updateContext);
+      return parseScope(context);
     case 'definition':
-      return parseApplicationDefinition(context, updateContext);
+      return parseApplicationDefinition(context);
   }
   throw new Error(
     'Unknown application sub-state ' + context.currentState.subState,
   );
 }
 
-function parseApplicationIdentifier(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseNamedScope(context, updateContext, 'application');
-}
-
-function parseApplicationDefinition(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseScopeDefinition(context, updateContext, [
+function parseApplicationDefinition(context: IContext): ParseResult {
+  return parseScopeDefinition(context, [
     { keyword: 'connection', state: 'connection', subState: 'identifier' },
   ]);
 }

@@ -4,33 +4,20 @@ import { parseNamedScope } from '../functions/parseNamedScope.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
-export function parseProcess(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
+export function parseProcess(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseProcessIdentifier(context, updateContext);
+      return parseNamedScope(context, 'process');
     case 'scope':
-      return parseScope(context, updateContext);
+      return parseScope(context);
     case 'definition':
-      return parseProcessDefinition(context, updateContext);
+      return parseProcessDefinition(context);
   }
   throw new Error('Unknown process sub-state ' + context.currentState.subState);
 }
 
-function parseProcessIdentifier(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseNamedScope(context, updateContext, 'process');
-}
-
-function parseProcessDefinition(
-  context: IContext,
-  updateContext: boolean,
-): ParseResult {
-  return parseScopeDefinition(context, updateContext, [
+function parseProcessDefinition(context: IContext): ParseResult {
+  return parseScopeDefinition(context, [
     { keyword: 'accept', state: 'accept', subState: 'identifier' },
   ]);
 }
