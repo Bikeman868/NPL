@@ -30,15 +30,16 @@ function parseMessageDefinition(context: IContext): ParseResult {
     return { text: closeScope, tokenType: 'ScopeEnd' };
   } else {
     const text = context.buffer.extractToEnd();
+    context.buffer.skipSepararator();
     context.setSubState('field');
     return { text, tokenType: 'Identifier' };
   }
 }
 
 function parseMessageField(context: IContext): ParseResult {
-  context.buffer.skipSepararator();
   const text = context.buffer.extractToEnd();
   context.buffer.skipToEol();
+  context.buffer.skipWhitespace();
 
   context.setSubState('definition');
 

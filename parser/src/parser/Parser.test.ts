@@ -45,17 +45,21 @@ namespace App {
 const testApp = 
 `using npl.connection
 namespace app {
+    message Response {  
+        string text 
+    }
 }`
 
 describe('Parser', () => {
   it('should extract keywords', () => {
-    const buffer = new ParsableString(testApp);
+    const buffer = new ParsableString(helloWorld);
     const context = new Context(buffer, false);
     const parser = new Parser();
 
     const tokens = parser.parse(context);
 
     const printer = new Printer();
+    console.log();
     printer.print(tokens);
 
     const keywords = tokens.filter((token) => token.tokenType === 'Keyword');

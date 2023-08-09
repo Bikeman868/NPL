@@ -18,6 +18,7 @@ export function parseNamedScope(
   if (context.buffer.hasScope()) {
     context.setSubState('scope');
   } else {
+    context.buffer.skipWhitespace();
     context.popState();
   }
   if (!name)

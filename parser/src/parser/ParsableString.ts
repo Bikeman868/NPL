@@ -149,7 +149,7 @@ export class ParsableString implements IParsable {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (!ch) return;
-      if (ch == eol) return;
+      if (ch == eol || ch == closeScope) return;
       if (ch == lineCommentDelimiter) {
         if (this.lookAhead() == lineCommentDelimiter) {
           while (true) {
