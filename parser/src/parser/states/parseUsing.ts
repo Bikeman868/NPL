@@ -1,7 +1,10 @@
 import { IContext } from '#interfaces/IContext.js';
-import { ParseResult } from './ParseResult.js'
+import { ParseResult } from '../functions/ParseResult.js';
 
-export function parseUsing(context: IContext, updateContext: boolean): ParseResult {
+export function parseUsing(
+  context: IContext,
+  updateContext: boolean,
+): ParseResult {
   context.buffer.skipSepararator();
   const text = context.buffer.extractToEnd();
   context.buffer.skipToEol();

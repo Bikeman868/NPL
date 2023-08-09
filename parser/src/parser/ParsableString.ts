@@ -199,15 +199,16 @@ export class ParsableString implements IParsable {
     this.skipUntil([eol, openScope]);
     if (this.current() == openScope) {
       this.skipCount(1);
+      this.skipWhitespace();
       return true;
     }
     return false;
   }
 
   isEndScope(): boolean {
-    this.skipWhitespace();
     if (this.current() == closeScope) {
       this.skipCount(1);
+      this.skipWhitespace();
       return true;
     }
     return false;

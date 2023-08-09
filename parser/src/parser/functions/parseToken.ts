@@ -1,66 +1,54 @@
 import { IContext } from '#interfaces/IContext.js';
 import { IToken } from '#interfaces/IToken.js';
+import { StateName } from '#interfaces/IParserState.js';
 import { Token } from '../Token.js';
-import { ParseResult } from './ParseResult.js'
-import { parseSourceFile } from './parseSourceFile.js'
-import { parseUsing } from './parseUsing.js'
-import { parseNamespace } from './parseNamespace.js'
-import { parseApplication } from './parseApplication.js'
-import { parseNetwork } from './parseNetwork.js'
-import { parseMessage } from './parseMessage.js'
-import { parseConnection } from './parseConnection.js'
-import { parseProcess } from './parseProcess.js'
-import { parseObject } from './parseObject.js'
-import { parseExpression } from './parseExpression.js'
+import { ParseResult } from './ParseResult.js';
+import { parseSourceFile } from '../states/parseSourceFile.js';
+import { parseUsing } from '../states/parseUsing.js';
+import { parseNamespace } from '../states/parseNamespace.js';
+import { parseApplication } from '../states/parseApplication.js';
+import { parseNetwork } from '../states/parseNetwork.js';
+import { parseMessage } from '../states/parseMessage.js';
+import { parseConnection } from '../states/parseConnection.js';
+import { parseProcess } from '../states/parseProcess.js';
+import { parseObject } from '../states/parseObject.js';
+import { parseExpression } from '../states/parseExpression.js';
+import { parseAccept } from '../states/parseAccept.js';
+import { parseRoute } from '../states/parseRoute.js';
+
+// Performs one iteration of the token parsing state machine. Delagates to
+// a function that is specific to the current state
+
+const stateMachines: Map<StateName, (context: IContext, updateContext: boolean) => ParseResult> = new Map([
+  ['sourcefile', parseSourceFile],
+  ['using', parseUsing],
+  ['namespace', parseNamespace],
+  ['application', parseApplication],
+  ['network', parseNetwork],
+  ['message', parseMessage],
+  ['connection', parseConnection],
+  ['process', parseProcess],
+  ['accept', parseAccept],
+  ['object', parseObject],
+  ['expression', parseExpression],
+  ['route', parseRoute],
+]);
 
 export function parseToken(context: IContext, updateContext: boolean): IToken {
-    context.capturePosition();
-    let result: ParseResult | undefined;
+  const stateMachine = stateMachines.get(context.currentState.state);
+  if (!stateMachine) throw new Error('No state machine configured for ' + context.currentState.state + ' state');
 
-    switch (context.currentState.state) {
-      case 'sourcefile':
-        result = parseSourceFile(context, updateContext);
-        break;
-      case 'using':
-        result = parseUsing(context, updateContext);
-        break;
-        case 'namespace':
-        result = parseNamespace(context, updateContext);
-        break;
-        case 'application':
-        result = parseApplication(context, updateContext);
-        break;
-        case 'network':
-        result = parseNetwork(context, updateContext);
-        break;
+  context.capturePosition();
+  const result = stateMachine(context, updateContext);
+  const endPosition = context.buffer.getPosition();
+  const length = endPosition.offset - context.position.offset;
 
-        case 'message':
-        result = parseMessage(context, updateContext);
-        break;
-      case 'connection':
-        result = parseConnection(context, updateContext);
-        break;
-      case 'process':
-        result = parseProcess(context, updateContext)
-        break;
-        case 'object':
-        result = parseObject(context, updateContext);
-        break;
-      case 'expression':
-        result = parseExpression(context, updateContext);
-        break;
-    }
+  context.debug(() => {
+    const state = context.currentState.getDescription();
+    const startPos = context.position;
+    return `Parsed ${result?.tokenType} token "${result?.text}" at offset ${startPos.offset} (L${startPos.line}:C${startPos.column}). Expecting ${state} next`;
+  });
 
-    if (!result) throw new Error('Unknown state ' + context.currentState.state);
-
-    const position = context.buffer.getPosition();
-    const length = position.offset - context.position.offset;
-
-    context.debug(() => {
-      const state = context.currentState.getDescription();
-      return `Parsed ${result?.tokenType} token "${result?.text}" as offset ${position.offset} (L${position.line}:C${position.column}). Next state is ${state}`;
-    });
-
-    if (!updateContext) context.restorePosition();
-    return new Token(result.text, result.tokenType, length);
-  }
+  if (!updateContext) context.restorePosition();
+  return new Token(result.text, result.tokenType, length);
+}

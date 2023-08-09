@@ -9,7 +9,10 @@ export type StateName =
   | 'process'
   | 'object'
   | 'expression'
-  | 'constant';
+  | 'constant'
+  | 'accept'
+  | 'emit'
+  | 'route';
 
 export interface IParserState {
   state: StateName;

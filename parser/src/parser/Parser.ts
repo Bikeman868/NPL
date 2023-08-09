@@ -1,7 +1,7 @@
 import { IContext } from '#interfaces/IContext.js';
 import { IParser } from '#interfaces/IParser.js';
 import { IToken } from '#interfaces/IToken.js';
-import { parseToken } from './functions/parseToken.js'
+import { parseToken } from './functions/parseToken.js';
 
 export class Parser implements IParser {
   extractNextToken(context: IContext): IToken {

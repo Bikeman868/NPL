@@ -11,7 +11,6 @@ namespace App {
     }
 
     network Hello {
-        /*
         ingress egress default {
             process Responder
         }
@@ -23,27 +22,22 @@ namespace App {
                 }
             }
         }
-        */
     }
 }
 
 namespace App {
     application HelloWorld {
         connection emitter {
-            /*
             config { 
                 count 1 
                 interval 0
                 message empty
             }
             ingress Hello
-            */
         }
         connection console {
-            /*
             config { mode console.lines }
             egress Hello
-            */
         }
     }
 }`;

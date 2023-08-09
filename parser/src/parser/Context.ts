@@ -73,6 +73,8 @@ export class Context implements IContext {
   }
 
   debug(messageFunc: () => any): void {
-    console.log(messageFunc());
+    let indent = '';
+    this._stateStack.forEach((s) => { indent += '  '; });
+    console.log(indent + messageFunc());
   }
 }

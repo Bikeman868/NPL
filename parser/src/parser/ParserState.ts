@@ -15,6 +15,6 @@ export class ParserState implements IParserState {
   }
 
   getDescription(): string {
-    return this.state as string + '.' + this.subState;
+    return (this.state as string) + '.' + this.subState;
   }
 }
