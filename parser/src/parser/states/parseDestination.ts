@@ -7,9 +7,15 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 export function parseDestination(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseNamedScope(context, '', 'Route destination keywords must be followed by the destination identifier');
+      return parseNamedScope(
+        context,
+        '',
+        'Route destination keywords must be followed by the destination identifier',
+      );
     case 'scope':
       return parseScope(context);
   }
-  throw new Error('Unknown destination sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown destination sub-state ' + context.currentState.subState,
+  );
 }

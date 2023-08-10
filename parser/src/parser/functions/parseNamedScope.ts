@@ -5,7 +5,7 @@ import { openScope } from '#interfaces/IParsable.js';
 /**
  * Generic parsing of this structure:
  *   <keyword> <identifier> { <scope> }
- * 
+ *
  * Assumes that the cursor is at the first character of the identifier
  * Assumes that the keyword token already pushed a new scope
  * The scope is optional.
@@ -26,8 +26,9 @@ export function parseNamedScope(
     context.popState();
   }
   if (!name)
-    context.syntaxError(customSyntaxError || 
-      `Keyword ${keyword} must be followed by the name of the ${keyword}`,
+    context.syntaxError(
+      customSyntaxError ||
+        `Keyword ${keyword} must be followed by the name of the ${keyword}`,
     );
 
   return { text: name, tokenType: 'Identifier' };

@@ -9,16 +9,28 @@ namespace app {
             process Responder
         }
 
-        ingress egress Http {
-            pipe Router
-        }
-
         process Responder {
             accept * { // Accept all message types
                 emit Response { 
                     data { text 'Hello, world' }
                 }
             }
+        }
+    }
+}
+namespace App {
+    application HelloWorld {
+        connection emitter {
+            config { 
+                count 1 
+                interval 0
+                message empty
+            }
+            ingress Hello
+        }
+        connection console {
+            config { mode console.lines }
+            egress Hello
         }
     }
 }

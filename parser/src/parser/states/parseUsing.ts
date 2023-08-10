@@ -8,7 +8,7 @@ export function parseUsing(context: IContext): ParseResult {
 
   if (!text)
     context.syntaxError('Using keyword must be followed by a namespace name');
-  
+
   context.popState();
 
   return { text, tokenType: 'Identifier' };

@@ -6,10 +6,13 @@ import { parseScope } from '../functions/parseScope.js';
 export function parseRoute(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseNamedScope(context, '', 'Destination type must be followed by the destination identifier');
+      return parseNamedScope(
+        context,
+        '',
+        'Destination type must be followed by the destination identifier',
+      );
     case 'scope':
       return parseScope(context);
   }
   throw new Error('Unknown route sub-state ' + context.currentState.subState);
 }
-

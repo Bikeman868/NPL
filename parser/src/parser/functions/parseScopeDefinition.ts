@@ -11,17 +11,17 @@ import { closeScope } from '#interfaces/IParsable.js';
  *     <keyword> <definition>
  *     <keyword> <definition>
  *   }
- * 
+ *
  * Assumes that the cursor is at the first non-whitespace character inside the {}
  * Pops the scope when the closing } is reached. The {} can be empty in which case
  * the cursor should start on the }.
- * 
+ *
  * For each keyword, pushes a new scope with the cursor at the first character of
  * the definiton. These scope parsers should pop the scope and leave the cursor
  * on the first character of the next keyword.
- * 
+ *
  * config is an always supported keyword.
- * 
+ *
  * @param options defines the valid keywords and scope to push or set for each.
  * Leave scope undefined to move to a new sub-scope. Set scope to push that scope
  */
@@ -50,8 +50,7 @@ export function parseScopeDefinition(
     for (let option of options) {
       if (keyword == option.keyword) {
         if (option.state) context.pushState(option.state, option.subState);
-        else if (option.subState)
-          context.setSubState(option.subState);
+        else if (option.subState) context.setSubState(option.subState);
         isValid = true;
         break;
       }

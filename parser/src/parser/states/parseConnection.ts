@@ -13,8 +13,6 @@ export function parseConnection(context: IContext): ParseResult {
       return parseScope(context);
     case 'definition':
       return parseConnectionDefinition(context);
-    case 'kind':
-      return parseConnectionKind(context);
   }
   throw new Error(
     'Unknown connection sub-state ' + context.currentState.subState,
@@ -23,21 +21,7 @@ export function parseConnection(context: IContext): ParseResult {
 
 function parseConnectionDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', subState: 'kind' },
-    { keyword: 'egress', subState: 'kind' },
+    { keyword: 'ingress', state: 'entrypoint', subState: 'identifier' },
+    { keyword: 'egress', state: 'entrypoint', subState: 'identifier' },
   ]);
-}
-
-function parseConnectionKind(context: IContext): ParseResult {
-  const keyword = context.buffer.extractToEnd(openScope);
-  context.buffer.skipSepararator();
-
-  if (keyword == 'ingress' || keyword == 'egress') {
-    return { text: keyword, tokenType: 'Keyword' };
-  }
-
-  context.buffer.skipToEol();
-  context.buffer.skipWhitespace();
-
-  return { text: keyword, tokenType: 'Identifier' };
 }

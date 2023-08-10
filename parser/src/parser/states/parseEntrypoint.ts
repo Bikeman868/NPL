@@ -13,7 +13,9 @@ export function parseEntrypoint(context: IContext): ParseResult {
     case 'definition':
       return parseEntrypointDefinition(context);
   }
-  throw new Error('Unknown entrypoint sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown entrypoint sub-state ' + context.currentState.subState,
+  );
 }
 
 function parseEntrypointDefinition(context: IContext): ParseResult {

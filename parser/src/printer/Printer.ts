@@ -57,6 +57,10 @@ export class Printer {
           this.write('}');
           this.eol();
           break;
+        case `Expression`:
+          this.write(token.text);
+          this.eol();
+          break;
         default:
           this.write(token.text);
           this.write(' ');
