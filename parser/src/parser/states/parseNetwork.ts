@@ -21,6 +21,6 @@ function parseNetworkDefinition(context: IContext): ParseResult {
     { keyword: 'ingress', state: 'entrypoint', subState: 'identifier' },
     { keyword: 'egress', state: 'entrypoint', subState: 'identifier' },
     { keyword: 'default', state: 'entrypoint', subState: 'identifier' },
-    { keyword: 'process', state: 'entrypoint', subState: 'identifier' },
+    { keyword: 'process', state: 'process', subState: 'identifier' },
   ]);
 }

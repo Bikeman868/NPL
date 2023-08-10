@@ -9,13 +9,15 @@ namespace app {
             process Responder
         }
 
-        ingress egress Named {
+        ingress egress Http {
             pipe Router
         }
 
         process Responder {
-            accept * {
-                
+            accept * { // Accept all message types
+                emit Response { 
+                    data { text 'Hello, world' }
+                }
             }
         }
     }
