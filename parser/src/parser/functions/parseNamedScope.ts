@@ -5,13 +5,17 @@ import { openScope } from '#interfaces/IParsable.js';
 /**
  * Generic parsing of this structure:
  *   <keyword> <identifier> { <scope> }
+ * 
  * Assumes that the cursor is at the first character of the identifier
- * The scope is optional. When present, transitions to 'scope' sub-state. When not present
- * pops the context state
+ * Assumes that the keyword token already pushed a new scope
+ * The scope is optional.
+ * When scope is present, transitions to 'scope' sub-state with the cursor on the {
+ * When no scope present, pops the state and leaves the curson on whatever comes next
  */
 export function parseNamedScope(
   context: IContext,
   keyword: string,
+  customSyntaxError?: string,
 ): ParseResult {
   const name = context.buffer.extractToEnd(openScope);
 
@@ -22,7 +26,7 @@ export function parseNamedScope(
     context.popState();
   }
   if (!name)
-    context.syntaxError(
+    context.syntaxError(customSyntaxError || 
       `Keyword ${keyword} must be followed by the name of the ${keyword}`,
     );
 

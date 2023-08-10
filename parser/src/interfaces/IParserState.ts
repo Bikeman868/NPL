@@ -12,7 +12,9 @@ export type StateName =
   | 'constant'
   | 'accept'
   | 'emit'
-  | 'route';
+  | 'route'
+  | 'destination'
+  | 'entrypoint';
 
 export interface IParserState {
   state: StateName;

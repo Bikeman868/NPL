@@ -25,15 +25,16 @@ function parseObjectDefinition(context: IContext): ParseResult {
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   } else {
-    const text = context.buffer.extractToEnd();
+    const identifier = context.buffer.extractToEnd();
+    context.buffer.skipSepararator();
     context.setSubState('field');
-    return { text, tokenType: 'Identifier' };
+    return { text: identifier, tokenType: 'Identifier' };
   }
 }
 
 function parseObjectField(context: IContext): ParseResult {
   context.buffer.skipSepararator();
-  const text = context.buffer.extractToAny([eol]);
+  const expression = context.buffer.extractToAny([eol, closeScope]);
   context.setSubState('definition');
-  return { text, tokenType: 'Expression' };
+  return { text: expression, tokenType: 'Expression' };
 }

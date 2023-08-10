@@ -1,0 +1,22 @@
+using npl.connection
+namespace app {
+    message Response {
+        string text
+    }
+
+    network Hello {
+        ingress egress default {
+            process Responder
+        }
+
+        ingress egress Named {
+            pipe Router
+        }
+
+        process Responder {
+            accept * {
+                
+            }
+        }
+    }
+}

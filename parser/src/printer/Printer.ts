@@ -35,14 +35,16 @@ export class Printer {
         index < tokens.length - 1 ? tokens[index + 1] : undefined;
       const prevToken = index > 0 ? tokens[index - 1] : undefined;
       switch (token.tokenType) {
-        case 'Identifier':
-          this.write(token.text);
-          this.write(' ');
-          break;
         case 'Keyword':
           if (!prevToken || prevToken.tokenType != 'Keyword') this.eol();
           this.write(token.text);
           this.write(' ');
+          break;
+        case 'ParamStart':
+          this.write('(');
+          break;
+        case 'ParamEnd':
+          this.write('(');
           break;
         case 'ScopeStart':
           this.write('{');
@@ -54,6 +56,10 @@ export class Printer {
           this._indent--;
           this.write('}');
           this.eol();
+          break;
+        default:
+          this.write(token.text);
+          this.write(' ');
           break;
       }
     }

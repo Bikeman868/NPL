@@ -4,7 +4,8 @@ import { Context } from './Context.js';
 import { ParsableString } from './ParsableString.js';
 import { Printer } from '../printer/Printer.js';
 
-const helloWorld = `using npl.connection
+const helloWorld =
+`using npl.connection
 
 namespace App {
     message Response {

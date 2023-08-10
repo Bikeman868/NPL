@@ -11,9 +11,11 @@ export class Context implements IContext {
   private _syntaxErrors: SyntaxError[];
   private _isDryRun: boolean;
 
-  constructor(buffer: IParsable, isDryRun: boolean) {
+  debugLogging: boolean = false;
+
+  constructor(buffer: IParsable, isDryRun?: boolean) {
     this._buffer = buffer;
-    this._isDryRun = isDryRun;
+    this._isDryRun = !!isDryRun;
     this._position = buffer.getPosition();
     this._currentState = new ParserState();
     this._stateStack = [];
@@ -41,7 +43,7 @@ export class Context implements IContext {
   }
 
   pushState(state?: StateName, subState?: string): IParserState {
-    this.debug(() => `${this.getDebugIndent()}^ ${state}.${subState}`)
+    this.debug(() => `${this.getDebugIndent()}${this._currentState.state}.${this._currentState.subState} => ${state}.${subState}`)
 
     if (!this._isDryRun) {
       this._stateStack.push(new ParserState(this._currentState));
@@ -53,19 +55,22 @@ export class Context implements IContext {
   }
 
   popState(): IParserState {
-    this.debug(() => `${this.getDebugIndent()}v ${this._currentState.state}.${this._currentState.subState}`)
+    const state = this._currentState.state;
+    const subState = this._currentState.subState;
 
     if (!this._isDryRun) {
-      const state = this._stateStack.pop();
-      if (!state) throw new Error('More pops than pushes');
-      this._currentState = state;
+      const popedState = this._stateStack.pop();
+      if (!popedState) throw new Error('More pops than pushes');
+      this._currentState = popedState;
     }
+
+    this.debug(() => `${this.getDebugIndent()}${this._currentState.state}.${this._currentState.subState} <= ${state}.${subState}`)
 
     return this._currentState;
   }
 
   setState(state?: StateName, subState?: string): IParserState {
-    this.debug(() => `${this.getDebugIndent()}State = ${state} ${subState}`)
+    this.debug(() => `${this.getDebugIndent()}*.* --> ${state}.${subState}`)
 
     if (!this._isDryRun) {
       if (state) this._currentState.state = state;
@@ -75,7 +80,7 @@ export class Context implements IContext {
   }
 
   setSubState(subState: string): IParserState {
-    this.debug(() => `${this.getDebugIndent()}Substate = ${subState}`)
+    this.debug(() => `${this.getDebugIndent()}*.${this._currentState.subState} --> *.${subState}`)
 
     if (!this._isDryRun) {
       this._currentState.subState = subState;
@@ -109,17 +114,18 @@ export class Context implements IContext {
   }
 
   debug(messageFunc: () => any): void {
-    // TODO: disable in production build
-    console.log(messageFunc());
+    if (this.debugLogging)
+      console.log(messageFunc());
   }
 
   getDebugIndent(): string {
     let indent = '';
 
-    // TODO: disable in production build
-    this._stateStack.forEach((s) => {
-      indent += '  ';
-    });
+    if (this.debugLogging) {
+      this._stateStack.forEach((s) => {
+        indent += '  ';
+      });
+    }
 
     return indent;
   }
