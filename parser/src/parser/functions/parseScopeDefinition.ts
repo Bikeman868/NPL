@@ -57,10 +57,12 @@ export function parseScopeDefinition(
     }
     if (!isValid) {
       let msg = 'Expecting "config"';
-      for (const option of options) {
-        msg += ', "' + option.keyword + '"';
+      for (let i = 0; i < options.length; i ++) {
+        const option = options[i];
+        msg += (i == options.length - 1) ? ' or ' : ', '; 
+        msg += '"' + option.keyword + '"';
       }
-      if (keyword) msg += ', but found "' + keyword + '"';
+      if (keyword) msg += ' but found "' + keyword + '"';
       else
         msg += ', but found "' + context.buffer.extractToAny(whitespace) + '"';
       context.syntaxError(msg);

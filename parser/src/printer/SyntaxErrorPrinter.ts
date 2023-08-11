@@ -7,6 +7,7 @@ export class SyntaxErrorPrinter {
 
   includeStateStack: boolean = false;
   includeMultipleErrorsOnSameLine: boolean = false;
+  includeConsoleColors: boolean = false;
 
   constructor(output?: (line: string) => void) {
     this._indent = 0;
@@ -31,6 +32,26 @@ export class SyntaxErrorPrinter {
     }
   }
 
+  private red() {
+    if (this.includeConsoleColors) this.write('\u001b[31m');
+  }
+
+  private green() {
+    if (this.includeConsoleColors) this.write('\u001b[32m');
+  }
+
+  private yellow() {
+    if (this.includeConsoleColors) this.write('\u001b[33m');
+  }
+
+  private blue() {
+    if (this.includeConsoleColors) this.write('\u001b[34m');
+  }
+
+  private defaultColor() {
+    if (this.includeConsoleColors) this.write('\u001b[0m');
+  }
+
   print(sourceFileText: string, syntaxErrors: SyntaxError[]) {
     const sourceLines = sourceFileText.split('\n');
 
@@ -47,8 +68,10 @@ export class SyntaxErrorPrinter {
         for (let i = 1; i < error.column; i++) indent += ' ';
 
         this.write(indent);
+        this.red();
         this.write('^ ')
         this.write(error.message);
+        this.defaultColor();
         this.eol();
 
         if (this.includeStateStack) {

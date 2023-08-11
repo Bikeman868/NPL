@@ -3,13 +3,11 @@ namespace app {
     message Response {
         string text
     }
-
     network Hello {
         ingress egress default {
             process Responder
         }
-
-        rocess Responder {
+        process Responder {
             accept * { // Accept all message types
                 emit Response { 
                     data { text 'Hello, world' }

@@ -24,9 +24,11 @@ const tokens = parser.parse(context);
 
 if (context.syntaxErrors.length > 0) {
   const printer = new SyntaxErrorPrinter();
+  printer.includeConsoleColors = true;
   printer.print(sourceFileText, context.syntaxErrors);
 } else {
   // Pretty print the code
   const printer = new TokenPrinter();
+  printer.includeConsoleColors = true;
   printer.print(tokens);
 }

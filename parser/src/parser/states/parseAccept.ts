@@ -3,6 +3,7 @@ import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 import { identifier } from '#interfaces/charsets.js';
+import { TokenType } from '#interfaces/TokenType.js';
 
 export function parseAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -25,6 +26,8 @@ function parseAcceptDefinition(context: IContext): ParseResult {
 function parseIdentifier(context: IContext): ParseResult {
   let name = context.buffer.extractAny(identifier);
 
+  const tokenType: TokenType = !!name ? 'Identifier' : 'Keyword';
+
   if (!name) {
     name = context.buffer.extractCount(1);
     if ('*' != name)
@@ -40,5 +43,5 @@ function parseIdentifier(context: IContext): ParseResult {
     context.popState();
   }
 
-  return { text: name, tokenType: 'Identifier' };
+  return { text: name, tokenType: tokenType };
 }
