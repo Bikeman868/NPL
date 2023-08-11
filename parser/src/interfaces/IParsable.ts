@@ -1,12 +1,5 @@
-export type Position = { line: number; column: number; offset: number };
-
-export const whitespace = [' ', '\t', '\n', '\r'];
-export const separator = [' ', '\t'];
-export const eol = '\n';
-export const openScope = '{';
-export const closeScope = '}';
-export const lineCommentDelimiter = '/';
-export const blockCommentDelimiter = '*';
+import { Position } from './Position.js';
+import { Charset } from './charsets.js';
 
 export interface IParsable {
   getPosition(): Position;
@@ -14,18 +7,18 @@ export interface IParsable {
 
   isEof(): boolean;
 
-  skipAny(chars: string[]): void;
-  skipUntil(chars: string[]): void;
+  skipAny(chars: Charset): void;
+  skipUntil(chars: Charset): void;
 
   skipWhitespace(): void;
   skipSepararator(): void;
   skipToEol(): void;
   skipCount(count: number): void;
 
-  extractToEnd(...endChars: string[]): string;
+  extractAny(chars: Charset): string;
   extractToSeparator(): string;
   extractCount(count: number): string;
-  extractToAny(chars: string[]): string;
+  extractToAny(chars: Charset): string;
 
   hasScope(): boolean;
   isEndScope(): boolean;

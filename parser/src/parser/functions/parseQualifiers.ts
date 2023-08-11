@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { openScope } from '#interfaces/IParsable.js';
+import { openScope, identifier } from '#interfaces/charsets.js';
 
 /**
  * Generic parsing of this structure:
@@ -17,7 +17,7 @@ export function parseQualifiers(
   context: IContext,
   qualifiers: string[],
 ): ParseResult {
-  const qualifierOrIdentifier = context.buffer.extractToEnd(openScope);
+  const qualifierOrIdentifier = context.buffer.extractAny(identifier);
   context.buffer.skipSepararator();
 
   // Optional qualifiers

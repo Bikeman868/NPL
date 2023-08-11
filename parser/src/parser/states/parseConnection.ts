@@ -3,7 +3,6 @@ import { ParseResult } from '../functions/ParseResult.js';
 import { parseNamedScope } from '../functions/parseNamedScope.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { openScope } from '#interfaces/IParsable.js';
 
 export function parseConnection(context: IContext): ParseResult {
   switch (context.currentState.subState) {

@@ -1,6 +1,6 @@
 import { IToken } from '#interfaces/IToken.js';
 
-export class Printer {
+export class TokenPrinter {
   private _output: (line: string) => void;
   private _indent: number;
   private _line: string;

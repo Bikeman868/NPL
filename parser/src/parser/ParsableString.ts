@@ -1,14 +1,16 @@
+import { IParsable } from '#interfaces/IParsable.js';
+import { Position } from '#interfaces/Position.js';
 import {
-  IParsable,
-  Position,
+  Charset,
   whitespace,
   separator,
-  eol,
+  identifier,
+  cr,
   openScope,
   closeScope,
   lineCommentDelimiter,
   blockCommentDelimiter,
-} from '#interfaces/IParsable.js';
+} from '#interfaces/charsets.js';
 
 export class ParsableString implements IParsable {
   private _buffer: string;
@@ -18,7 +20,6 @@ export class ParsableString implements IParsable {
     this._buffer = buffer;
     this._position = { offset: 0, line: 1, column: 1 };
   }
-
   // Advances the cursor to the next character
   private next(): string | null {
     if (this._position.offset === this._buffer.length) return null;
@@ -26,7 +27,7 @@ export class ParsableString implements IParsable {
     const ch = this._buffer.charAt(this._position.offset);
     this._position.offset++;
 
-    if (ch == eol) {
+    if (ch == cr) {
       this._position.column = 1;
       this._position.line++;
     } else {
@@ -60,7 +61,7 @@ export class ParsableString implements IParsable {
     return this._position.offset == this._buffer.length;
   }
 
-  skipAny(chars: string[]) {
+  skipAny(chars: Charset) {
     while (this._position.offset < this._buffer.length) {
       const current = this.current();
       if (!current) return;
@@ -79,7 +80,7 @@ export class ParsableString implements IParsable {
     }
   }
 
-  skipUntil(chars: string[]) {
+  skipUntil(chars: Charset) {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (!ch) return;
@@ -107,7 +108,7 @@ export class ParsableString implements IParsable {
         if (this.lookAhead() == lineCommentDelimiter) {
           while (true) {
             const next = this.next();
-            if (!next || next == eol) break;
+            if (!next || next == cr) break;
           }
           continue;
         } else if (this.lookAhead() == blockCommentDelimiter) {
@@ -149,12 +150,12 @@ export class ParsableString implements IParsable {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (!ch) return;
-      if (ch == eol || ch == closeScope) return;
+      if (ch == cr || ch == closeScope) return;
       if (ch == lineCommentDelimiter) {
         if (this.lookAhead() == lineCommentDelimiter) {
           while (true) {
             const next = this.next();
-            if (!next || next == eol) break;
+            if (!next || next == cr) break;
           }
           continue;
         }
@@ -173,7 +174,7 @@ export class ParsableString implements IParsable {
       : this._buffer.slice(start, this._position.offset);
   }
 
-  extractToAny(chars: string[]): string {
+  extractToAny(chars: Charset): string {
     const startOffset = this._position.offset;
     this.skipUntil(chars);
     return this.extract(startOffset);
@@ -185,12 +186,14 @@ export class ParsableString implements IParsable {
     return this.extract(startOffset);
   }
 
-  extractToEnd(...endChars: string[]): string {
-    return this.extractToAny([...whitespace, ...endChars]);
+  extractAny(chars: Charset): string {
+    const startOffset = this._position.offset;
+    this.skipAny(chars);
+    return this.extract(startOffset);
   }
 
   extractToSeparator(): string {
-    return this.extractToAny(separator);
+    return this.extractToAny(identifier);
   }
 
   /**
@@ -198,7 +201,7 @@ export class ParsableString implements IParsable {
    * Moves the cursor to the opening { or eol. Retuns true if it is {
    */
   hasScope(): boolean {
-    this.skipUntil([eol, openScope]);
+    this.skipUntil([cr, openScope]);
     return this.current() == openScope;
   }
 

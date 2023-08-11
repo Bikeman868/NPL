@@ -1,6 +1,5 @@
 import { IContext } from '#interfaces/IContext.js';
-import { StateName } from '#interfaces/IParserState.js';
-import { openScope, closeScope, eol } from '#interfaces/IParsable.js';
+import { openScope } from '#interfaces/charsets.js';
 import { ParseResult } from './ParseResult.js';
 
 /**

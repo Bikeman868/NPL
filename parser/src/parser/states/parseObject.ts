@@ -1,7 +1,7 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
-import { closeScope, eol } from '#interfaces/IParsable.js';
+import { closeScope, identifier, whitespace, cr } from '#interfaces/charsets.js';
 
 export function parseObject(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -23,17 +23,19 @@ function parseObjectDefinition(context: IContext): ParseResult {
     return { text: closeScope, tokenType: 'ScopeEnd' };
   }
 
-  const fieldname = context.buffer.extractToEnd();
+  const fieldname = context.buffer.extractAny(identifier);
   context.buffer.skipSepararator();
   context.setSubState('field');
 
+  if (!fieldname) context.syntaxError(`Field name expected, but "${context.buffer.extractToAny(whitespace)}" found`);
   return { text: fieldname, tokenType: 'Identifier' };
 }
 
 function parseObjectField(context: IContext): ParseResult {
-  const expression = context.buffer.extractToAny([eol, closeScope]);
+  const expression = context.buffer.extractToAny([cr, closeScope]);
   context.buffer.skipWhitespace();
   context.setSubState('definition');
 
+  if (!expression) context.syntaxError('Expression expected');
   return { text: expression, tokenType: 'Expression' };
 }

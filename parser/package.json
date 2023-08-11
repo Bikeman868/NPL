@@ -12,13 +12,15 @@
     "#utils/*": "./dist/utils/*"
   },
   "scripts": {
-    "generate:buildinfo": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
-    "generate": "npm run generate:buildinfo",
+    "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
+    "generate:buildinfo.win": "echo 'export default { version: \"Windows\", date: \"Windows\" }' > ./src/buildInfo.ts",
+    "generate": "npm run generate:buildinfo.win",
     "format:prettier": "prettier .",
     "format": "npm run format:prettier -- --write",
     "clean:dist": "rimraf dist",
-    "clean:buildinfo": "rm -f *.tsbuildinfo",
-    "clean": "npm run clean:dist && npm run clean:buildinfo",
+    "clean:buildinfo.linux": "rm -f *.tsbuildinfo",
+    "clean:buildinfo.win": "del -F *.tsbuildinfo",
+    "clean": "npm run clean:dist && npm run clean:buildinfo.win",
     "compile": "tsc",
     "build": "npm run clean && npm run generate && npm run compile",
     "test": "vitest"

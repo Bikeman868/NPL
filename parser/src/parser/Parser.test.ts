@@ -2,9 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { Parser } from './Parser.js';
 import { Context } from './Context.js';
 import { ParsableString } from './ParsableString.js';
-import { Printer } from '../printer/Printer.js';
+import { IToken } from '#interfaces/IToken.js';
+import { TokenType } from '#interfaces/TokenType.js';
+import { SyntaxError } from '#interfaces/IContext.js';
 
-const helloWorld = `using npl.connection
+const helloWorld =
+`using npl.connection
 
 namespace App {
     message Response {
@@ -44,13 +47,48 @@ namespace App {
     }
 }`;
 
-describe('Parser', () => {
-  it('should extract keywords', () => {
-    const buffer = new ParsableString(helloWorld);
+function parse(sourceCode: string): IToken[] {
+    const buffer = new ParsableString(sourceCode);
     const context = new Context(buffer, false);
     const parser = new Parser();
+    return parser.parse(context);
+}
 
-    const tokens = parser.parse(context);
+function syntaxCheck(sourceCode: string): SyntaxError[] {
+    const buffer = new ParsableString(sourceCode);
+    const context = new Context(buffer, false);
+    const parser = new Parser();
+    parser.parse(context);
+    return context.syntaxErrors;
+}
+
+function expectTokens(
+    expected: { type: TokenType, text: string | undefined }[],
+    actual: IToken[]) {
+    expect(actual.length).toBe(expected.length);
+
+    for (const index in expected) {
+        expect(actual[index].tokenType).toBe(expected[index].type);
+        if (expected[index].text) {
+            expect(actual[index].text).toBe(expected[index].text);
+        }
+    }
+}
+
+function expectSyntaxErrors(
+    expected: { line: number, column: number, message: string }[], 
+    actual: SyntaxError[]) {
+    expect(actual.length).greaterThanOrEqual(expected.length);
+    for (const index in expected) {
+        expect(actual[index].line).toBe(expected[index].line)
+        expect(actual[index].column).toBe(expected[index].column)
+        expect(actual[index].message).toBe(expected[index].message)
+    }
+}
+
+describe('Parser', () => {
+  it('should extract keywords', () => {
+    const tokens = parse(helloWorld)
     const keywords = tokens.filter((token) => token.tokenType === 'Keyword');
 
     let i = 0;
@@ -75,4 +113,54 @@ describe('Parser', () => {
     expect(keywords[i++].text).toBe('config');
     expect(keywords[i++].text).toBe('egress');
   });
+
+  it('should parse empty namespace', () => {
+    expectTokens([
+        { type: 'Keyword', text: 'namespace' }, 
+        { type: 'Identifier', text: 'app'},
+        { type: 'ScopeStart', text: '{'},
+        { type: 'ScopeEnd', text: '}'},
+    ], parse('namespace app {}'))
+
+    expectTokens([
+        { type: 'Keyword', text: 'namespace' }, 
+        { type: 'Identifier', text: 'app'},
+        { type: 'ScopeStart', text: '{'},
+        { type: 'ScopeEnd', text: '}'},
+    ], parse('namespace app{}'))
+
+    expectTokens([
+        { type: 'Keyword', text: 'namespace' }, 
+        { type: 'Identifier', text: 'app'},
+        { type: 'ScopeStart', text: '{'},
+        { type: 'ScopeEnd', text: '}'},
+    ], parse('namespace app{ }'))
+
+    expectTokens([
+        { type: 'Keyword', text: 'namespace' }, 
+        { type: 'Identifier', text: 'app'},
+        { type: 'ScopeStart', text: '{'},
+        { type: 'ScopeEnd', text: '}'},
+    ], parse('  namespace   app {\n  }'))
+  })
+
+  it('should report syntax error on missing identifier', () => { 
+    expectSyntaxErrors([
+        { line: 1, column: 11, message: 'Keyword namespace must be followed by the name of the namespace' }
+    ], syntaxCheck('namespace { }'))
+
+    expectSyntaxErrors([
+        { line: 1, column: 10, message: 'Keyword namespace must be followed by the name of the namespace' }
+    ], syntaxCheck('namespace{}'))
+
+    expectSyntaxErrors([
+        { line: 2, column: 1, message: 'Keyword namespace must be followed by the name of the namespace' }
+    ], syntaxCheck('namespace \n{ }'))
+  })
+
+  it('should report syntax error eol before scope block', () => { 
+    expectSyntaxErrors([
+        { line: 2, column: 1, message: 'Expecting "config", "using", "namespace", but found "{"' },
+    ], syntaxCheck('namespace name\n{\n}'))
+  })
 });

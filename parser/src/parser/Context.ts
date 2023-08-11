@@ -1,4 +1,5 @@
-import { IParsable, Position } from '#interfaces/IParsable.js';
+import { IParsable } from '#interfaces/IParsable.js';
+import { Position } from '#interfaces/Position.js';
 import { IContext, SyntaxError } from '#interfaces/IContext.js';
 import { IParserState, StateName } from '#interfaces/IParserState';
 import { ParserState } from './ParserState.js';

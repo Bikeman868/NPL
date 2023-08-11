@@ -1,7 +1,7 @@
 import { IContext } from '#interfaces/IContext.js';
 import { StateName } from '#interfaces/IParserState.js';
 import { ParseResult } from './ParseResult.js';
-import { closeScope } from '#interfaces/IParsable.js';
+import { identifier, whitespace, closeScope } from '#interfaces/charsets.js';
 
 /**
  * Genric parsing of this structure:
@@ -38,7 +38,7 @@ export function parseScopeDefinition(
   }
 
   // Get keyword and skip to definition
-  const keyword = context.buffer.extractToEnd();
+  const keyword = context.buffer.extractAny(identifier);
   context.buffer.skipWhitespace();
 
   if (keyword == 'config') {
@@ -47,7 +47,7 @@ export function parseScopeDefinition(
     }
   } else {
     let isValid = false;
-    for (let option of options) {
+    for (const option of options) {
       if (keyword == option.keyword) {
         if (option.state) context.pushState(option.state, option.subState);
         else if (option.subState) context.setSubState(option.subState);
@@ -56,12 +56,16 @@ export function parseScopeDefinition(
       }
     }
     if (!isValid) {
-      let msg = 'Expecting one of `config`';
-      for (var i = 0; i < options.length; i++) {
-        msg += ', `' + options[i].keyword + '`';
+      let msg = 'Expecting "config"';
+      for (const option of options) {
+        msg += ', "' + option.keyword + '"';
       }
-      msg += ' but found `' + keyword + `'`;
-      context.syntaxError(msg);
+      if (keyword)
+        msg += ', but found "' + keyword + '"';
+      else
+        msg += ', but found "' + context.buffer.extractToAny(whitespace) + '"';
+    context.syntaxError(msg);
+    if (!keyword) throw new Error('Non-alpha characters found where keyword was expected')
     }
   }
 

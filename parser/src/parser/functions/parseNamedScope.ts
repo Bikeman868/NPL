@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from './ParseResult.js';
-import { openScope } from '#interfaces/IParsable.js';
+import { identifier } from '#interfaces/charsets.js';
 
 /**
  * Generic parsing of this structure:
@@ -17,7 +17,7 @@ export function parseNamedScope(
   keyword: string,
   customSyntaxError?: string,
 ): ParseResult {
-  const name = context.buffer.extractToEnd(openScope);
+  const name = context.buffer.extractAny(identifier);
 
   if (context.buffer.hasScope()) {
     context.setSubState('scope');

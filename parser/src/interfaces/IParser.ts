@@ -1,5 +1,5 @@
-import { IContext } from '#interfaces/IContext.js';
-import { IToken } from '#interfaces/IToken.js';
+import { IContext } from './IContext.js';
+import { IToken } from './IToken.js';
 
 export interface IParser {
   parse(context: IContext): IToken[];

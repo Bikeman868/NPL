@@ -1,7 +1,7 @@
 import { Parser } from './parser/Parser.js';
 import { Context } from './parser/Context.js';
 import { ParsableString } from './parser/ParsableString.js';
-import { Printer } from './printer/Printer.js';
+import { TokenPrinter } from './printer/TokenPrinter.js';
 import { readFileSync } from 'node:fs';
 
 // Pass name of NPL source file on command line
@@ -22,5 +22,5 @@ const parser = new Parser();
 const tokens = parser.parse(context);
 
 // Pretty print the code
-const printer = new Printer();
+const printer = new TokenPrinter();
 printer.print(tokens);
