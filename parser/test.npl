@@ -9,7 +9,7 @@ namespace app {
             process Responder
         }
 
-        process Responder {
+        rocess Responder {
             accept * { // Accept all message types
                 emit Response { 
                     data { text 'Hello, world' }

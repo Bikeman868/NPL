@@ -1,7 +1,12 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
-import { closeScope, identifier, whitespace, cr } from '#interfaces/charsets.js';
+import {
+  closeScope,
+  identifier,
+  whitespace,
+  cr,
+} from '#interfaces/charsets.js';
 
 export function parseObject(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -27,7 +32,12 @@ function parseObjectDefinition(context: IContext): ParseResult {
   context.buffer.skipSepararator();
   context.setSubState('field');
 
-  if (!fieldname) context.syntaxError(`Field name expected, but "${context.buffer.extractToAny(whitespace)}" found`);
+  if (!fieldname)
+    context.syntaxError(
+      `Field name expected, but "${context.buffer.extractToAny(
+        whitespace,
+      )}" found`,
+    );
   return { text: fieldname, tokenType: 'Identifier' };
 }
 

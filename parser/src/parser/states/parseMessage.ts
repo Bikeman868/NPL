@@ -32,7 +32,12 @@ function parseMessageDefinition(context: IContext): ParseResult {
     const name = context.buffer.extractAny(identifier);
     context.buffer.skipSepararator();
     context.setSubState('field');
-    if (!name) context.syntaxError(`Message field type expected, but "${context.buffer.extractToAny(whitespace)}" found`);
+    if (!name)
+      context.syntaxError(
+        `Message field type expected, but "${context.buffer.extractToAny(
+          whitespace,
+        )}" found`,
+      );
     return { text: name, tokenType: 'Identifier' };
   }
 }
@@ -44,6 +49,11 @@ function parseMessageField(context: IContext): ParseResult {
 
   context.setSubState('definition');
 
-  if (!text) context.syntaxError(`Message field name expected, but "${context.buffer.extractToAny(whitespace)}" found`);
+  if (!text)
+    context.syntaxError(
+      `Message field name expected, but "${context.buffer.extractToAny(
+        whitespace,
+      )}" found`,
+    );
   return { text, tokenType: 'Identifier' };
 }

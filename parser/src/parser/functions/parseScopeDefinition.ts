@@ -60,12 +60,14 @@ export function parseScopeDefinition(
       for (const option of options) {
         msg += ', "' + option.keyword + '"';
       }
-      if (keyword)
-        msg += ', but found "' + keyword + '"';
+      if (keyword) msg += ', but found "' + keyword + '"';
       else
         msg += ', but found "' + context.buffer.extractToAny(whitespace) + '"';
-    context.syntaxError(msg);
-    if (!keyword) throw new Error('Non-alpha characters found where keyword was expected')
+      context.syntaxError(msg);
+      if (!keyword)
+        throw new Error(
+          'Non-alpha characters found where keyword was expected',
+        );
     }
   }
 

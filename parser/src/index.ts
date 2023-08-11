@@ -2,6 +2,7 @@ import { Parser } from './parser/Parser.js';
 import { Context } from './parser/Context.js';
 import { ParsableString } from './parser/ParsableString.js';
 import { TokenPrinter } from './printer/TokenPrinter.js';
+import { SyntaxErrorPrinter } from './printer/SyntaxErrorPrinter.js';
 import { readFileSync } from 'node:fs';
 
 // Pass name of NPL source file on command line
@@ -21,6 +22,11 @@ context.debugLogging = false;
 const parser = new Parser();
 const tokens = parser.parse(context);
 
-// Pretty print the code
-const printer = new TokenPrinter();
-printer.print(tokens);
+if (context.syntaxErrors.length > 0) {
+  const printer = new SyntaxErrorPrinter();
+  printer.print(sourceFileText, context.syntaxErrors);
+} else {
+  // Pretty print the code
+  const printer = new TokenPrinter();
+  printer.print(tokens);
+}

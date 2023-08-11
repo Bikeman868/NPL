@@ -1,11 +1,7 @@
 import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
 import { IParserState, StateName } from '#interfaces/IParserState.js';
-
-export type SyntaxError = {
-  state: string;
-  message: string;
-} & Position;
+import { SyntaxError } from '#interfaces/SyntaxError.js';
 
 export interface IContext {
   readonly buffer: IParsable;

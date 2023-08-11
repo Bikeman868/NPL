@@ -1,6 +1,7 @@
 import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
-import { IContext, SyntaxError } from '#interfaces/IContext.js';
+import { IContext } from '#interfaces/IContext.js';
+import { SyntaxError } from '#interfaces/SyntaxError.js';
 import { IParserState, StateName } from '#interfaces/IParserState';
 import { ParserState } from './ParserState.js';
 
@@ -115,13 +116,15 @@ export class Context implements IContext {
 
   syntaxError(message: string): void {
     this.debug(() => 'Syntax error "' + message + '"');
+
     let state = '';
     let stackDepth = '';
-    this._stateStack.forEach((s) => {
+    for (const s of this._stateStack) {
       state += stackDepth + s.getDescription() + '\n';
       stackDepth += '  ';
-    });
-    state += this._currentState.getDescription();
+    };
+    state += stackDepth + this._currentState.getDescription();
+
     this._syntaxErrors.push({
       state,
       message,

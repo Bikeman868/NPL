@@ -28,7 +28,7 @@ export function parseNamedScope(
   if (!name)
     context.syntaxError(
       customSyntaxError ||
-        `Keyword ${keyword} must be followed by the name of the ${keyword}`,
+        `Keyword ${keyword} must be followed by the ${keyword} identifier`,
     );
 
   return { text: name, tokenType: 'Identifier' };

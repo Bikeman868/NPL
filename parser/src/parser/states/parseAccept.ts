@@ -1,13 +1,13 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { parseNamedScope } from '../functions/parseNamedScope.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
+import { identifier } from '#interfaces/charsets.js';
 
 export function parseAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseNamedScope(context, 'accept');
+      return parseIdentifier(context);
     case 'scope':
       return parseScope(context);
     case 'definition':
@@ -20,4 +20,25 @@ function parseAcceptDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
     { keyword: 'emit', state: 'emit', subState: 'identifier' },
   ]);
+}
+
+function parseIdentifier(context: IContext): ParseResult {
+  let name = context.buffer.extractAny(identifier);
+
+  if (!name) {
+    name = context.buffer.extractCount(1);
+    if ('*' != name)
+      context.syntaxError(
+        'Processes can accept a specific message type, the empty message, or all messages using *',
+      );
+  }
+
+  if (context.buffer.hasScope()) {
+    context.setSubState('scope');
+  } else {
+    context.buffer.skipWhitespace();
+    context.popState();
+  }
+
+  return { text: name, tokenType: 'Identifier' };
 }
