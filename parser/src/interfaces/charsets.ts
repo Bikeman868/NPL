@@ -1,7 +1,7 @@
 export type Charset = Iterable<String>;
 
-export const cr = '\n';
-export const lf = '\r';
+export const newline = '\n';
+export const cr = '\r';
 export const tab = '\t';
 export const space = ' ';
 export const openScope = '{';
@@ -86,4 +86,4 @@ export const alphanumeric: Charset = [...alpha, ...digit];
 export const identifier: Charset = [...alphanumeric, underscore];
 export const qualifiedIdentifier: Charset = [...identifier, decimal];
 export const separator: Charset = [space, tab];
-export const whitespace: Charset = [...separator, cr, lf];
+export const whitespace: Charset = [...separator, newline];

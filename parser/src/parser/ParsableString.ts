@@ -3,6 +3,7 @@ import { Position } from '#interfaces/Position.js';
 import {
   Charset,
   whitespace,
+  newline,
   cr,
   openScope,
   closeScope,
@@ -18,32 +19,45 @@ export class ParsableString implements IParsable {
     this._position = { offset: 0, line: 1, column: 1 };
     this.skipAny(whitespace);
   }
-  // Advances the cursor to the next character
+
+  // Advances the cursor to the next character skipping carriage returns
   private next(): string | null {
-    if (this._position.offset === this._buffer.length) return null;
+    while(true) {
+      if (this._position.offset === this._buffer.length) return null;
 
-    const ch = this._buffer.charAt(this._position.offset);
-    this._position.offset++;
+      const ch = this._buffer.charAt(this._position.offset++);
 
-    if (ch == cr) {
-      this._position.column = 1;
-      this._position.line++;
-    } else {
-      this._position.column++;
+      if (ch == newline) {
+        this._position.column = 1;
+        this._position.line++;
+      } else {
+        this._position.column++;
+      }
+      
+      if (ch != cr) return ch;
     }
-
-    return ch;
   }
 
   // Returns the character under the cursor
   private current(): string | null {
-    if (this._position.offset === this._buffer.length) return null;
-    return this._buffer.charAt(this._position.offset);
+    let i = this._position.offset;
+    while (true) {
+      if (i === this._buffer.length) return null;
+      const ch = this._buffer.charAt(i++);
+      if (ch != cr) return ch;
+    }
   }
 
-  // Returns `count` characters starting with the character under the cursor
+  // Returns `count` characters starting with the character under the cursor but does
+  // not move the cursor. Ignores linefeeds
   peek(count: number): string {
-    return this._buffer.slice(this._position.offset, this._position.offset + count);
+    let result: string = '';
+    let i = this._position.offset;
+    while (result.length < count && i < this._buffer.length) {
+      const ch = this._buffer.charAt(i++);
+      if (ch != cr) result += ch;
+    }
+    return result;
   }
 
   getPosition(): Position {
@@ -102,7 +116,7 @@ export class ParsableString implements IParsable {
 
       let ch = this.current();
       if (!ch) return;
-      if (ch == cr || ch == closeScope) return;
+      if (ch == newline || ch == closeScope) return;
       this.next();
     }
   }
@@ -114,7 +128,7 @@ export class ParsableString implements IParsable {
   private extract(start: number): string {
     return start === this._position.offset
       ? ''
-      : this._buffer.slice(start, this._position.offset);
+      : this._buffer.slice(start, this._position.offset).replace(cr, '');
   }
 
   extractToAny(chars: Charset): string {
@@ -145,7 +159,7 @@ export class ParsableString implements IParsable {
     const start = this._position.offset;
     const end = this._buffer.indexOf(matchingText, this._position.offset);
     this.skipCount(end - start);
-    return this._buffer.slice(start, end);
+    return this._buffer.slice(start, end).replace(cr, '');;
   }
 
   /**
@@ -153,7 +167,7 @@ export class ParsableString implements IParsable {
    * Moves the cursor to the opening { or eol. Retuns true if it is {
    */
   hasScope(): boolean {
-    this.skipUntil([cr, openScope]);
+    this.skipUntil([newline, openScope]);
     return this.current() == openScope;
   }
 

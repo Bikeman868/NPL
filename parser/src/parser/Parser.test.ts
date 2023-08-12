@@ -269,4 +269,30 @@ describe('Parser', () => {
     parse('namespace app { /* comment */ }'),
     );
   })
+
+  it('should ignore linefeeds', () => {
+    expectTokens(
+      [
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('namespace app {\r\n  }\r\n'),
+    );
+
+    expectTokens(
+      [
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'Keyword', text: 'network' },
+        { type: 'Identifier', text: 'Hello' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'ScopeEnd', text: '}' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('namespace app {\r\n  network Hello {\r\n  }\r\n}\r\n'),
+    );
+  })
 });

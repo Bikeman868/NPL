@@ -18,7 +18,7 @@ import { parseRoute } from '../states/parseRoute.js';
 import { parseEmit } from '../states/parseEmit.js';
 import { parseEntrypoint } from '../states/parseEntrypoint.js';
 import { 
-  cr,
+  newline,
   whitespace,
   lineCommentDelimiter,
   blockCommentStart,
@@ -64,7 +64,7 @@ export function parseToken(context: IContext): IToken {
   if (peek == lineCommentDelimiter) {
     context.buffer.skipCount(lineCommentDelimiter.length);
     context.buffer.skipAny(whitespace);
-    const text = context.buffer.extractToAny([cr]);
+    const text = context.buffer.extractToAny([newline]);
     context.buffer.skipAny(whitespace);
     result = { tokenType: 'Comment', text }
   } else if (peek == blockCommentStart) {

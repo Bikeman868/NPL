@@ -5,7 +5,7 @@ import {
   closeScope,
   identifier,
   whitespace,
-  cr,
+  newline,
   separator,
 } from '#interfaces/charsets.js';
 
@@ -43,7 +43,7 @@ function parseObjectDefinition(context: IContext): ParseResult {
 }
 
 function parseObjectField(context: IContext): ParseResult {
-  const expression = context.buffer.extractToAny([cr, closeScope]);
+  const expression = context.buffer.extractToAny([newline, closeScope]);
   context.buffer.skipAny(whitespace)
   context.setSubState('definition');
 
