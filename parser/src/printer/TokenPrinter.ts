@@ -72,7 +72,7 @@ export class TokenPrinter {
       switch (token.tokenType) {
         case 'Keyword':
           if (!prevToken || prevToken.tokenType != 'Keyword') this.eol();
-          if (token.text == 'namespace' || token.text == 'network' || token.text == 'message' || token.text == 'application' || token.text == 'connection' || token.text == 'process') this.blankLine()
+          if (token.text == 'namespace' || token.text == 'message') this.blankLine()
           this.cyan();
           this.write(token.text);
           this.defaultColor();

@@ -9,9 +9,8 @@ export const closeScope = '}';
 export const lineCommentDelimiter = '/';
 export const blockCommentDelimiter = '*';
 export const decimal = '.';
+export const underscore = '_';
 
-export const separator: Charset = [space, tab];
-export const whitespace: Charset = [...separator, cr, lf];
 export const lowercase: Charset = [
   'a',
   'b',
@@ -81,5 +80,9 @@ export const digit: Charset = [
   '9',
 ];
 export const alpha: Charset = [...lowercase, ...uppercase];
+export const keyword: Charset = lowercase;
 export const alphanumeric: Charset = [...alpha, ...digit];
-export const identifier: Charset = [...alphanumeric, decimal];
+export const identifier: Charset = [...alphanumeric, underscore];
+export const qualifiedIdentifier: Charset = [...identifier, decimal];
+export const separator: Charset = [space, tab];
+export const whitespace: Charset = [...separator, cr, lf];

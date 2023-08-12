@@ -7,7 +7,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 export function parseEntrypoint(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseQualifiers(context, ['ingress', 'egress', 'default']);
+      return parseQualifiers(context, ['ingress', 'egress', 'default', 'network']);
     case 'scope':
       return parseScope(context);
     case 'definition':

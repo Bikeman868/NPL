@@ -1,13 +1,13 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { parseNamedScope } from '../functions/parseNamedScope.js';
+import { parseNamedDefinition } from '../functions/parseNamedDefinition.js';
 import { parseScope } from '../functions/parseScope.js';
-import { identifier, whitespace, closeScope } from '#interfaces/charsets.js';
+import { identifier, qualifiedIdentifier, whitespace, closeScope } from '#interfaces/charsets.js';
 
 export function parseMessage(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseMessageIdentifier(context);
+      return parseNamedDefinition(context, 'message');
     case 'scope':
       return parseScope(context);
     case 'definition':
@@ -18,10 +18,6 @@ export function parseMessage(context: IContext): ParseResult {
   throw new Error('Unknown message sub-state ' + context.currentState.subState);
 }
 
-function parseMessageIdentifier(context: IContext): ParseResult {
-  return parseNamedScope(context, 'message');
-}
-
 function parseMessageDefinition(context: IContext): ParseResult {
   if (context.buffer.isEndScope()) {
     context.buffer.skipCount(1);
@@ -29,7 +25,7 @@ function parseMessageDefinition(context: IContext): ParseResult {
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   } else {
-    const name = context.buffer.extractAny(identifier);
+    const name = context.buffer.extractAny(qualifiedIdentifier);
     context.buffer.skipSepararator();
     context.setSubState('field');
     if (!name)
@@ -38,7 +34,7 @@ function parseMessageDefinition(context: IContext): ParseResult {
           whitespace,
         )}" found`,
       );
-    return { text: name, tokenType: 'Identifier' };
+    return { text: name, tokenType: 'QualifiedIdentifier' };
   }
 }
 

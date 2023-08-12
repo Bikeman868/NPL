@@ -12,7 +12,7 @@ import { identifier } from '#interfaces/charsets.js';
  * When scope is present, transitions to 'scope' sub-state with the cursor on the {
  * When no scope present, pops the state and leaves the curson on whatever comes next
  */
-export function parseNamedScope(
+export function parseNamedDefinition(
   context: IContext,
   keyword: string,
   customSyntaxError?: string,

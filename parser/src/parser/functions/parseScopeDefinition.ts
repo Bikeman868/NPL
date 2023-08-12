@@ -1,7 +1,7 @@
 import { IContext } from '#interfaces/IContext.js';
 import { StateName } from '#interfaces/IParserState.js';
 import { ParseResult } from './ParseResult.js';
-import { identifier, whitespace, closeScope } from '#interfaces/charsets.js';
+import { keyword as keywordCharset, whitespace, closeScope } from '#interfaces/charsets.js';
 
 /**
  * Genric parsing of this structure:
@@ -38,7 +38,7 @@ export function parseScopeDefinition(
   }
 
   // Get keyword and skip to definition
-  const keyword = context.buffer.extractAny(identifier);
+  const keyword = context.buffer.extractAny(keywordCharset);
   context.buffer.skipWhitespace();
 
   if (keyword == 'config') {

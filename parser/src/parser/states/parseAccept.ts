@@ -2,7 +2,7 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { identifier } from '#interfaces/charsets.js';
+import { qualifiedIdentifier } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
 export function parseAccept(context: IContext): ParseResult {
@@ -24,9 +24,9 @@ function parseAcceptDefinition(context: IContext): ParseResult {
 }
 
 function parseIdentifier(context: IContext): ParseResult {
-  let name = context.buffer.extractAny(identifier);
+  let name = context.buffer.extractAny(qualifiedIdentifier);
 
-  const tokenType: TokenType = !!name ? 'Identifier' : 'Keyword';
+  const tokenType: TokenType = !!name ? 'QualifiedIdentifier' : 'Keyword';
 
   if (!name) {
     name = context.buffer.extractCount(1);

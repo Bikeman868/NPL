@@ -16,7 +16,6 @@ export interface IParsable {
   skipCount(count: number): void;
 
   extractAny(chars: Charset): string;
-  extractToSeparator(): string;
   extractCount(count: number): string;
   extractToAny(chars: Charset): string;
 

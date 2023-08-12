@@ -17,7 +17,6 @@ import { parseAccept } from '../states/parseAccept.js';
 import { parseRoute } from '../states/parseRoute.js';
 import { parseEmit } from '../states/parseEmit.js';
 import { parseEntrypoint } from '../states/parseEntrypoint.js';
-import { parseDestination } from '../states/parseDestination.js';
 
 // Performs one iteration of the token parsing state machine. Delagates to
 // a function that is specific to the current state
@@ -37,7 +36,6 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['expression', parseExpression],
     ['route', parseRoute],
     ['emit', parseEmit],
-    ['destination', parseDestination],
     ['entrypoint', parseEntrypoint],
   ]);
 

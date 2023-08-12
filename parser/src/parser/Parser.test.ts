@@ -103,6 +103,7 @@ describe('Parser', () => {
     expect(keywords[i++].text).toBe('process');
     expect(keywords[i++].text).toBe('process');
     expect(keywords[i++].text).toBe('accept');
+    expect(keywords[i++].text).toBe('*');
     expect(keywords[i++].text).toBe('emit');
     expect(keywords[i++].text).toBe('data');
     expect(keywords[i++].text).toBe('namespace');
@@ -119,7 +120,7 @@ describe('Parser', () => {
     expectTokens(
       [
         { type: 'Keyword', text: 'namespace' },
-        { type: 'Identifier', text: 'app' },
+        { type: 'QualifiedIdentifier', text: 'app' },
         { type: 'ScopeStart', text: '{' },
         { type: 'ScopeEnd', text: '}' },
       ],
@@ -129,7 +130,7 @@ describe('Parser', () => {
     expectTokens(
       [
         { type: 'Keyword', text: 'namespace' },
-        { type: 'Identifier', text: 'app' },
+        { type: 'QualifiedIdentifier', text: 'app' },
         { type: 'ScopeStart', text: '{' },
         { type: 'ScopeEnd', text: '}' },
       ],
@@ -139,7 +140,7 @@ describe('Parser', () => {
     expectTokens(
       [
         { type: 'Keyword', text: 'namespace' },
-        { type: 'Identifier', text: 'app' },
+        { type: 'QualifiedIdentifier', text: 'app' },
         { type: 'ScopeStart', text: '{' },
         { type: 'ScopeEnd', text: '}' },
       ],
@@ -149,7 +150,7 @@ describe('Parser', () => {
     expectTokens(
       [
         { type: 'Keyword', text: 'namespace' },
-        { type: 'Identifier', text: 'app' },
+        { type: 'QualifiedIdentifier', text: 'app' },
         { type: 'ScopeStart', text: '{' },
         { type: 'ScopeEnd', text: '}' },
       ],
@@ -164,7 +165,7 @@ describe('Parser', () => {
           line: 1,
           column: 11,
           message:
-            'Keyword namespace must be followed by the name of the namespace',
+            'Keyword namespace must be followed by the namespace identifier',
         },
       ],
       syntaxCheck('namespace { }'),
@@ -176,7 +177,7 @@ describe('Parser', () => {
           line: 1,
           column: 10,
           message:
-            'Keyword namespace must be followed by the name of the namespace',
+            'Keyword namespace must be followed by the namespace identifier',
         },
       ],
       syntaxCheck('namespace{}'),
@@ -188,7 +189,7 @@ describe('Parser', () => {
           line: 2,
           column: 1,
           message:
-            'Keyword namespace must be followed by the name of the namespace',
+            'Keyword namespace must be followed by the namespace identifier',
         },
       ],
       syntaxCheck('namespace \n{ }'),
@@ -201,7 +202,7 @@ describe('Parser', () => {
         {
           line: 2,
           column: 1,
-          message: 'Expecting "config", "using", "namespace", but found "{"',
+          message: 'Expecting "config", "using" or "namespace", but found "{"',
         },
       ],
       syntaxCheck('namespace name\n{\n}'),

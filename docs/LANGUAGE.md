@@ -9,19 +9,14 @@ Sorry, but it's tradition. This is a hello world console app written in NPL.
 ```npl
 using npl.connection
 
-namespace App {
-    message Response {
-        string text
-    }
-
+namespace app {
     network Hello {
         ingress egress default {
             process Responder
         }
-
         process Responder {
             accept * {
-                emit Response { 
+                emit console.line { 
                     data { text 'Hello, world' }
                 }
             }
@@ -37,15 +32,14 @@ namespace App {
                 interval 0
                 message empty
             }
-            ingress Hello
+            ingress network Hello
         }
         connection console {
             config { mode console.lines }
-            egress Hello
+            egress network Hello
         }
     }
-}
-```
+}```
 
 Note that if you wanted to write a hello world web page instead, then you would only need to modify the application definition, all of the rest of the code could remain unchanged.
 
@@ -77,17 +71,12 @@ In this trivial example I coud have put eveything in one `namespace` declaration
 
 ## Message
 
-The message declaration:
-
-```npl
-message Response {
-    string text
-}
-````
-
-Defines a message called `Response` in the `App` namespace. Response messages have one piece of data called `text` which is a `string`.
-
-Note that the message is defined directly in the namespace and is not part of a network, because messages can be passed between networks and are used in unit tests and integration tests.
+For this example we are using a `console.line` message that is defined by the `console` 
+connection. This is not very typical. Most applications should define custom messages in
+the namespace of the application, ane emit those, then provide a process that maps the
+fields of the application's message type onto the message type of the console. Doing it
+this way allows you to easily swap out the console for another connection type that uses a
+different message format.
 
 ## Process
 
@@ -96,7 +85,7 @@ The process declaration:
 ```npl
 process Responder {
     accept * {
-        emit Response { 
+        emit console.line { 
             data { text 'Hello, world' }
         }
     }
@@ -105,13 +94,14 @@ process Responder {
 
 Defines a process that will accept messages, process them, and optionally emit other messages. `process` is a reserved word, and is followed by the name of the process. Note that processes must be defined inside of a `network`.
 
-The process definition is enclosed in `{}` and comprises a number of clauses that define the behavior of the process. Note that processes can not have internal state, but messages have context. The state travels with the message, the message is immutable, but the message context can be mutated.
+The process definition is enclosed in `{}` and comprises a number of clauses that define the behavior of the process. Note that processes can not have internal state, only message processing
+logic. Conversely messages have state but no functionality. In NPL state travels with the message.
 
 The `accept` reserved word is followed by the name of a message or `*` (which means that it will accept any type of message).
 
-In this case `accept * {}` defines the processing steps to perform when a message of any type is received, and  `emit Response { text 'Hello, world' }` sends a `Response` type message with it's `text` property set to the string literal "Hello, world".
+In this case `accept * {}` defines the processing steps to perform when a message of any type is received, and  `emit console.line { text 'Hello, world' }` sends a `console.line` type message with it's `text` field set to the string literal "Hello, world".
 
-Note that the process does not know where the incomming message came from, or where the response that it emitted will be sent next. Processes are wired together by routing logic.
+Note that the process does not know where the incomming message came from, or where the response that it emitted will be sent next. Processes know nothing about the structure of the program, and are wired together by routing logic.
 
 ## Network
 
@@ -155,11 +145,11 @@ application HelloWorld {
                 interval 0
                 message empty
             }
-        ingress Hello
+        ingress network Hello
     }
     connection console {
         config { mode console.lines }
-        egress Hello
+        egress network Hello
     }
 }
 ```

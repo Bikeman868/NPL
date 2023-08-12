@@ -1,15 +1,12 @@
 using npl.connection
 namespace app {
-    message Response {
-        string text
-    }
     network Hello {
         ingress egress default {
             process Responder
         }
         process Responder {
-            accept * { // Accept all message types
-                emit Response { 
+            accept * {
+                emit console.line { 
                     data { text 'Hello, world' }
                 }
             }
@@ -24,11 +21,11 @@ namespace App {
                 interval 0
                 message empty
             }
-            ingress Hello
+            ingress network Hello
         }
         connection console {
             config { mode console.lines }
-            egress Hello
+            egress network Hello
         }
     }
 }

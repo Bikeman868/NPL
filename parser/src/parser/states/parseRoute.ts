@@ -1,12 +1,12 @@
 import { IContext } from '#interfaces/IContext.js';
-import { parseNamedScope } from '../functions/parseNamedScope.js';
+import { parseNamedReference } from '../functions/parseNamedReference.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 
 export function parseRoute(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseNamedScope(
+      return parseNamedReference(
         context,
         '',
         'Destination type must be followed by the destination identifier',

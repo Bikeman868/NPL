@@ -13,7 +13,6 @@ export type StateName =
   | 'accept'
   | 'emit'
   | 'route'
-  | 'destination'
   | 'entrypoint';
 
 export interface IParserState {

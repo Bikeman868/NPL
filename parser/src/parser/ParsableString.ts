@@ -104,30 +104,6 @@ export class ParsableString implements IParsable {
       const current = this.current();
       if (!current) return;
 
-      if (current == lineCommentDelimiter) {
-        if (this.lookAhead() == lineCommentDelimiter) {
-          while (true) {
-            const next = this.next();
-            if (!next || next == cr) break;
-          }
-          continue;
-        } else if (this.lookAhead() == blockCommentDelimiter) {
-          this.next();
-          while (true) {
-            const next = this.next();
-            if (!next) break;
-            if (next == blockCommentDelimiter) {
-              if (this.lookAhead() == lineCommentDelimiter) {
-                this.next();
-                this.next();
-                break;
-              }
-            }
-          }
-          continue;
-        }
-      }
-
       let matching = false;
 
       for (let char of whitespace) {
@@ -190,10 +166,6 @@ export class ParsableString implements IParsable {
     const startOffset = this._position.offset;
     this.skipAny(chars);
     return this.extract(startOffset);
-  }
-
-  extractToSeparator(): string {
-    return this.extractToAny(identifier);
   }
 
   /**
