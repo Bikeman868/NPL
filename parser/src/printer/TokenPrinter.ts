@@ -119,23 +119,24 @@ export class TokenPrinter {
           break;
         case 'Comment': {
             this.green();
-            const lines = token.text.split('\n');
+            const lines = token.text.split('\n').map(l => l.trim());
             if (lines.length == 1) {
               this.write('/* ')
-              this.write(lines[0].trim())
+              this.write(lines[0])
               this.write(' */')
+              this.defaultColor();
             } else {
               this.write('/*')
               this.eol();
               for (const line of lines) {
                 this.write('  ')
-                this.write(line.trim())
+                this.write(line)
                 this.eol();
               }
               this.write('*/')
+              this.defaultColor();
               this.eol();
             }
-            this.defaultColor();
           }
           break;
         default:
