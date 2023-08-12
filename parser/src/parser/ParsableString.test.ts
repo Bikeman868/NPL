@@ -58,4 +58,17 @@ describe('Parsable string', () => {
     expect(buffer.extractCount(1)).toBe('\n');
     expect(buffer.extractAny(identifier)).toBe('line3')
   })
+
+  it ('should end lines at //', () => {
+    const buffer = new ParsableString('line1 trailing\nline2 // comment\nline3');
+    expect(buffer.extractAny(identifier)).toBe('line1')
+    buffer.skipToEol();
+    expect(buffer.extractCount(1)).toBe('\n');
+    expect(buffer.extractAny(identifier)).toBe('line2')
+    buffer.skipToEol();
+    expect(buffer.extractCount(2)).toBe('//');
+    expect(buffer.extractToEol()).toBe(' comment');
+    expect(buffer.extractCount(1)).toBe('\n');
+    expect(buffer.extractAny(identifier)).toBe('line3')
+  })
 });

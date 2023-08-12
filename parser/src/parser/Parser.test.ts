@@ -208,4 +208,65 @@ describe('Parser', () => {
       syntaxCheck('namespace name\n{\n}'),
     );
   });
+
+  it('should parse comments at the start of the file', () => {
+    expectTokens(
+      [
+        { type: 'Comment', text: 'comment' },
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('// comment\nnamespace app{}'),
+    );
+
+    expectTokens(
+      [
+        { type: 'Comment', text: 'line1\nline2' },
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('/* line1\nline2 */\nnamespace app{}'),
+    );
+  })
+
+  it('should parse comment to end of line', () => {
+    expectTokens(
+      [
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'Comment', text: 'comment' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('namespace app { // comment\n}'),
+    );
+
+    expectTokens(
+      [
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'Comment', text: '}' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+      parse('namespace app { // }\n}'),
+    );
+  })
+
+  it('should parse block comments', () => {
+    expectTokens(
+      [
+        { type: 'Keyword', text: 'namespace' },
+        { type: 'QualifiedIdentifier', text: 'app' },
+        { type: 'ScopeStart', text: '{' },
+        { type: 'Comment', text: 'comment' },
+        { type: 'ScopeEnd', text: '}' },
+      ],
+    parse('namespace app { /* comment */ }'),
+    );
+  })
 });

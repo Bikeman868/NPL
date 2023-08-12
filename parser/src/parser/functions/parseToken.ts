@@ -65,11 +65,14 @@ export function parseToken(context: IContext): IToken {
     context.buffer.skipCount(lineCommentDelimiter.length);
     context.buffer.skipAny(whitespace);
     const text = context.buffer.extractToAny([cr]);
+    context.buffer.skipAny(whitespace);
     result = { tokenType: 'Comment', text }
   } else if (peek == blockCommentStart) {
     context.buffer.skipCount(blockCommentStart.length);
-    const text = context.buffer.extractUntil(blockCommentEnd);
+    context.buffer.skipAny(whitespace);
+    const text = context.buffer.extractUntil(blockCommentEnd).trim();
     context.buffer.skipCount(blockCommentEnd.length);
+    context.buffer.skipAny(whitespace);
     result = { tokenType: 'Comment', text }
   } else {
     result = stateMachine(context);
