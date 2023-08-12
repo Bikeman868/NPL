@@ -30,7 +30,7 @@ export class Parser implements IParser {
       }
     } catch (error: any) {
       context.syntaxError(
-        'Too many issues to continue, fix syntax errors at the top of the file and try again',
+        'The parser encountered an unrecoverable error, please fix syntax errors before this point and try again',
       );
     }
     return tokens;

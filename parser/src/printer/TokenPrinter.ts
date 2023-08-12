@@ -103,13 +103,15 @@ export class TokenPrinter {
           this.defaultColor();
           this.eol();
           break;
-        case `Identifier`:
+        case 'QualifiedIdentifier':
+        case 'Identifier':
           this.red();
           this.write(token.text);
           this.defaultColor();
           this.write(' ');
           break;
-        case `Expression`:
+        case 'Constant':
+        case 'Expression':
           this.yellow();
           this.write(token.text);
           this.defaultColor();
