@@ -32,14 +32,14 @@ export function parseScopeDefinition(
   if (context.buffer.isEndScope()) {
     // Empty scope block
     context.buffer.skipCount(1);
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   }
 
   // Get keyword and skip to definition
   const keyword = context.buffer.extractAny(keywordCharset);
-  context.buffer.skipWhitespace();
+  context.buffer.skipAny(whitespace);
 
   if (keyword == 'config') {
     if (context.buffer.hasScope()) {

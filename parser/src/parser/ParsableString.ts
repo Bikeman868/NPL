@@ -3,13 +3,10 @@ import { Position } from '#interfaces/Position.js';
 import {
   Charset,
   whitespace,
-  separator,
-  identifier,
   cr,
   openScope,
   closeScope,
   lineCommentDelimiter,
-  blockCommentDelimiter,
 } from '#interfaces/charsets.js';
 
 export class ParsableString implements IParsable {
@@ -19,6 +16,7 @@ export class ParsableString implements IParsable {
   constructor(buffer: string) {
     this._buffer = buffer;
     this._position = { offset: 0, line: 1, column: 1 };
+    this.skipAny(whitespace);
   }
   // Advances the cursor to the next character
   private next(): string | null {
@@ -43,10 +41,9 @@ export class ParsableString implements IParsable {
     return this._buffer.charAt(this._position.offset);
   }
 
-  // Peeks at the next character without advancing the cursor
-  private lookAhead(): string | null {
-    if (this._position.offset + 1 >= this._buffer.length) return null;
-    return this._buffer.charAt(this._position.offset + 1);
+  // Returns `count` characters starting with the character under the cursor
+  peek(count: number): string {
+    return this._buffer.slice(this._position.offset, this._position.offset + count);
   }
 
   getPosition(): Position {
@@ -99,43 +96,13 @@ export class ParsableString implements IParsable {
     }
   }
 
-  skipWhitespace() {
-    while (this._position.offset < this._buffer.length) {
-      const current = this.current();
-      if (!current) return;
-
-      let matching = false;
-
-      for (let char of whitespace) {
-        if (current == char) {
-          matching = true;
-          break;
-        }
-      }
-
-      if (!matching) return;
-      this.next();
-    }
-  }
-
-  skipSepararator() {
-    this.skipAny(separator);
-  }
-
   skipToEol() {
     while (this._position.offset < this._buffer.length) {
+      if (this.peek(2) == lineCommentDelimiter) return;
+
       let ch = this.current();
       if (!ch) return;
       if (ch == cr || ch == closeScope) return;
-      if (ch == lineCommentDelimiter) {
-        if (this.lookAhead() == lineCommentDelimiter) {
-          while (true) {
-            const next = this.next();
-            if (!next || next == cr) break;
-          }
-          continue;
-        }
-      }
       this.next();
     }
   }
@@ -166,6 +133,19 @@ export class ParsableString implements IParsable {
     const startOffset = this._position.offset;
     this.skipAny(chars);
     return this.extract(startOffset);
+  }
+
+  extractToEol(): string {
+    const startOffset = this._position.offset;
+    this.skipToEol();
+    return this.extract(startOffset);
+  }
+
+  extractUntil(matchingText: string): string {
+    const start = this._position.offset;
+    const end = this._buffer.indexOf(matchingText, this._position.offset);
+    this.skipCount(end - start);
+    return this._buffer.slice(start, end);
   }
 
   /**

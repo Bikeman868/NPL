@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from './ParseResult.js';
-import { identifier } from '#interfaces/charsets.js';
+import { identifier, whitespace } from '#interfaces/charsets.js';
 
 /**
  * Generic parsing of this structure:
@@ -22,7 +22,7 @@ export function parseNamedDefinition(
   if (context.buffer.hasScope()) {
     context.setSubState('scope');
   } else {
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.popState();
   }
   if (!name)

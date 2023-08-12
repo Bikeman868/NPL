@@ -2,7 +2,7 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseNamedDefinition } from '../functions/parseNamedDefinition.js';
 import { parseScope } from '../functions/parseScope.js';
-import { identifier, qualifiedIdentifier, whitespace, closeScope } from '#interfaces/charsets.js';
+import { identifier, qualifiedIdentifier, whitespace, closeScope, separator } from '#interfaces/charsets.js';
 
 export function parseMessage(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -21,12 +21,12 @@ export function parseMessage(context: IContext): ParseResult {
 function parseMessageDefinition(context: IContext): ParseResult {
   if (context.buffer.isEndScope()) {
     context.buffer.skipCount(1);
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   } else {
     const name = context.buffer.extractAny(qualifiedIdentifier);
-    context.buffer.skipSepararator();
+    context.buffer.skipAny(separator);
     context.setSubState('field');
     if (!name)
       context.syntaxError(
@@ -41,7 +41,7 @@ function parseMessageDefinition(context: IContext): ParseResult {
 function parseMessageField(context: IContext): ParseResult {
   const text = context.buffer.extractAny(identifier);
   context.buffer.skipToEol();
-  context.buffer.skipWhitespace();
+  context.buffer.skipAny(whitespace);
 
   context.setSubState('definition');
 

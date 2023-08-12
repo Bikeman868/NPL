@@ -27,7 +27,7 @@ The `parser.parse()` method takes `IContext` so you can provide your own impleme
 for `Context` also takes `IParsable` so you can provide your own implementation of that instead.
 
 Instead of `parser.parse()` you can also parse part of a source file using `parseUntil()` and `skipUntil()`
-methods, or you can parse token by token by calling `extractNextToken()`.
+methods, or you can parse one token at a time by repeatedly calling `extractNextToken()`.
 
 When calling `extractNextToken()`, you can pass a context with `isDryRun` set to true, and the next token
 will be extracted without modifying the context. The parser itself is stateless, all of the required state

@@ -2,7 +2,7 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { qualifiedIdentifier } from '#interfaces/charsets.js';
+import { qualifiedIdentifier, whitespace } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
 export function parseAccept(context: IContext): ParseResult {
@@ -39,7 +39,7 @@ function parseIdentifier(context: IContext): ParseResult {
   if (context.buffer.hasScope()) {
     context.setSubState('scope');
   } else {
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.popState();
   }
 

@@ -5,7 +5,7 @@ namespace app {
             process Responder
         }
         process Responder {
-            accept * {
+            accept * { // Accept all message types
                 emit console.line { 
                     data { text 'Hello, world' }
                 }

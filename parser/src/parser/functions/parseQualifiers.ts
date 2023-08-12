@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { openScope, identifier } from '#interfaces/charsets.js';
+import { openScope, identifier, whitespace, separator } from '#interfaces/charsets.js';
 
 /**
  * Generic parsing of this structure:
@@ -18,7 +18,7 @@ export function parseQualifiers(
   qualifiers: string[],
 ): ParseResult {
   const qualifierOrIdentifier = context.buffer.extractAny(identifier);
-  context.buffer.skipSepararator();
+  context.buffer.skipAny(separator);
 
   // Optional qualifiers
   if (qualifiers.includes(qualifierOrIdentifier)) {
@@ -30,7 +30,7 @@ export function parseQualifiers(
     if (context.buffer.hasScope()) {
       context.setSubState('scope');
     } else {
-      context.buffer.skipWhitespace();
+      context.buffer.skipAny(whitespace);
       context.popState();
     }
     return { text: qualifierOrIdentifier, tokenType: 'Identifier' };
@@ -39,12 +39,12 @@ export function parseQualifiers(
   // Optional scope block
   if (context.buffer.hasScope()) {
     context.buffer.skipCount(1);
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.setSubState('definition');
     return { text: openScope, tokenType: 'ScopeStart' };
   }
 
-  context.buffer.skipWhitespace();
+  context.buffer.skipAny(whitespace);
   context.popState();
   return { text: '', tokenType: 'Identifier' };
 }

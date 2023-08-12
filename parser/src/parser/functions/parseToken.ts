@@ -17,6 +17,13 @@ import { parseAccept } from '../states/parseAccept.js';
 import { parseRoute } from '../states/parseRoute.js';
 import { parseEmit } from '../states/parseEmit.js';
 import { parseEntrypoint } from '../states/parseEntrypoint.js';
+import { 
+  cr,
+  whitespace,
+  lineCommentDelimiter,
+  blockCommentStart,
+  blockCommentEnd,
+} from '#interfaces/charsets.js'
 
 // Performs one iteration of the token parsing state machine. Delagates to
 // a function that is specific to the current state
@@ -50,7 +57,24 @@ export function parseToken(context: IContext): IToken {
 
   const indent = context.getDebugIndent();
   context.capturePosition();
-  const result = stateMachine(context);
+  let result: ParseResult;
+
+  const peek = context.buffer.peek(2);
+
+  if (peek == lineCommentDelimiter) {
+    context.buffer.skipCount(lineCommentDelimiter.length);
+    context.buffer.skipAny(whitespace);
+    const text = context.buffer.extractToAny([cr]);
+    result = { tokenType: 'Comment', text }
+  } else if (peek == blockCommentStart) {
+    context.buffer.skipCount(blockCommentStart.length);
+    const text = context.buffer.extractUntil(blockCommentEnd);
+    context.buffer.skipCount(blockCommentEnd.length);
+    result = { tokenType: 'Comment', text }
+  } else {
+    result = stateMachine(context);
+  }
+  
   const endPosition = context.buffer.getPosition();
   const length = endPosition.offset - context.position.offset;
 

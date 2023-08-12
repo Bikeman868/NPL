@@ -32,6 +32,10 @@ export class Context implements IContext {
     return this._isDryRun;
   }
 
+  set isDryRun(enabled: boolean) {
+    this._isDryRun = enabled;
+  }
+
   get currentState(): IParserState {
     return this._currentState;
   }

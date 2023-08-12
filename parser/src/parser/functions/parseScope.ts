@@ -1,5 +1,5 @@
 import { IContext } from '#interfaces/IContext.js';
-import { openScope } from '#interfaces/charsets.js';
+import { openScope, whitespace } from '#interfaces/charsets.js';
 import { ParseResult } from './ParseResult.js';
 
 /**
@@ -11,7 +11,7 @@ import { ParseResult } from './ParseResult.js';
  */
 export function parseScope(context: IContext): ParseResult {
   context.buffer.skipCount(1);
-  context.buffer.skipWhitespace();
+  context.buffer.skipAny(whitespace);
 
   context.setSubState('definition');
   return { text: openScope, tokenType: 'ScopeStart' };

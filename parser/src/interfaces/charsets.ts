@@ -6,8 +6,9 @@ export const tab = '\t';
 export const space = ' ';
 export const openScope = '{';
 export const closeScope = '}';
-export const lineCommentDelimiter = '/';
-export const blockCommentDelimiter = '*';
+export const lineCommentDelimiter = '//';
+export const blockCommentStart = '/*';
+export const blockCommentEnd = '*/';
 export const decimal = '.';
 export const underscore = '_';
 

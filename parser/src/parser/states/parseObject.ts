@@ -6,6 +6,7 @@ import {
   identifier,
   whitespace,
   cr,
+  separator,
 } from '#interfaces/charsets.js';
 
 export function parseObject(context: IContext): ParseResult {
@@ -23,13 +24,13 @@ export function parseObject(context: IContext): ParseResult {
 function parseObjectDefinition(context: IContext): ParseResult {
   if (context.buffer.isEndScope()) {
     context.buffer.skipCount(1);
-    context.buffer.skipWhitespace();
+    context.buffer.skipAny(whitespace);
     context.popState();
     return { text: closeScope, tokenType: 'ScopeEnd' };
   }
 
   const fieldname = context.buffer.extractAny(identifier);
-  context.buffer.skipSepararator();
+  context.buffer.skipAny(separator);
   context.setSubState('field');
 
   if (!fieldname)
@@ -43,7 +44,7 @@ function parseObjectDefinition(context: IContext): ParseResult {
 
 function parseObjectField(context: IContext): ParseResult {
   const expression = context.buffer.extractToAny([cr, closeScope]);
-  context.buffer.skipWhitespace();
+  context.buffer.skipAny(whitespace)
   context.setSubState('definition');
 
   if (!expression) context.syntaxError('Expression expected');
