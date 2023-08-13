@@ -14,7 +14,7 @@ export class Context implements IContext {
   private _syntaxErrors: SyntaxError[];
   private _isDryRun: boolean;
 
-  debugLogging: boolean = false;
+  debugLogging: (context: IContext) => boolean = () => false;
 
   constructor(buffer: IParsable, isDryRun?: boolean) {
     this._buffer = buffer;
@@ -138,14 +138,17 @@ export class Context implements IContext {
   }
 
   debug(messageFunc: () => any): void {
-    if (this.debugLogging) console.log(messageFunc());
+    if (this.debugLogging(this)) {
+      const lineNumber = ("00" + this._position.line).slice(-3);
+      console.log(lineNumber + ' ' + messageFunc());
+    }
   }
 
   getDebugIndent(): string {
     let indent = '';
 
-    if (this.debugLogging) {
-      this._stateStack.forEach((s) => {
+    if (this.debugLogging(this)) {
+      this._stateStack.forEach(() => {
         indent += '  ';
       });
     }

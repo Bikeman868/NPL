@@ -11,12 +11,12 @@ export function parsePipe(context: IContext): ParseResult {
     case 'scope':
       return parseScope(context);
     case 'definition':
-      return parseProcessDefinition(context);
+      return parsePipeDefinition(context);
   }
   throw new Error('Unknown process sub-state ' + context.currentState.subState);
 }
 
-function parseProcessDefinition(context: IContext): ParseResult {
+function parsePipeDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
     { keyword: 'route', state: 'route', subState: 'identifier' },
   ]);

@@ -4,6 +4,7 @@ import { ParsableString } from './parser/ParsableString.js';
 import { TokenPrinter } from './printer/TokenPrinter.js';
 import { SyntaxErrorPrinter } from './printer/SyntaxErrorPrinter.js';
 import { readFileSync } from 'node:fs';
+import { IContext } from '#interfaces/IContext.js';
 
 // Pass name of NPL source file on command line
 const sourceFileBytes = readFileSync(process.argv[2]);
@@ -16,7 +17,7 @@ const sourceFileText = sourceFileBytes.toString(
 // The parser requires parsable text
 const buffer = new ParsableString(sourceFileText);
 const context = new Context(buffer);
-context.debugLogging = false;
+context.debugLogging = (context: IContext) => context.position.line >= 13;
 
 // Tokenise the source file
 const parser = new Parser();

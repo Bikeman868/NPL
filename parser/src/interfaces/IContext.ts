@@ -11,7 +11,7 @@ export interface IContext {
   readonly syntaxErrors: SyntaxError[];
   readonly isDryRun: boolean;
 
-  debugLogging: boolean;
+  debugLogging: (context: IContext) => boolean;
 
   pushState(state?: StateName, subState?: string): IParserState;
   popState(): IParserState;

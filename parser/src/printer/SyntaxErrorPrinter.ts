@@ -13,11 +13,7 @@ export class SyntaxErrorPrinter {
   constructor(output?: (line: string) => void) {
     this._indent = 0;
     this._line = '';
-    this._output =
-      output ||
-      ((line) => {
-        console.log(line);
-      });
+    this._output = output || (line => { console.log(line); });
   }
 
   private write(text: string) {
@@ -33,10 +29,17 @@ export class SyntaxErrorPrinter {
     }
   }
 
-  private red() {
+  private errorColor() {
     if (this.includeConsoleColors) {
       this.write(textStyle.red);
       this.write(textStyle.bold);
+    }
+  }
+
+  private lineNumberColor() {
+    if (this.includeConsoleColors) {
+      this.write(textStyle.cyan);
+      this.write(textStyle.dim);
     }
   }
 
@@ -52,6 +55,10 @@ export class SyntaxErrorPrinter {
 
     let lineNumber = 1;
     for (const sourceLine of sourceLines) {
+      this.lineNumberColor();
+      this.write(('000' + lineNumber).slice(-3));
+      this.defaultColor();
+      this.write(' ');
       this.write(sourceLine);
       this.eol();
 
@@ -60,7 +67,7 @@ export class SyntaxErrorPrinter {
         for (let i = 1; i < error.column; i++) indent += ' ';
 
         this.write(indent);
-        this.red();
+        this.errorColor();
         this.write('^ ');
         this.write(error.message);
         this.defaultColor();
