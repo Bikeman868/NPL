@@ -1,4 +1,5 @@
 import { SyntaxError } from '#interfaces/SyntaxError';
+import textStyle from  './consoleEscape.js'
 
 export class SyntaxErrorPrinter {
   private _output: (line: string) => void;
@@ -33,23 +34,14 @@ export class SyntaxErrorPrinter {
   }
 
   private red() {
-    if (this.includeConsoleColors) this.write('\u001b[31m');
-  }
-
-  private green() {
-    if (this.includeConsoleColors) this.write('\u001b[32m');
-  }
-
-  private yellow() {
-    if (this.includeConsoleColors) this.write('\u001b[33m');
-  }
-
-  private blue() {
-    if (this.includeConsoleColors) this.write('\u001b[34m');
+    if (this.includeConsoleColors) {
+      this.write(textStyle.red);
+      this.write(textStyle.bold);
+    }
   }
 
   private defaultColor() {
-    if (this.includeConsoleColors) this.write('\u001b[0m');
+    if (this.includeConsoleColors) this.write(textStyle.reset);
   }
 
   print(sourceFileText: string, syntaxErrors: SyntaxError[]) {

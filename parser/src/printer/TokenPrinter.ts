@@ -1,4 +1,6 @@
 import { IToken } from '#interfaces/IToken.js';
+import consoleEscape from './consoleEscape.js';
+import textStyle from  './consoleEscape.js'
 
 export class TokenPrinter {
   private output: (line: string) => void;
@@ -96,32 +98,14 @@ export class TokenPrinter {
     this.output('');
   }
 
-  private red() {
-    if (this.includeConsoleColors) this.write('\u001b[31m');
+  private setStyle(...escapeCodes: string[]) {
+    if (this.includeConsoleColors)
+      for (const code of escapeCodes)
+        this.write(code);
   }
 
-  private green() {
-    if (this.includeConsoleColors) this.write('\u001b[32m');
-  }
-
-  private yellow() {
-    if (this.includeConsoleColors) this.write('\u001b[33m');
-  }
-
-  private blue() {
-    if (this.includeConsoleColors) this.write('\u001b[34m');
-  }
-
-  private magenta() {
-    if (this.includeConsoleColors) this.write('\u001b[35m');
-  }
-
-  private cyan() {
-    if (this.includeConsoleColors) this.write('\u001b[36m');
-  }
-
-  private defaultColor() {
-    if (this.includeConsoleColors) this.write('\u001b[0m');
+  private resetStyle() {
+    if (this.includeConsoleColors) this.write(consoleEscape.reset);
   }
 
   private printKeyword() {
@@ -141,28 +125,28 @@ export class TokenPrinter {
       }
     }
 
-    this.cyan();
+    this.setStyle(consoleEscape.cyan, consoleEscape.bold);
     this.write(this.token.text);
-    this.defaultColor();
+    this.resetStyle();
     this.write(' ');
   }
 
   private printParamStart() {
-    this.red();
+    this.setStyle(consoleEscape.red);
     this.write('(');
-    this.defaultColor();
+    this.resetStyle();
   }
 
   private printParamEnd() {
-    this.red();
+    this.setStyle(consoleEscape.red);
     this.write(')');
-    this.defaultColor();
+    this.resetStyle();
   }
 
   private printScopeStart() {
-    this.yellow();
+    this.setStyle(consoleEscape.yellow);
     this.write('{');
-    this.defaultColor();
+    this.resetStyle();
     if (this.nextIsSingleLineComment) this.write(' ');
     else {
       this.newLine();
@@ -175,23 +159,23 @@ export class TokenPrinter {
     this.scopeStack.pop();
     this.newLine();
     this.indent--;
-    this.yellow();
+    this.setStyle(consoleEscape.yellow);
     this.write('}');
-    this.defaultColor();
+    this.resetStyle();
     this.newLine();
   }
 
   private printIdentifier() {
-    this.red();
+    this.setStyle(consoleEscape.red);
     this.write(this.token.text);
-    this.defaultColor();
+    this.resetStyle();
     this.write(' ');
   }
 
   private printExpression() {
-    this.yellow();
+    this.setStyle(consoleEscape.yellow);
     this.write(this.token.text);
-    this.defaultColor();
+    this.resetStyle();
     if (this.nextIsSingleLineComment) this.write('');
     else this.newLine();
   }
@@ -199,15 +183,15 @@ export class TokenPrinter {
   private printComment() {
     const lines = this.token.text.split('\n').map((l) => l.trim());
     if (lines.length == 1) {
-      this.green();
+      this.setStyle(consoleEscape.green, consoleEscape.dim);
       this.write('// ');
       this.write(lines[0]);
-      this.defaultColor();
+      this.resetStyle();
       this.newLine();
       if (this.prevToken?.tokenType == 'ScopeStart') this.indent++;
     } else {
       this.newLine();
-      this.green();
+      this.setStyle(consoleEscape.green, consoleEscape.dim);
       this.write('/*');
       this.newLine();
       for (const line of lines) {
@@ -216,7 +200,7 @@ export class TokenPrinter {
         this.newLine();
       }
       this.write('*/');
-      this.defaultColor();
+      this.resetStyle();
       this.newLine();
     }
   }
