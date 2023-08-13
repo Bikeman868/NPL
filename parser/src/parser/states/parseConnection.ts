@@ -20,7 +20,7 @@ export function parseConnection(context: IContext): ParseResult {
 
 function parseConnectionDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', state: 'entrypoint', subState: 'identifier' },
-    { keyword: 'egress', state: 'entrypoint', subState: 'identifier' },
+    { keyword: 'ingress', state: 'connectionEntry', subState: 'identifier' },
+    { keyword: 'egress', state: 'connectionEntry', subState: 'identifier' },
   ]);
 }

@@ -2,7 +2,13 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseNamedDefinition } from '../functions/parseNamedDefinition.js';
 import { parseScope } from '../functions/parseScope.js';
-import { identifier, qualifiedIdentifier, whitespace, closeScope, separator } from '#interfaces/charsets.js';
+import {
+  identifier,
+  qualifiedIdentifier,
+  whitespace,
+  closeScope,
+  separator,
+} from '#interfaces/charsets.js';
 
 export function parseMessage(context: IContext): ParseResult {
   switch (context.currentState.subState) {

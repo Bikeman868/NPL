@@ -1,10 +1,15 @@
 import { IContext } from '#interfaces/IContext.js';
-import { ParseResult } from '../functions/ParseResult.js';
-import { openScope, identifier, whitespace, separator } from '#interfaces/charsets.js';
+import { ParseResult } from './ParseResult.js';
+import {
+  openScope,
+  qualifiedIdentifier,
+  whitespace,
+  separator,
+} from '#interfaces/charsets.js';
 
 /**
  * Generic parsing of this structure:
- *   <keyword> <qualifier>...<qualifier> <identifier> { <scope> }
+ *   <keyword> <qualifier>...<qualifier> <identifier>.<identifier> { <scope> }
  *
  * Assumes that the cursor is at the first character of the first qualifier or the identifier
  * Assumes that the keyword token already pushed a new scope
@@ -13,11 +18,11 @@ import { openScope, identifier, whitespace, separator } from '#interfaces/charse
  * When scope is present, transitions to 'definition' sub-state with the cursor on the begining of the scope
  * When no scope present, pops the state and leaves the curson on whatever comes next
  */
-export function parseQualifiers(
+export function parseQualifiedReference(
   context: IContext,
   qualifiers: string[],
 ): ParseResult {
-  const qualifierOrIdentifier = context.buffer.extractAny(identifier);
+  const qualifierOrIdentifier = context.buffer.extractAny(qualifiedIdentifier);
   context.buffer.skipAny(separator);
 
   // Optional qualifiers
@@ -25,7 +30,7 @@ export function parseQualifiers(
     return { text: qualifierOrIdentifier, tokenType: 'Keyword' };
   }
 
-  // Optional identifier
+  // Optional qualified identifier
   if (qualifierOrIdentifier) {
     if (context.buffer.hasScope()) {
       context.setSubState('scope');
@@ -33,7 +38,7 @@ export function parseQualifiers(
       context.buffer.skipAny(whitespace);
       context.popState();
     }
-    return { text: qualifierOrIdentifier, tokenType: 'Identifier' };
+    return { text: qualifierOrIdentifier, tokenType: 'QualifiedIdentifier' };
   }
 
   // Optional scope block
@@ -46,5 +51,5 @@ export function parseQualifiers(
 
   context.buffer.skipAny(whitespace);
   context.popState();
-  return { text: '', tokenType: 'Identifier' };
+  return { text: '', tokenType: 'QualifiedIdentifier' };
 }

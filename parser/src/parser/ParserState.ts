@@ -1,4 +1,5 @@
-import { IParserState, StateName } from '#interfaces/IParserState.js';
+import { IParserState } from '#interfaces/IParserState.js';
+import { StateName } from '#interfaces/StateName.js';
 
 export class ParserState implements IParserState {
   state: StateName;

@@ -18,9 +18,9 @@ export function parseNetwork(context: IContext): ParseResult {
 
 function parseNetworkDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', state: 'entrypoint', subState: 'identifier' },
-    { keyword: 'egress', state: 'entrypoint', subState: 'identifier' },
-    { keyword: 'default', state: 'entrypoint', subState: 'identifier' },
+    { keyword: 'ingress', state: 'networkEntry', subState: 'identifier' },
+    { keyword: 'egress', state: 'networkEntry', subState: 'identifier' },
+    { keyword: 'default', state: 'networkEntry', subState: 'identifier' },
     { keyword: 'process', state: 'process', subState: 'identifier' },
   ]);
 }

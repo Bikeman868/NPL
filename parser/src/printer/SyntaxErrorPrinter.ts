@@ -69,7 +69,7 @@ export class SyntaxErrorPrinter {
 
         this.write(indent);
         this.red();
-        this.write('^ ')
+        this.write('^ ');
         this.write(error.message);
         this.defaultColor();
         this.eol();
@@ -86,10 +86,11 @@ export class SyntaxErrorPrinter {
 
         if (this.includeMultipleErrorsOnSameLine)
           error = syntaxErrors[++syntaxErrorIndex];
-        else while (error?.line == lineNumber)
-          error = syntaxErrors[++syntaxErrorIndex];
+        else
+          while (error?.line == lineNumber)
+            error = syntaxErrors[++syntaxErrorIndex];
       }
-        
+
       lineNumber++;
     }
   }

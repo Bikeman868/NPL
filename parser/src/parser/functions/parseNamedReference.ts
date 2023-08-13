@@ -28,7 +28,7 @@ export function parseNamedReference(
   if (!name)
     context.syntaxError(
       customSyntaxError ||
-        `Keyword ${keyword} must be followed by the ${keyword} identifier`,
+        `Keyword ${keyword} must be followed by the ${keyword} qualified identifier`,
     );
 
   return { text: name, tokenType: 'QualifiedIdentifier' };

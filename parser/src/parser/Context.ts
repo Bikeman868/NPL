@@ -2,7 +2,8 @@ import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
 import { IContext } from '#interfaces/IContext.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
-import { IParserState, StateName } from '#interfaces/IParserState';
+import { IParserState } from '#interfaces/IParserState';
+import { StateName } from '#interfaces/StateName.js';
 import { ParserState } from './ParserState.js';
 
 export class Context implements IContext {
@@ -126,7 +127,7 @@ export class Context implements IContext {
     for (const s of this._stateStack) {
       state += stackDepth + s.getDescription() + '\n';
       stackDepth += '  ';
-    };
+    }
     state += stackDepth + this._currentState.getDescription();
 
     this._syntaxErrors.push({

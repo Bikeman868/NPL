@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { IToken } from '#interfaces/IToken.js';
-import { StateName } from '#interfaces/IParserState.js';
+import { StateName } from '#interfaces/StateName.js';
 import { Token } from '../Token.js';
 import { ParseResult } from './ParseResult.js';
 import { parseSourceFile } from '../states/parseSourceFile.js';
@@ -16,14 +16,15 @@ import { parseExpression } from '../states/parseExpression.js';
 import { parseAccept } from '../states/parseAccept.js';
 import { parseRoute } from '../states/parseRoute.js';
 import { parseEmit } from '../states/parseEmit.js';
-import { parseEntrypoint } from '../states/parseEntrypoint.js';
-import { 
+import { parseNetworkEntry } from '../states/parseNetworkEntry.js';
+import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
+import {
   newline,
   whitespace,
   lineCommentDelimiter,
   blockCommentStart,
   blockCommentEnd,
-} from '#interfaces/charsets.js'
+} from '#interfaces/charsets.js';
 
 // Performs one iteration of the token parsing state machine. Delagates to
 // a function that is specific to the current state
@@ -43,7 +44,8 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['expression', parseExpression],
     ['route', parseRoute],
     ['emit', parseEmit],
-    ['entrypoint', parseEntrypoint],
+    ['networkEntry', parseNetworkEntry],
+    ['connectionEntry', parseConnectionEntry],
   ]);
 
 export function parseToken(context: IContext): IToken {
@@ -66,18 +68,18 @@ export function parseToken(context: IContext): IToken {
     context.buffer.skipAny(whitespace);
     const text = context.buffer.extractToAny([newline]);
     context.buffer.skipAny(whitespace);
-    result = { tokenType: 'Comment', text }
+    result = { tokenType: 'Comment', text };
   } else if (peek == blockCommentStart) {
     context.buffer.skipCount(blockCommentStart.length);
     context.buffer.skipAny(whitespace);
     const text = context.buffer.extractUntil(blockCommentEnd).trim();
     context.buffer.skipCount(blockCommentEnd.length);
     context.buffer.skipAny(whitespace);
-    result = { tokenType: 'Comment', text }
+    result = { tokenType: 'Comment', text };
   } else {
     result = stateMachine(context);
   }
-  
+
   const endPosition = context.buffer.getPosition();
   const length = endPosition.offset - context.position.offset;
 

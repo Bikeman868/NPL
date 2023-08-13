@@ -1,0 +1,17 @@
+export type StateName =
+  | 'sourcefile'
+  | 'using'
+  | 'namespace'
+  | 'application'
+  | 'network'
+  | 'message'
+  | 'connection'
+  | 'process'
+  | 'object'
+  | 'expression'
+  | 'constant'
+  | 'accept'
+  | 'emit'
+  | 'route'
+  | 'networkEntry'
+  | 'connectionEntry';

@@ -1,7 +1,11 @@
 import { IContext } from '#interfaces/IContext.js';
-import { StateName } from '#interfaces/IParserState.js';
+import { StateName } from '#interfaces/StateName.js';
 import { ParseResult } from './ParseResult.js';
-import { keyword as keywordCharset, whitespace, closeScope } from '#interfaces/charsets.js';
+import {
+  keyword as keywordCharset,
+  whitespace,
+  closeScope,
+} from '#interfaces/charsets.js';
 
 /**
  * Genric parsing of this structure:
@@ -57,9 +61,9 @@ export function parseScopeDefinition(
     }
     if (!isValid) {
       let msg = 'Expecting "config"';
-      for (let i = 0; i < options.length; i ++) {
+      for (let i = 0; i < options.length; i++) {
         const option = options[i];
-        msg += (i == options.length - 1) ? ' or ' : ', '; 
+        msg += i == options.length - 1 ? ' or ' : ', ';
         msg += '"' + option.keyword + '"';
       }
       if (keyword) msg += ' but found "' + keyword + '"';

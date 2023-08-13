@@ -1,6 +1,7 @@
 import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
-import { IParserState, StateName } from '#interfaces/IParserState.js';
+import { IParserState } from '#interfaces/IParserState.js';
+import { StateName } from '#interfaces/StateName.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
 
 export interface IContext {

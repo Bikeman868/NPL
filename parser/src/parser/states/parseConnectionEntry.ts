@@ -1,13 +1,13 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
-import { parseQualifiers } from '../functions/parseQualifiers.js';
+import { parseQualifiedReference } from '../functions/parseQualifiedReference.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
-export function parseEntrypoint(context: IContext): ParseResult {
+export function parseConnectionEntry(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
-      return parseQualifiers(context, ['ingress', 'egress', 'default', 'network']);
+      return parseQualifiedReference(context, ['ingress', 'egress', 'network']);
     case 'scope':
       return parseScope(context);
     case 'definition':
@@ -20,8 +20,6 @@ export function parseEntrypoint(context: IContext): ParseResult {
 
 function parseEntrypointDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'pipe', state: 'route', subState: 'identifier' },
     { keyword: 'network', state: 'route', subState: 'identifier' },
-    { keyword: 'process', state: 'route', subState: 'identifier' },
   ]);
 }

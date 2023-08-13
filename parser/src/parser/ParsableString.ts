@@ -22,7 +22,7 @@ export class ParsableString implements IParsable {
 
   // Advances the cursor to the next character skipping carriage returns
   private next(): string | null {
-    while(true) {
+    while (true) {
       if (this._position.offset === this._buffer.length) return null;
 
       const ch = this._buffer.charAt(this._position.offset++);
@@ -33,7 +33,7 @@ export class ParsableString implements IParsable {
       } else {
         this._position.column++;
       }
-      
+
       if (ch != cr) return ch;
     }
   }
@@ -159,7 +159,7 @@ export class ParsableString implements IParsable {
     const start = this._position.offset;
     const end = this._buffer.indexOf(matchingText, this._position.offset);
     this.skipCount(end - start);
-    return this._buffer.slice(start, end).replace(cr, '');;
+    return this._buffer.slice(start, end).replace(cr, '');
   }
 
   /**

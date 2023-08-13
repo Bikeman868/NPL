@@ -1,6 +1,7 @@
 # NPL Parser
 
 This is a shared library for parsing NPL source files. It is used by many development tools including:
+
 - The NPL compiler
 - Code formatters
 - Code linters
@@ -66,4 +67,3 @@ Format the code:
 ```shell
 npm run format
 ```
-

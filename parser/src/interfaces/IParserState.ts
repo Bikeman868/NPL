@@ -1,19 +1,4 @@
-export type StateName =
-  | 'sourcefile'
-  | 'using'
-  | 'namespace'
-  | 'application'
-  | 'network'
-  | 'message'
-  | 'connection'
-  | 'process'
-  | 'object'
-  | 'expression'
-  | 'constant'
-  | 'accept'
-  | 'emit'
-  | 'route'
-  | 'entrypoint';
+import { StateName } from './StateName';
 
 export interface IParserState {
   state: StateName;

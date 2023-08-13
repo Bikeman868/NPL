@@ -165,7 +165,7 @@ describe('Parser', () => {
           line: 1,
           column: 11,
           message:
-            'Keyword namespace must be followed by the namespace identifier',
+            'Keyword namespace must be followed by the namespace qualified identifier',
         },
       ],
       syntaxCheck('namespace { }'),
@@ -177,7 +177,7 @@ describe('Parser', () => {
           line: 1,
           column: 10,
           message:
-            'Keyword namespace must be followed by the namespace identifier',
+            'Keyword namespace must be followed by the namespace qualified identifier',
         },
       ],
       syntaxCheck('namespace{}'),
@@ -189,7 +189,7 @@ describe('Parser', () => {
           line: 2,
           column: 1,
           message:
-            'Keyword namespace must be followed by the namespace identifier',
+            'Keyword namespace must be followed by the namespace qualified identifier',
         },
       ],
       syntaxCheck('namespace \n{ }'),
@@ -231,7 +231,7 @@ describe('Parser', () => {
       ],
       parse('/* line1\nline2 */\nnamespace app{}'),
     );
-  })
+  });
 
   it('should parse comment to end of line', () => {
     expectTokens(
@@ -255,7 +255,7 @@ describe('Parser', () => {
       ],
       parse('namespace app { // }\n}'),
     );
-  })
+  });
 
   it('should parse block comments', () => {
     expectTokens(
@@ -266,9 +266,9 @@ describe('Parser', () => {
         { type: 'Comment', text: 'comment' },
         { type: 'ScopeEnd', text: '}' },
       ],
-    parse('namespace app { /* comment */ }'),
+      parse('namespace app { /* comment */ }'),
     );
-  })
+  });
 
   it('should ignore linefeeds', () => {
     expectTokens(
@@ -294,5 +294,5 @@ describe('Parser', () => {
       ],
       parse('namespace app {\r\n  network Hello {\r\n  }\r\n}\r\n'),
     );
-  })
+  });
 });

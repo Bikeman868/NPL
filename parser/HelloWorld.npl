@@ -1,31 +1,32 @@
-using npl.connection
+using npl.connection // Saves having to write npl.connection.console each time
 namespace app {
-    network Hello {
-        ingress egress default {
-            process Responder
+    network Hello { // This network responds to messages with 'Hello world'
+        ingress egress default { // Default entry point for incoming and outgoing messages
+            process Responder // All messages are handled by the 'Responder' process
         }
         process Responder {
             accept * { // Accept all message types
-                emit console.line { 
-                    data { text 'Hello, world' }
+                emit console.text { // Produce a new message of type npl.connection.console.text
+                    data { text 'Hello, world' } // Set the message field values
                 }
             }
         }
     }
-}
-namespace App {
-    application HelloWorld {
-        connection emitter {
+} 
+
+namespace App { // Namespace can be defined in multiple source files
+    application HelloWorld { // Only 1 application definition is permitted
+        connection emitter { // npl.connection.emitter just emits messages
             config { 
-                count 1 
-                interval 0
-                message empty
+                count 1 // Emit 1 message and stop
+                interval 0 // Infinite delay between messages
+                message empty // Emit an empty message
             }
-            ingress network Hello
+            ingress network Hello // Send recieved messages to the Hello network default entry point
         }
-        connection console {
-            config { mode console.lines }
-            egress network Hello
+        connection console { // npl.connection.console lets you send text to the console output
+            config { mode console.lines } // Configure the console to output a line of text for each message
+            egress network Hello // Collect output from the default entry point on the Hello network
         }
     }
 }

@@ -44,7 +44,7 @@ function parseObjectDefinition(context: IContext): ParseResult {
 
 function parseObjectField(context: IContext): ParseResult {
   const expression = context.buffer.extractToAny([newline, closeScope]);
-  context.buffer.skipAny(whitespace)
+  context.buffer.skipAny(whitespace);
   context.setSubState('definition');
 
   if (!expression) context.syntaxError('Expression expected');
