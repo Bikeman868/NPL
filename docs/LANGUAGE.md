@@ -270,7 +270,7 @@ The route definition comprises routing logic to apply to this message type. The 
 * `route` to alter the path that the message will take through the network.
 * `clone` to make a copy of the message with a different route.
 
-Routing is a big subject that is covered in detail elsewhere. In this example we are using `route.prepend` to add a new destination to the beginning of the route, changing where the message will go next.
+Routing is a big subject that is covered in detail elsewhere. In this example we are using `prepend` to add a new destination to the beginning of the route, changing where the message will go next.
 
 This `pipe` segments requests into 3 categories.
 
