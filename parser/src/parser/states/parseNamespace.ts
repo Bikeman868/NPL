@@ -23,5 +23,6 @@ function parseNamespaceDefinition(context: IContext): ParseResult {
     { keyword: 'application', state: 'application', subState: 'identifier' },
     { keyword: 'message', state: 'message', subState: 'identifier' },
     { keyword: 'network', state: 'network', subState: 'identifier' },
+    { keyword: 'enum', state: 'enum', subState: 'identifier' },
   ]);
 }

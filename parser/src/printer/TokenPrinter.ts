@@ -131,7 +131,7 @@ export class TokenPrinter {
       const currentScope = this.scopeStack.at(-1);
       if (
         (['namespace', 'application', 'connection'].includes(this.token.text)) ||
-        (currentScope == 'namespace' && ['network', 'message'].includes(this.token.text)) ||
+        (currentScope == 'namespace' && ['network', 'message', 'enum'].includes(this.token.text)) ||
         (currentScope == 'network' && ['process', 'pipe', 'ingress', 'egress'].includes(this.token.text))
       ) {
         this.blankLine();

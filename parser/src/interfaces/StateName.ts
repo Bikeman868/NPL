@@ -5,6 +5,7 @@ export type StateName =
   | 'application'
   | 'network'
   | 'message'
+  | 'enum'
   | 'connection'
   | 'process'
   | 'pipe'

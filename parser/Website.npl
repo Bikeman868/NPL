@@ -13,21 +13,25 @@ namespace App {
 
         pipe Router {
             route httpListener.HttpRequest {
+                /*
                 if (message.path.startsWith('/api')) {
-                    route.append { process Logger }
-                    route.prepend { network Api.Request }
-                    route.capture ApiResponse { 
-                        route.prepend { process Json }
+                    append { process Logger }
+                    prepend { network Api.Request }
+                    capture ApiResponse { 
+                        prepend { process Json }
                     }
-                } else if (message.path.startsWith('/ux')) {
-                    route.append { process Logger }
-                    route.prepend { network Html.Request }
-                    route.capture HtmlResponse { 
-                        route.prepend { process Html }
-                    }
-                } else {
-                    route.prepend { process NotFound }
                 }
+                elseif (message.path.startsWith('/ux')) {
+                    append { process Logger }
+                    prepend { network Html.Request }
+                    capture HtmlResponse { 
+                        prepend { process Html }
+                    }
+                }
+                else {
+                    prepend { process NotFound }
+                }
+                */
             }
         }
 

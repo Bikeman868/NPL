@@ -19,6 +19,7 @@ import { parseRoute } from '../states/parseRoute.js';
 import { parseEmit } from '../states/parseEmit.js';
 import { parseNetworkEntry } from '../states/parseNetworkEntry.js';
 import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
+import { parseEnum } from '../states/parseEnum.js';
 import {
   newline,
   whitespace,
@@ -44,6 +45,7 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['message', parseMessage],
     ['process', parseProcess],
     ['pipe', parsePipe],
+    ['enum', parseEnum],
 
     ['accept', parseAccept],
     ['object', parseObject],

@@ -227,19 +227,19 @@ namespace App {
         pipe Router {
             route httpListener.HttpRequest {
                 if (message.path.startsWith('/api')) {
-                    route.append { process Logger }
-                    route.prepend { network Api.Request }
-                    route.capture ApiResponse { 
-                        route.prepend { process Json }
+                    append { process Logger }
+                    prepend { network Api.Request }
+                    capture ApiResponse { 
+                        prepend { process Json }
                     }
                 } else if (message.path.startsWith('/ux')) {
-                    route.append { process Logger }
-                    route.prepend { network Html.Request }
-                    route.capture HtmlResponse { 
-                        route.prepend { process Html }
+                    append { process Logger }
+                    prepend { network Html.Request }
+                    capture HtmlResponse { 
+                        prepend { process Html }
                     }
                 } else {
-                    route.prepend { process NotFound }
+                    prepend { process NotFound }
                 }
             }
         }
@@ -334,9 +334,9 @@ The `config` reserved word can also be used to access configuration values, so i
 
 ```npl
 if (context.origin.jwt.role == config.requiredRole)
-  route.prepend { process DoIt }
+  prepend { process DoIt }
 else
-  route.prepend { process AccessDenied }
+  prepend { process AccessDenied }
 ```
 
 Note that config is only mutable at runtime via a yaml configuration file. You cannot cheat and use config to hold mutable state.
@@ -401,25 +401,25 @@ This is an example pipe definition:
 
 ```npl
 pipe Pipe1 {
-    route Message1 { route.prepend { process Process1 } }
+    route Message1 { prepend { process Process1 } }
     route Message2 { 
-        route.prepend { 
+        prepend { 
             process Process1
             process Process2
             pipe Pipe2
         }
-        route.append  { pipe Pipe2 }
+        append  { pipe Pipe2 }
     }
     route Message3 {
         clone {
             field1 'new field 1 value'
             field2 'new field 2 value'
         }
-        route.clear
+        clear
     }
     route * {
-        route.clear
-        route.prepend { process NotImplementedLogger }
+        clear
+        prepend { process NotImplementedLogger }
     }
 }
 ```
@@ -427,9 +427,9 @@ pipe Pipe1 {
 This illustrates a few patterns and techniques as follows:
 
 * `Message1` routing simply adds a new destination to the front of the route. This is where the message will be sent next. Simple routing statements like this can be all on 1 line if you want.
-* `Message2` routing makes multiple routing changes. These must be separated by line breaks. The `route.prepend` statement also routes to multiple destinations, in this case the destintions must be separated by line breaks.
+* `Message2` routing makes multiple routing changes. These must be separated by line breaks. The `prepend` statement also routes to multiple destinations, in this case the destintions must be separated by line breaks.
 * `Message3` routing makes a copy of the original message (including its route), where the copy has some modified field values. It also clears the route on the original message so that it will not be processed any further. This is as close as you can get to mutating a message.
-* `*` routing applies to any other type of message. In this case we clear the route to prevent any further processing of this message, then send the message to the `NotImplementedLogger` process. Note that the `route.prepend` statement must come after `route.clear` or the prepend would also be cleared.
+* `*` routing applies to any other type of message. In this case we clear the route to prevent any further processing of this message, then send the message to the `NotImplementedLogger` process. Note that the `prepend` statement must come after `clear` or the prepend would also be cleared.
 
 ## The `route` reserved word
 
@@ -443,13 +443,13 @@ The `clone` reserved word makes a copy of the message in context, but modifies s
 
 The `route` statement supports the following operations on the message route:
 
-* `route.clear` deletes all routing information on the messaage. If no further manipulation of the route takes place, then the message will be dropped, and no further processing will take place.
-* `route.prepend` adds a new destination to the front of the routing list, making it the next place that the message will be sent. The destination can be a `pipe`, `process` or `network` entry point.
-* `route.append` adds a new destination to the end of the routing list, so that the message will be sent to this destination for processing after all of the destinations on this list have processed the message. The destination can be a `pipe`, `process` or `network` entry point.
-* `route.capture` specifies how to route messages emitted by processes as they proces this message. The `route.capture` statement is followed by a message type, then a route definition enclosed ini `{}`. The route definiton uses the same `route` reserved word. This does allows you to create nested `route.capture` statements, but this is bad practice and other solutions should be saught.
-* `route.remove` is followed by a list of destinations, and removes all of those destinations from the routing list. This is not often useful, but is provided for completeness.
+* `clear` deletes all routing information on the messaage. If no further manipulation of the route takes place, then the message will be dropped, and no further processing will take place.
+* `prepend` adds a new destination to the front of the routing list, making it the next place that the message will be sent. The destination can be a `pipe`, `process` or `network` entry point.
+* `append` adds a new destination to the end of the routing list, so that the message will be sent to this destination for processing after all of the destinations on this list have processed the message. The destination can be a `pipe`, `process` or `network` entry point.
+* `capture` specifies how to route messages emitted by processes as they proces this message. The `capture` statement is followed by a message type, then a route definition enclosed ini `{}`. The route definiton uses the same `route` reserved word. This does allows you to create nested `capture` statements, but this is bad practice and other solutions should be saught.
+* `remove` is followed by a list of destinations, and removes all of those destinations from the routing list. This is not often useful, but is provided for completeness.
 
-As well as using `route.capture` to globally catch all emitted messages of a specific type, you can also add a scope block after a routing destination to capture messages emitted from that destination.
+As well as using `capture` to globally catch all emitted messages of a specific type, you can also add a scope block after a routing destination to capture messages emitted from that destination.
 
 For example:
 
@@ -458,15 +458,15 @@ namespace App {
     network Network1 {
         pipe Pipe1 {
             route Message1 {
-                route.prepend {
+                prepend {
                     process Process1 {
                         capture Message2 {
-                            route.prepend { process Process2 }
+                            prepend { process Process2 }
                         }
                     }
                 }
-                route.capture Message2 { 
-                    route.prepend { process Process3 }
+                capture Message2 { 
+                    prepend { process Process3 }
                 }
             }
         }

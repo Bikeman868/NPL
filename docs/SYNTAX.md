@@ -13,23 +13,25 @@ This document defines what is valid for an NPL program. The syntax is defined us
 - Other symbols are literals. For example curly braces, quotes, commas etc must appear exactly as shown.
 - Words not in italics are literal words in the syntax.
 
+Note that comments can appear in most of the places you would expect, but this is not explicitly called out in the
+stntax definitions below, because it would be an optional comment element between every other element of the syntax.
+NPL supports C-like comments, with `//` commenting to the end of the line, and `/*` and `*/` providing multi-line comments.
+
 Note that this document defines the syntax. It is possible for code to be syntactically correct but structurally invalid. For example having multiple application definitions within a source file is structurally invalid but syntactially correct.
 
 ## Source code files
 
 Each source code file must conform to the following syntax.
 
-_source-file_ = _using_* _namespace_?
+_source-file_ = [_whitespace_] _using_* _namespace_?
 
-_using_ = _whitespace_ `using` _separator_ qualified-identifier_ _new-line_
+_using_ = `using` _separator_ qualified-identifier_ _new-line_ [_whitespace_]
 
-_namespace_ = _whitespace_ `namespace` _separator_ _qualified-identifier_ _open-scope_ _namespace-definition_ _close-scope_
-
-_qualified-identifier_ = _identifier_ (_decimal_ _idendifier_)*
+_namespace_ = `namespace` _separator_ _qualified-identifier_ _open-scope_ _namespace-definition_ _close-scope_ [_whitespace_]
 
 _namespace-definition_ = (_whitespace_ | _application_ | _network_ | _message_ | _enum_)*
 
-## Type Definitions
+## Namespace Type Definitions
 
 _application_ = `application` _separator_ _identifier_ [_open-scope_ _application-definition_ _close-scope_] _new-line_
 
@@ -37,19 +39,15 @@ _message_ = `message` _separator_ _identifier_ [_open-scope_ _message-definition
 
 _network_ = `network` _separator_ _identifier_ [_open-scope_ _network-definition_ _close-scope_] _new-line_
 
-_process_ = `process` _separator_ _identifier_ [_open-scope_ _process-definition_ _close-scope_] _new-line_
-
-_pipe_ = `pipe` _separator_ _identifier_ [_open-scope_ pipe-definition_ _close-scope_] _new-line_
-
 _enum_ = `enum` _separator_ _identifier_ [_open-scope_ (_identifier_ _whitespace_)* _close-scope_] _new-line_
 
 ### Application definitions
 
 _application-definition_ = (_whitespace_ | _connection_)*
 
-_connection_ = `connection` _separator_ _qualified-identifier_ [_open-scope_ _connection-definition_ _close-scope_] _new-line_
+_connection_ = `connection` _separator_ _qualified-identifier_ [_separator_] [_open-scope_ _connection-definition_ _close-scope_] _new-line_
 
-_connection-definition_ = [_config_] (`ingress` | `egress`)? _qualified_identifier_ _new-line_
+_connection-definition_ = [_config_] _entry-type_ [_separator_ _entry-type_] [_separator_ `network`] _qualified_identifier_ _new-line_
 
 ### Message definitions
 
@@ -59,13 +57,17 @@ _message-field_ = _type_ _separator_ _identifier_ _new-line_
 
 ### Network and Pipe definitions
 
-_network-definition_ = [_config_] (_whitespace_ | _entry-point_ | _process_)*
+_network-definition_ = [_config_] (_whitespace_ | _entry-point_ | _process_ | _pipe_)*
 
 _entry-point_ = _entry-type_ [_separator_ _entry-type_] [_separator_ _entry-name_] [_open-scope_ _route_ _close_scope_] _new-line_
 
 _entry-type_ = `ingress` | `egress`
 
 _entry-name_ = `default` | _identifier_
+
+_process_ = `process` _separator_ _identifier_ [_open-scope_ _process-definition_ _close-scope_] _new-line_
+
+_pipe_ = `pipe` _separator_ _identifier_ [_open-scope_ pipe-definition_ _close-scope_] _new-line_
 
 _route_ = [_destination_] (_new-line_ _destination_)*
 
@@ -79,7 +81,7 @@ _routing-logic_ = _routing-if_ | _routing-else_ | _routing-else-if_ | _routing-w
 
 _routing-if_ = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-_routing-else-if_ = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+_routing-else-if_ = `elseif` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
 _routing-else_ = `else` _open-scope_ _route_definition_ _close_scope_ _new-line_
 
@@ -87,15 +89,15 @@ _routing-while_ = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _
 
 _routing-for_ = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
 
-_prepend-command_ = `route.prepend` _open-scope_ _route_ _close_scope_ _new-line_
+_prepend-command_ = `prepend` _open-scope_ _route_ _close_scope_ _new-line_
 
-_append-command_ = `route.append` _open-scope_ _route_ _close_scope_ _new-line_
+_append-command_ = `append` _open-scope_ _route_ _close_scope_ _new-line_
 
-_clear-command_ = `route.clear` _new-line_
+_clear-command_ = `clear` _new-line_
 
-_remove-command_ = `route.remove` _open-scope_ _route_ _close_scope_ _new-line_
+_remove-command_ = `remove` _open-scope_ _route_ _close_scope_ _new-line_
 
-_capture-command_ = `route.capture` _separator_ _qualified-identifer_ [_open-scope_ _route_ _close_scope_] _new-line_
+_capture-command_ = `capture` _separator_ _qualified-identifer_ [_open-scope_ _route_ _close_scope_] _new-line_
 
 _clone-command_ = `clone` _open-scope_ _route_ _close_scope_ _new-line_
 
@@ -149,13 +151,13 @@ _config-value_ = _whitespace_ _identifier_ _separator_ _constant-expression_
 
 _expression_ = _constant-expression_ | _computed-expression_ | _array-expression_ | _map-expression_
 
-_constant-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _constant-value_ [_whitespace_ _binary-operator_ _whitespace_ _constant-expression_] [_close-paren_]
+_constant-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _constant-value_ [_whitespace_] [_binary-operator_ _separator_ _constant-expression_] [_close-paren_]
 
-_computed-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _computed-value_ [_whitespace_ _binary-operator_ _whitespace_ _computed-expression_] [_close-paren_]
+_computed-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _computed-value_ [_whitespace_] [_binary-operator_ _separator_ _computed-expression_] [_close-paren_]
 
 _array-expression_ = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
 
-_map-expression_ = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
+_map-expression_ = _identifier_ (_decimal_ _identifier_)?
 
 _computed-value_ = _constant-value_ | _qualified-identifier_ | _method-call_
 
@@ -166,7 +168,6 @@ _enum-value_ = _qualified-identifier_
 _env-value_ = `%` _identifier_ `%`
 
 _method-call_ = _qualified-identifier_ _open-paren_ [_expression_] (_comma-separator_ _expression_)* _close-paren_
-
 
 _binary-operator_ = `<` | `>` | `<=` | `>=` | `==` | `!=` | `===` | `!==` | `+` | `-` | `/` | `*` | `%` | `<<` | `>>` | `|` | `||` | `&` | `&&`
 
@@ -202,27 +203,27 @@ _open_round_ = `/0x28`
 
 _close_round_ = `/0x29`
 
+_underscore_ = `/0x5f`
+
 _alpha_ = `a` | `b` | ... | `Y` | `Z`
 
 _numeric_ = `0` | `1` | ... | `9`
 
 _alphanumeric_ = _alpha_ | _numeric
 
-_punctuation_ = ''
-
-_char_ = _alphanumeric_ | _punctuation_
-
 _number_ = (_numeric_)? [ _decimal_ (_numeric_)* ]
 
 _string_ = _quote_ !(_quote_ | _linebreak_)* _quote_
 
-_identifier_ = _alpha_ (_alphanumeric_)*
+_identifier_ = (_alpha_ | _underscore_) (_alphanumeric_ | _underscore_)*
 
-_whitespace_ = (_space_ | _tab_ | _linebreak_)*
+_qualified-identifier_ = _identifier_ (_decimal_ _idendifier_)*
+
+_whitespace_ = (_space_ | _tab_ | _linebreak_)?
 
 _separator_ = (_space_ | _tab_)?
 
-_new-line_ = _whitespace_ _linebreak_ _whitespace_
+_new-line_ = [_whitespace_] _linebreak_ [_whitespace_]
 
 _open-paren_ = (_space_ | _tab_)* _open_round_ (_space_ | _tab_)*
 
@@ -232,8 +233,8 @@ _open-array_ = (_space_ | _tab_)* _open_square_ (_space_ | _tab_)*
 
 _close_array_ = (_space_ | _tab_)* _close_square_ (_space_ | _tab_)*
 
-_open-scope_ = _whitespace_ `{` _whitespace_
+_open-scope_ = [_whitespace_] `{` [_whitespace_]
 
-_close-scope_ = _whitespace_ `}`
+_close-scope_ = [_whitespace_] `}`
 
 _comma-separator_ = (_space_ | _tab_)* `,` (_space_ | _tab_)*
