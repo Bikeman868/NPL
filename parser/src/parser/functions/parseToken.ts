@@ -11,6 +11,7 @@ import { parseNetwork } from '../states/parseNetwork.js';
 import { parseMessage } from '../states/parseMessage.js';
 import { parseConnection } from '../states/parseConnection.js';
 import { parseProcess } from '../states/parseProcess.js';
+import { parsePipe } from '../states/parsePipe.js';
 import { parseObject } from '../states/parseObject.js';
 import { parseExpression } from '../states/parseExpression.js';
 import { parseAccept } from '../states/parseAccept.js';
@@ -35,17 +36,29 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['using', parseUsing],
     ['namespace', parseNamespace],
     ['application', parseApplication],
-    ['network', parseNetwork],
-    ['message', parseMessage],
     ['connection', parseConnection],
+    ['connectionEntry', parseConnectionEntry],
+
+    ['network', parseNetwork],
+    ['networkEntry', parseNetworkEntry],
+    ['message', parseMessage],
     ['process', parseProcess],
+    ['pipe', parsePipe],
+
     ['accept', parseAccept],
     ['object', parseObject],
     ['expression', parseExpression],
     ['route', parseRoute],
     ['emit', parseEmit],
-    ['networkEntry', parseNetworkEntry],
-    ['connectionEntry', parseConnectionEntry],
+
+    ['appendRoute', parseRoute],
+    ['prependRoute', parseRoute],
+    ['clearRoute', parseRoute],
+    ['captureRoute', parseRoute],
+    ['removeRoute', parseRoute],
+    ['ifRoute', parseRoute],
+    ['elseRoute', parseRoute],
+    ['elseifRoute', parseRoute],
   ]);
 
 export function parseToken(context: IContext): IToken {

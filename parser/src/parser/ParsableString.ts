@@ -111,12 +111,18 @@ export class ParsableString implements IParsable {
   }
 
   skipToEol() {
+    let scopeDepth = 0;
     while (this._position.offset < this._buffer.length) {
       if (this.peek(2) == lineCommentDelimiter) return;
 
       let ch = this.current();
       if (!ch) return;
-      if (ch == newline || ch == closeScope) return;
+      if (ch == newline) return;
+      if (ch == closeScope) {
+        if (scopeDepth == 0) return;
+        scopeDepth--;
+      }
+      if (ch == openScope) scopeDepth++;
       this.next();
     }
   }

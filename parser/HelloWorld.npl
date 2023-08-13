@@ -1,22 +1,12 @@
-using npl.connection // Saves having to write npl.connection.console each time
-namespace app {
-    network Hello { // This network responds to messages with 'Hello world'
-        ingress egress default { // Default entry point for incoming and outgoing messages
-            process Responder // All messages are handled by the 'Responder' process
-        }
-        process Responder {
-            accept * { // Accept all message types
-                emit console.text { // Produce a new message of type npl.connection.console.text
-                    data { text 'Hello, world' } // Set the message field values
-                }
-            }
-        }
-    }
-} 
+// This using statement lets us abbreviate `npl.connection.console` to just `console`
+using npl.connection
 
-namespace App { // Namespace can be defined in multiple source files
-    application HelloWorld { // Only 1 application definition is permitted
-        connection emitter { // npl.connection.emitter just emits messages
+namespace app {
+    /* This simple hello world application demonstrates some of the
+       basic prinicples of NPL. Try modifying this app and see what happens
+    */
+    application HelloWorld { // Only 1 application definition is allowed
+        connection emitter { // npl.connection.emitter periodically emits messages
             config { 
                 count 1 // Emit 1 message and stop
                 interval 0 // Infinite delay between messages
@@ -30,3 +20,18 @@ namespace App { // Namespace can be defined in multiple source files
         }
     }
 }
+
+namespace app { // Namespace can be defined in multiple source files
+    network Hello { // This network responds to messages with 'Hello world'
+        ingress egress default { // Default entry point for incoming and outgoing messages
+            process Responder // All messages are handled by the 'Responder' process
+        }
+        process Responder {
+            accept * { // Accept all message types
+                emit console.text { // Produce a new message of type npl.connection.console.text
+                    data { text 'Hello, world' } // Set the message field values
+                }
+            }
+        }
+    }
+} 

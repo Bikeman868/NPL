@@ -28,7 +28,7 @@ if (context.syntaxErrors.length > 0) {
   printer.print(sourceFileText, context.syntaxErrors);
 } else {
   // Pretty print the code
-  const printer = new TokenPrinter();
+  const printer = new TokenPrinter(tokens);
   printer.includeConsoleColors = true;
-  printer.print(tokens);
+  printer.print();
 }

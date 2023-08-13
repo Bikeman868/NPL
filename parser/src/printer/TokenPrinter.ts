@@ -1,37 +1,99 @@
 import { IToken } from '#interfaces/IToken.js';
 
 export class TokenPrinter {
-  private _output: (line: string) => void;
-  private _indent: number;
-  private _line: string;
+  private output: (line: string) => void;
+  private token!: IToken;
+  private nextToken?: IToken;
+  private prevToken?: IToken;
+  private scopeStack: string[];
+  private nextScope?: string;
+  private nextIsSingleLineComment!: boolean;
+  private indent: number;
+  private line: string;
+  private tokens: IToken[];
 
   includeConsoleColors: boolean = false;
 
-  constructor(output?: (line: string) => void) {
-    this._indent = 0;
-    this._line = '';
-    this._output =
+  constructor(tokens: IToken[], output?: (line: string) => void) {
+    this.tokens = tokens;
+    this.indent = 0;
+    this.line = '';
+    this.nextToken = tokens[0];
+    this.scopeStack = [];
+
+    this.output =
       output ||
       ((line) => {
         console.log(line);
       });
   }
 
-  private write(text: string) {
-    this._line += text;
+  print() {
+    if (!this.tokens || this.tokens.length == 0) return;
+
+    for (var index = 0; index < this.tokens.length; index++) {
+      this.prevToken = this.token;
+      this.token = this.nextToken!;
+      this.nextToken =
+        index < this.tokens.length - 1 ? this.tokens[index + 1] : undefined;
+
+      if (this.nextToken && this.nextToken.tokenType == 'Comment') {
+        const lines = this.nextToken.text.split('\n');
+        this.nextIsSingleLineComment = lines.length == 1;
+      } else {
+        this.nextIsSingleLineComment = false;
+      }
+
+      switch (this.token!.tokenType) {
+        case 'Keyword':
+          this.printKeyword();
+          break;
+        case 'ParamStart':
+          this.printParamStart();
+          break;
+        case 'ParamEnd':
+          this.printParamEnd();
+          break;
+        case 'ScopeStart':
+          this.printScopeStart();
+          break;
+        case 'ScopeEnd':
+          this.printScopeEnd();
+          break;
+        case 'QualifiedIdentifier':
+        case 'Identifier':
+          this.printIdentifier();
+          break;
+        case 'Constant':
+        case 'Expression':
+          this.printExpression();
+          break;
+        case 'Comment':
+          this.printComment();
+          break;
+        default:
+          this.write(this.token.text);
+          this.write(' ');
+          break;
+      }
+    }
   }
 
-  private eol() {
-    if (this._line) {
+  private write(text: string) {
+    this.line += text;
+  }
+
+  private newLine() {
+    if (this.line) {
       let indent = '';
-      for (let i = 0; i < this._indent; i++) indent += '  ';
-      this._output(indent + this._line);
-      this._line = '';
+      for (let i = 0; i < this.indent; i++) indent += '  ';
+      this.output(indent + this.line);
+      this.line = '';
     }
   }
 
   private blankLine() {
-    this._output('');
+    this.output('');
   }
 
   private red() {
@@ -62,89 +124,100 @@ export class TokenPrinter {
     if (this.includeConsoleColors) this.write('\u001b[0m');
   }
 
-  print(tokens: IToken[]) {
-    for (var index = 0; index < tokens.length; index++) {
-      const token = tokens[index];
-      const nextToken =
-        index < tokens.length - 1 ? tokens[index + 1] : undefined;
-      const prevToken = index > 0 ? tokens[index - 1] : undefined;
-      switch (token.tokenType) {
-        case 'Keyword':
-          if (!prevToken || prevToken.tokenType != 'Keyword') this.eol();
-          if (token.text == 'namespace' || token.text == 'message')
-            this.blankLine();
-          this.cyan();
-          this.write(token.text);
-          this.defaultColor();
-          this.write(' ');
-          break;
-        case 'ParamStart':
-          this.red();
-          this.write('(');
-          this.defaultColor();
-          break;
-        case 'ParamEnd':
-          this.red();
-          this.write('(');
-          this.defaultColor();
-          break;
-        case 'ScopeStart':
-          this.yellow();
-          this.write('{');
-          this.defaultColor();
-          this.eol();
-          this._indent++;
-          break;
-        case 'ScopeEnd':
-          this.eol();
-          this._indent--;
-          this.yellow();
-          this.write('}');
-          this.defaultColor();
-          this.eol();
-          break;
-        case 'QualifiedIdentifier':
-        case 'Identifier':
-          this.red();
-          this.write(token.text);
-          this.defaultColor();
-          this.write(' ');
-          break;
-        case 'Constant':
-        case 'Expression':
-          this.yellow();
-          this.write(token.text);
-          this.defaultColor();
-          this.eol();
-          break;
-        case 'Comment':
-          {
-            this.green();
-            const lines = token.text.split('\n').map((l) => l.trim());
-            if (lines.length == 1) {
-              this.write('/* ');
-              this.write(lines[0]);
-              this.write(' */');
-              this.defaultColor();
-            } else {
-              this.write('/*');
-              this.eol();
-              for (const line of lines) {
-                this.write('  ');
-                this.write(line);
-                this.eol();
-              }
-              this.write('*/');
-              this.defaultColor();
-              this.eol();
-            }
-          }
-          break;
-        default:
-          this.write(token.text);
-          this.write(' ');
-          break;
+  private printKeyword() {
+    if (!this.prevToken || this.prevToken.tokenType != 'Keyword') {
+      this.newLine();
+
+      const currentScope = this.scopeStack.at(-1);
+      if (
+        (['namespace', 'application', 'connection'].includes(this.token.text)) ||
+        (currentScope == 'namespace' && ['network', 'message'].includes(this.token.text)) ||
+        (currentScope == 'network' && ['process', 'pipe', 'ingress', 'egress'].includes(this.token.text))
+      ) {
+        this.blankLine();
+        this.nextScope = this.token.text;
+      } else if (['process', 'pipe', 'ingress', 'egress'].includes(this.token.text)) {
+        this.nextScope = this.token.text;
       }
+    }
+
+    this.cyan();
+    this.write(this.token.text);
+    this.defaultColor();
+    this.write(' ');
+  }
+
+  private printParamStart() {
+    this.red();
+    this.write('(');
+    this.defaultColor();
+  }
+
+  private printParamEnd() {
+    this.red();
+    this.write(')');
+    this.defaultColor();
+  }
+
+  private printScopeStart() {
+    this.yellow();
+    this.write('{');
+    this.defaultColor();
+    if (this.nextIsSingleLineComment) this.write(' ');
+    else {
+      this.newLine();
+      this.indent++;
+    }
+    this.scopeStack.push(this.nextScope || '');
+  }
+
+  private printScopeEnd() {
+    this.scopeStack.pop();
+    this.newLine();
+    this.indent--;
+    this.yellow();
+    this.write('}');
+    this.defaultColor();
+    this.newLine();
+  }
+
+  private printIdentifier() {
+    this.red();
+    this.write(this.token.text);
+    this.defaultColor();
+    this.write(' ');
+  }
+
+  private printExpression() {
+    this.yellow();
+    this.write(this.token.text);
+    this.defaultColor();
+    if (this.nextIsSingleLineComment) this.write('');
+    else this.newLine();
+  }
+
+  private printComment() {
+    const lines = this.token.text.split('\n').map((l) => l.trim());
+    if (lines.length == 1) {
+      this.green();
+      this.write('// ');
+      this.write(lines[0]);
+      this.defaultColor();
+      this.newLine();
+      if (this.prevToken?.tokenType == 'ScopeStart') this.indent++;
+    } else {
+      this.newLine();
+      this.green();
+      this.write('/*');
+      this.newLine();
+      for (const line of lines) {
+        this.write('  ');
+        this.write(line);
+        this.newLine();
+      }
+      this.write('*/');
+      this.defaultColor();
+      this.newLine();
     }
   }
 }

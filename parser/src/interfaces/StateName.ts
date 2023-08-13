@@ -7,6 +7,7 @@ export type StateName =
   | 'message'
   | 'connection'
   | 'process'
+  | 'pipe'
   | 'object'
   | 'expression'
   | 'constant'
@@ -14,4 +15,12 @@ export type StateName =
   | 'emit'
   | 'route'
   | 'networkEntry'
-  | 'connectionEntry';
+  | 'connectionEntry'
+  | 'appendRoute'
+  | 'prependRoute'
+  | 'clearRoute'
+  | 'captureRoute'
+  | 'removeRoute'
+  | 'ifRoute'
+  | 'elseRoute'
+  | 'elseifRoute';

@@ -80,4 +80,12 @@ describe('Parsable string', () => {
     expect(buffer.extractCount(1)).toBe('\n');
     expect(buffer.extractAny(identifier)).toBe('line3');
   });
+
+  it('should skip to end of scope', () => {
+    const buffer = new ParsableString('name expression {} }\n');
+    expect(buffer.extractAny(identifier)).toBe('name');
+    buffer.skipAny(whitespace);
+    expect(buffer.extractToEol()).toBe('expression {} ');
+    expect(buffer.extractCount(2)).toBe('}\n');
+  });
 });

@@ -4,7 +4,7 @@ import { newline, separator } from '#interfaces/charsets.js';
 
 export function parseExpression(context: IContext): ParseResult {
   context.buffer.skipAny(separator);
-  const text = context.buffer.extractToAny([newline]);
+  const text = context.buffer.extractToEol();
   if (!text) context.syntaxError('Computed expression expected');
   context.popState();
   return { text, tokenType: 'Expression' };
