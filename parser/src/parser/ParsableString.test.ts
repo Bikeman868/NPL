@@ -43,7 +43,7 @@ describe('Parsable string', () => {
     expect(buffer.peek(2)).toBe('/*');
     buffer.skipCount(2);
     expect(buffer.extractUntil('*/')).toBe(' line 1\n line 2 ');
-    buffer.skipCount(2);
+    buffer.skipCount(3);
     expect(buffer.extractToAny(whitespace)).toBe('some');
     buffer.skipAny(whitespace);
     expect(buffer.extractToEol()).toBe('code ');

@@ -42,7 +42,7 @@ namespace App {
     }
 }
 
-napespace App {
+namespace App {
     network Api {
         ingress egress Secure {
             config { 

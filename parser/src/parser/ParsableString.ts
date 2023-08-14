@@ -164,8 +164,10 @@ export class ParsableString implements IParsable {
   extractUntil(matchingText: string): string {
     const start = this._position.offset;
     const end = this._buffer.indexOf(matchingText, this._position.offset);
-    this.skipCount(end - start);
-    return this._buffer.slice(start, end).replace(cr, '');
+    const rawExtract = this._buffer.slice(start, end);
+    const extract = rawExtract.replace(cr, '');
+    this.skipCount(end - start + extract.length - rawExtract.length);
+    return extract;
   }
 
   /**

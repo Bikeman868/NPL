@@ -4,7 +4,7 @@ import { parseNamedReference } from '../functions/parseNamedReference.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
-export function parseEmit(context: IContext): ParseResult {
+export function parseProcessEmit(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
       return parseNamedReference(context, 'emit');

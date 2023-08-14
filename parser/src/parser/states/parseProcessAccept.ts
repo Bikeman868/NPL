@@ -5,7 +5,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 import { qualifiedIdentifier, whitespace } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
-export function parseAccept(context: IContext): ParseResult {
+export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
       return parseIdentifier(context);

@@ -4,7 +4,7 @@ import { parseNamedReference } from '../functions/parseNamedReference.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 
-export function parseRoute(context: IContext): ParseResult {
+export function parsePipeRoute(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
       return parseNamedReference(

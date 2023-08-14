@@ -14,9 +14,9 @@ import { parseProcess } from '../states/parseProcess.js';
 import { parsePipe } from '../states/parsePipe.js';
 import { parseObject } from '../states/parseObject.js';
 import { parseExpression } from '../states/parseExpression.js';
-import { parseAccept } from '../states/parseAccept.js';
-import { parseRoute } from '../states/parseRoute.js';
-import { parseEmit } from '../states/parseEmit.js';
+import { parseProcessAccept } from '../states/parseProcessAccept.js';
+import { parsePipeRoute } from '../states/parsePipeRoute.js';
+import { parseProcessEmit } from '../states/parseProcessEmit.js';
 import { parseNetworkEntry } from '../states/parseNetworkEntry.js';
 import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
 import { parseEnum } from '../states/parseEnum.js';
@@ -51,20 +51,20 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
 
     // Pipes and routes
     ['pipe', parsePipe],
-    ['pipeRoute', parseRoute],
-    ['appendRoute', parseRoute],
-    ['prependRoute', parseRoute],
-    ['clearRoute', parseRoute],
-    ['captureRoute', parseRoute],
-    ['removeRoute', parseRoute],
-    ['ifRoute', parseRoute],
-    ['elseRoute', parseRoute],
-    ['elseifRoute', parseRoute],
+    ['pipeRoute', parsePipeRoute],
+    ['appendRoute', parsePipeRoute],
+    ['prependRoute', parsePipeRoute],
+    ['clearRoute', parsePipeRoute],
+    ['captureRoute', parsePipeRoute],
+    ['removeRoute', parsePipeRoute],
+    ['ifRoute', parsePipeRoute],
+    ['elseRoute', parsePipeRoute],
+    ['elseifRoute', parsePipeRoute],
 
     // Processes
     ['process', parseProcess],
-    ['processAccept', parseAccept],
-    ['processEmit', parseEmit],
+    ['processAccept', parseProcessAccept],
+    ['processEmit', parseProcessEmit],
 
     // Object initialization and expressions
     ['object', parseObject],
