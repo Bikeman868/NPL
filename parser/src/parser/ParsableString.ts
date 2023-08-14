@@ -8,6 +8,7 @@ import {
   openScope,
   closeScope,
   lineCommentDelimiter,
+  separator,
 } from '#interfaces/charsets.js';
 
 export class ParsableString implements IParsable {
@@ -173,7 +174,7 @@ export class ParsableString implements IParsable {
    * Moves the cursor to the opening { or eol. Retuns true if it is {
    */
   hasScope(): boolean {
-    this.skipUntil([newline, openScope]);
+    this.skipAny(separator)
     return this.current() == openScope;
   }
 
