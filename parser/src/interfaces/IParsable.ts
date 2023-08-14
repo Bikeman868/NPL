@@ -23,4 +23,5 @@ export interface IParsable {
 
   hasScope(): boolean;
   isEndScope(): boolean;
+  isBeginScope(): boolean;
 }

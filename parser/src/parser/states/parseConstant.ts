@@ -1,11 +1,10 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { newline, separator } from '#interfaces/charsets.js';
+import { separator } from '#interfaces/charsets.js';
 
-export function parseExpression(context: IContext): ParseResult {
-  context.buffer.skipAny(separator);
+export function parseConstant(context: IContext): ParseResult {
   const text = context.buffer.extractToEol();
-  if (!text) context.syntaxError('Constant expression expected');
+  if (!text) context.syntaxError('Constant constant expected');
   context.popState();
   return { text, tokenType: 'Constant' };
 }

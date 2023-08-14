@@ -19,7 +19,7 @@ export function parseAccept(context: IContext): ParseResult {
 
 function parseAcceptDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'emit', state: 'emit', subState: 'identifier' },
+    { keyword: 'emit', state: 'processEmit', subState: 'identifier' },
   ]);
 }
 

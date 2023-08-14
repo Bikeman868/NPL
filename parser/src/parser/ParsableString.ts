@@ -178,9 +178,16 @@ export class ParsableString implements IParsable {
   }
 
   /**
-   * @returns true if there is no more definitions in this scope blosk
+   * @returns true if there is no more definitions in this scope block
    */
   isEndScope(): boolean {
     return this.current() == closeScope;
+  }
+
+  /**
+   * @returns true if this is the start of a scope block
+   */
+  isBeginScope(): boolean {
+    return this.current() == openScope;
   }
 }

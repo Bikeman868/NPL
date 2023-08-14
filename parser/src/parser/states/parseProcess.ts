@@ -18,6 +18,6 @@ export function parseProcess(context: IContext): ParseResult {
 
 function parseProcessDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'accept', state: 'accept', subState: 'identifier' },
+    { keyword: 'accept', state: 'processAccept', subState: 'identifier' },
   ]);
 }

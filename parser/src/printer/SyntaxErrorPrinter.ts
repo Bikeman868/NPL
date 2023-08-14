@@ -52,6 +52,7 @@ export class SyntaxErrorPrinter {
 
     let syntaxErrorIndex = 0;
     let error = syntaxErrors[syntaxErrorIndex];
+    const lineNumberSpacer = '    ';
 
     let lineNumber = 1;
     for (const sourceLine of sourceLines) {
@@ -63,7 +64,7 @@ export class SyntaxErrorPrinter {
       this.eol();
 
       while (error?.line == lineNumber) {
-        let indent = '';
+        let indent = lineNumberSpacer;
         for (let i = 1; i < error.column; i++) indent += ' ';
 
         this.write(indent);

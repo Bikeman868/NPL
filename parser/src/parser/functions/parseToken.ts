@@ -20,6 +20,8 @@ import { parseEmit } from '../states/parseEmit.js';
 import { parseNetworkEntry } from '../states/parseNetworkEntry.js';
 import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
 import { parseEnum } from '../states/parseEnum.js';
+import { parseConfig } from '../states/parseConfig.js';
+import { parseConstant } from '../states/parseConstant.js';
 import {
   newline,
   whitespace,
@@ -33,6 +35,7 @@ import {
 
 const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
   new Map([
+    // Top level source file structure
     ['sourcefile', parseSourceFile],
     ['using', parseUsing],
     ['namespace', parseNamespace],
@@ -40,19 +43,15 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['connection', parseConnection],
     ['connectionEntry', parseConnectionEntry],
 
+    // Elements of a namespace
+    ['enum', parseEnum],
+    ['message', parseMessage],
     ['network', parseNetwork],
     ['networkEntry', parseNetworkEntry],
-    ['message', parseMessage],
-    ['process', parseProcess],
+
+    // Pipes and routes
     ['pipe', parsePipe],
-    ['enum', parseEnum],
-
-    ['accept', parseAccept],
-    ['object', parseObject],
-    ['expression', parseExpression],
-    ['route', parseRoute],
-    ['emit', parseEmit],
-
+    ['pipeRoute', parseRoute],
     ['appendRoute', parseRoute],
     ['prependRoute', parseRoute],
     ['clearRoute', parseRoute],
@@ -61,6 +60,17 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['ifRoute', parseRoute],
     ['elseRoute', parseRoute],
     ['elseifRoute', parseRoute],
+
+    // Processes
+    ['process', parseProcess],
+    ['processAccept', parseAccept],
+    ['processEmit', parseEmit],
+
+    // Object initialization and expressions
+    ['object', parseObject],
+    ['config', parseConfig],
+    ['expression', parseExpression],
+    ['constant', parseConstant],
   ]);
 
 export function parseToken(context: IContext): IToken {

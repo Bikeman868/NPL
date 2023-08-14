@@ -47,7 +47,7 @@ export function parseScopeDefinition(
 
   if (keyword == 'config') {
     if (context.buffer.hasScope()) {
-      context.pushState('object', 'scope');
+      context.pushState('config', 'scope');
     }
   } else {
     let isValid = false;
