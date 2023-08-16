@@ -111,7 +111,7 @@ _message-type_ = `*` | `empty` | _qualified-identifier_
 
 _process-definition_ = [_config_] [_message-processing_] (_new-line_ _message-processing_)*
 
-_message-processing_ = `accept` _message-type_ [_open-scope_ _statements_ _close-scope_] _new-line_
+_message-processing_ = `accept` _message-type_ _separator_ _identifier [_open-scope_ _statements_ _close-scope_] _new-line_
 
 _statements_ = [_process-statement_] (_new-line_ _process-statement_)*
 

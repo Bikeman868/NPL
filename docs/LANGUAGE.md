@@ -17,6 +17,7 @@ This is not a formal definition of [the language syntax](SYNTAX.md), but a pract
     - [Routing network](#pipes-routing-network)
 - [Configuration](#configuration)
 - [Multi-threading](#multi-threading)
+- [Awaiting messages](#awaiting-messages)
 - [Routing](#routing)
     - [Message routes](#routing-message-routes)
     - [Pipes](#routing-pipes)
@@ -43,7 +44,7 @@ namespace app {
             process Responder
         }
         process Responder {
-            accept * {
+            accept * msg {
                 emit console.line { 
                     data { text 'Hello, world' }
                 }
@@ -116,7 +117,7 @@ The process declaration:
 
 ```npl
 process Responder {
-    accept * {
+    accept * msg {
         emit console.line { 
             data { text 'Hello, world' }
         }
@@ -129,9 +130,9 @@ Defines a process that will accept messages, process them, and optionally emit o
 The process definition is enclosed in `{}` and comprises a number of clauses that define the behavior of the process. Note that processes can not have internal state, only message processing
 logic. Conversely messages have state but no functionality. In NPL state travels with the message.
 
-The `accept` reserved word is followed by the name of a message or `*` (which means that it will accept any type of message).
+The `accept` reserved word is followed by the name of a message or `*` (which means that it will accept any type of message) and an identifier to use to refer to this message within the message handling code.
 
-In this case `accept * {}` defines the processing steps to perform when a message of any type is received, and  `emit console.line { text 'Hello, world' }` sends a `console.line` type message with it's `text` field set to the string literal "Hello, world".
+In this case `accept * msg {}` defines the processing steps to perform when a message of any type is received, and  `emit console.line { text 'Hello, world' }` sends a `console.line` type message with it's `text` field set to the string literal "Hello, world".
 
 Note that the process does not know where the incomming message came from, or where the response that it emitted will be sent next. Processes know nothing about the structure of the program, and are wired together by routing logic.
 
@@ -388,6 +389,72 @@ Because processes cannot contain mutable state, and a message can only be proces
 The NPL runtime can expand and contract the number of process instances that are running to accomodate the workload and prevent bottlenecks. You can observe these scaling events using the built-in NPL tools.
 
 NPL can also partition your application across many compute instances without changing a single line of code, because your processes and pipes are inherently unaware of the runtime context of your application. This allows you to take any application not specifically built for scale, and deploy it at massive scale without modification.
+
+<a name="awaiting"></a>
+# Awaiting messages
+
+Most of the time, processes will emit a message in one message handler, then recieve the response in a different handler, like this:
+
+```npl
+```
+
+But sometimes a process will need information from multiple messages to do its work, and that is where the `await` reserved word comes in. For those of you that have used other languages that have a `async/await` keyword pair, this is similar, but everything in NPL is always syync, so the `async` keyword is not needed.
+
+Lets say for example we want to write a process that will accept a cart message, calculate the total, add the tax, and emit this as a new invoice message. But to calculate the tax is needs to get the applicable tax rate from a database. We could send a message to the database asking for the tax rate, and have an `accept` handler for the response, but in this handler we no longer have the invoice message.
+
+In this scenario you can write:
+
+```npl
+process InvoiceCalculator {
+    accept Cart cart {
+        emit TaxRequest {
+            region cart.region
+            country cart.country
+        }
+        await { TaxResponse tax }
+        const subTotal = cart.items.sum(item => item.price * item.quantity)
+        emit Invoice {
+            ...cart
+            taxRate tax.rate
+            subTotal subTotal
+            total subTotal * (1 + tax.rate / 100)
+        }
+    }
+}
+```
+
+This assumes that somewhere in the system there is a process that accept `TaxRequest` messages and returns `TaxResponse` messages.
+This process doesn't konw, or need to know how this mechansism works.
+
+The `await` keyword can also wait for one of several message types by making a list. You can also put several `await` statements in the code, and the processing will wait for all of these messages to be available beofre continuing.
+
+To illustrate this, imagine that the tax process will return either a `TaxResponse` or an `Exception` and we want to continue processing whichever the response is:
+
+```npl
+process InvoiceCalculator {
+    accept Cart cart {
+        emit TaxRequest {
+            region cart.region
+            country cart.country
+        }
+        await { 
+            TaxResponse tax
+            Exception ex
+        }
+        if (tax) {
+            const subTotal = cart.items.sum(item => item.price * item.quantity)
+            emit Invoice {
+                ...cart
+                taxRate tax.rate
+                subTotal subTotal
+                total subTotal * (1 + tax.rate / 100)
+            }
+        } else {
+            emit Exception { text 'Unable to get tax information' }
+        }
+    }
+}
+```
 
 <a name="routing"></a>
 # Routing
@@ -650,13 +717,13 @@ namespace App {
         ingress egress MathQuestions { process DoMath }
 
         process DoMath {
-            accept MathQuestion {
-                if (message.operation == Operation.add)
-                    emit MathAnswer { answer message.a + message.b }
-                elseif (message.operation == Operation.subtract)
-                    emit MathAnswer { answer message.a - message.b }
+            accept MathQuestion question {
+                if (question.operation == Operation.add)
+                    emit MathAnswer { answer question.a + question.b }
+                elseif (question.operation == Operation.subtract)
+                    emit MathAnswer { answer question.a - question.b }
                 else
-                    emit Exception { text `Unknown math operation ${message.operation}`}
+                    emit Exception { text `Unknown math operation ${question.operation}`}
             }
 
             test 'should add numbers' {
@@ -674,7 +741,7 @@ namespace App {
                 emit MathQuestion {
                     a 12
                     b 20
-                    op Operation.subtract
+                    operation Operation.subtract
                 }
                 expect MathAnswer {
                     answer -8
