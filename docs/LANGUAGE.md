@@ -2,6 +2,34 @@
 
 This is not a formal definition of [the language syntax](SYNTAX.md), but a practical handbook that will get you writing code quickly.
 
+# Contents
+
+- [Hello World example](#hello-world)
+    - [Syntax](#hello-world-syntax)
+    - [Namespace and using](#hello-world-namespace)
+    - [Message](#hello-world-message)
+    - [Process](#hello-world-process)
+    - [Network](#hello-world-network)
+    - [Application](#hello-world-application)
+    - [Additional notes](#hello-world-notes)
+- [Pipes example](#pipes)
+    - [Application](#pipes-application)
+    - [Routing network](#pipes-routing-network)
+- [Configuration](#configuration)
+- [Multi-threading](#multi-threading)
+- [Routing](#routing)
+    - [Message routes](#routing-message-routes)
+    - [Pipes](#routing-pipes)
+    - [The `route` reserved word](#routing-route)
+- [Logic](#logic)
+- [Messages](#messages)
+- [Context](#context)
+- [Sharing code](#sharing-code)
+- [Code organization](#code-organization)
+- [Custom connections](#custom-connections)
+- [Unit Testing](#unit-testing)
+
+<a name="hello-world>"></a>
 # Hello World
 
 Sorry, but it's tradition. This is a hello world console app written in NPL.
@@ -43,10 +71,11 @@ namespace App {
 
 Note that if you wanted to write a hello world web page instead, then you would only need to modify the application definition, all of the rest of the code could remain unchanged.
 
-To try this code, save it so a file called `HelloWorld.npl`, install NPL on your computer, then type `npl HelloWorld`. Type Ctrl-C to signal the program to stop. In larger programs, you would break the code into multiple files, probably one per declaration, but the NPL compiler doesn't care how you arrange your declarations among source files, and you can rearrange them without affecting the behavior of your application.
+To try this code, save it so a file called `HelloWorld.npl`, install NPL on your computer, then type `npl run HelloWorld`. Type Ctrl-C to signal the program to stop. In larger programs, you would break the code into multiple files, probably one per declaration, but the NPL compiler doesn't care how you arrange your declarations among source files, and you can rearrange them without affecting the behavior of your application.
 
 Lets explain this step by step before we go any further.
 
+<a name="hello-world-syntax"></a>
 ## Syntax
 
 A quick sidenote about syntax. In NPL the general pattern is to have one or more reserved words, then a name, then optional `{}`. The reserved words say what kind of thing we are declaring, then we give is a name, then the `{}` enclose the definition of the thing we just named.
@@ -59,6 +88,7 @@ NPL minizes those annoying separatore. The question of whether I need a comma, s
 
 NPL does use `.` to separate hierarchical names, and `{}` to denote scope, but otherwise tries to keep the syntax clean and simple.
 
+<a name="hello-world-namespace"></a>
 ## Namespace and using
 
 The namespace declaration `namespace App` defines a namespace called `App`. Inside the namespace, code can reference other code elements simply by their name. If you want to reference something in another namespace, then you have to prefix the name with the namespace and a `.`. For example to reference the `Response` message above from another namespace, you can write `App.Response`.
@@ -69,6 +99,7 @@ Like other programming languages, namespaces exist to avoid name clashes between
 
 In this trivial example I coud have put eveything in one `namespace` declaration, but I split the code into two `namespace` declarations just to show that this is allowed. In typical large applications, the contents of a namespace will span many source files.
 
+<a name="hello-world-message"></a>
 ## Message
 
 For this example we are using a `console.line` message that is defined by the `console` 
@@ -78,6 +109,7 @@ fields of the application's message type onto the message type of the console. D
 this way allows you to easily swap out the console for another connection type that uses a
 different message format.
 
+<a name="hello-world-process"></a>
 ## Process
 
 The process declaration:
@@ -103,6 +135,7 @@ In this case `accept * {}` defines the processing steps to perform when a messag
 
 Note that the process does not know where the incomming message came from, or where the response that it emitted will be sent next. Processes know nothing about the structure of the program, and are wired together by routing logic.
 
+<a name="hello-world-network"></a>
 ## Network
 
 The network declaration:
@@ -131,6 +164,7 @@ The network entry point can define multiple processes, in which case each messag
 
 Network entry points can also be wired to pipes and the entry points of other networks. Large networks can be comprised of many smaller networks to whatever depth makes sense for your application.
 
+<a name="hello-world-application"></a>
 ## Application
 
 This is the only place where you can define connections. Connections define how your application connects to the rest of the system. You can have multiple applications that share the same networks, but have different connections to the world outside the application.
@@ -172,12 +206,14 @@ The second `connection` is to `console`, which is defined as an egress from the 
 
 Defining this as an `egress` means that the application sends messages to the console connection. The source of the egress messages is the default entry point of the `Hello` network. This will result in the phrase "Hello, world" being printed to the console window.
 
+<a name="hello-world-notes"></a>
 ## Additional notes
 
 From this example you can probably see that it's pretty easy to write integration tests, you simply define an application for each test that connects one or more networks within your codebase to real or dummy inputs and outputs.
 
 Unit tests are also easy because only processes can contain logic, and these have no state.
 
+<a name="pipes"></a>
 # Pipes example
 
 The hello world example above is too simple to need any pipe definitions, but pipes are really fundamental to the way you design solutions in NPL, beacuse they define how messages are routed within a network.
@@ -188,6 +224,7 @@ Lets say for example you want to accept an http request, validate the request us
 
 With what we have seen so far, this would be problematic, but that's because we didn't cover pipes yet!
 
+<a name="pipes-application"></a>
 ## Application
 
 For this example, the application needs one http listener `connection` that listens for http requests. The http listener connection emits messages that include the callers IP address, the domain name path and query string, JWT etc.
@@ -215,6 +252,7 @@ As you work with NPL, you will find it very helpful that each application can on
 
 To start an application you pass the name of the source file that contains a single `application` definition. You can have multiple applications based on the same codebase by putting each `application` definition in a separate file.
 
+<a name="pipes-routing-network"></a>
 ## Routing network
 
 The previous section defined a `network` called `Http`. Lets now look at how we might define that network.
@@ -282,6 +320,7 @@ If the http request path starts with `/ux` then this is an html page request. Th
 
 For all other paths, the message is routed to the `App.Http.NotFound` process which will emit the `App.Http.Json` process, which emits an `npl.connection.httpListener.HttpResponse` message containing a 404 status code.
 
+<a name="configuration"></a>
 # Configuration
 
 Configuration is a first class feature of the NPL language. For software to be flexible enough to have a useful lifetime, it needs to be configurable, but it also needs sensible defaults that only need to be overriden in specific circumstances.
@@ -341,6 +380,7 @@ else
 
 Note that config is only mutable at runtime via a yaml configuration file. You cannot cheat and use config to hold mutable state.
 
+<a name="multi-threading"></a>
 # Multi-threading
 
 Because processes cannot contain mutable state, and a message can only be processed by one process at a time, your application is automatically thread safe without you having to think about it. The threading model can be changed by overriding the application's `config` either in the application code, or via a yaml configuration file.
@@ -349,6 +389,7 @@ The NPL runtime can expand and contract the number of process instances that are
 
 NPL can also partition your application across many compute instances without changing a single line of code, because your processes and pipes are inherently unaware of the runtime context of your application. This allows you to take any application not specifically built for scale, and deploy it at massive scale without modification.
 
+<a name="routing"></a>
 # Routing
 
 The concept of message routing is very fundamental to the core concepts of NPL. This is a network programming language, and its a network of processes that process messages. To make the applicatiob do different processing under different circumstances it is necessary to route messages to different processes under different circumstances.
@@ -363,6 +404,7 @@ You can think of an NPL application as a hierarchy of graphs within graphs, wher
 
 Most routing is performed by `pipe` definitions. A `process` is allowed to change a message's route, and define the initial route for messages it emits, but this is discouraged and should be used very sparingly.
 
+<a name="routing-message-routes"></a>
 ## Message routes
 
 Every message has a route associated with it. The route describes a path through the application that the message will take. The route can be adjsuted along the way, because the message originator should not have to know the full structure of the application to be able to fire off new messages (something that most processes need to do).
@@ -387,6 +429,7 @@ In a similar way, other processes along the path can add routing rules to the me
 
 When messages are emitted and there is no rule for this message type, then the default is to send the emitted message back to the process that emitted the message that is being processed. This means that in the http listener example above, there was no need to attach a routing rule for the `HttpResponse` message, because by default any messages emitted during the processing of Message A would be routed back to the process that emitted Message A, and that was the http listener.
 
+<a name="routing-pipes"></a>
 ## Pipes
 
 Pipes are defined within a `network`, and define the routing of messages that are delivered to the network. Messages can be routed to other pipes, processes and network entry points (usually of another network).
@@ -431,6 +474,7 @@ This illustrates a few patterns and techniques as follows:
 * `Message3` routing makes a copy of the original message (including its route), where the copy has some modified field values. It also clears the route on the original message so that it will not be processed any further. This is as close as you can get to mutating a message.
 * `*` routing applies to any other type of message. In this case we clear the route to prevent any further processing of this message, then send the message to the `NotImplementedLogger` process. Note that the `prepend` statement must come after `clear` or the prepend would also be cleared.
 
+<a name="routing-route"></a>
 ## The `route` reserved word
 
 The `route` reserved word modifies the route associated with the message that is in context. For a `process`, this is the message that the process is currently processing. For a `pipe` this is the message that the pipe is routing.
@@ -446,7 +490,7 @@ The `route` statement supports the following operations on the message route:
 * `clear` deletes all routing information on the messaage. If no further manipulation of the route takes place, then the message will be dropped, and no further processing will take place.
 * `prepend` adds a new destination to the front of the routing list, making it the next place that the message will be sent. The destination can be a `pipe`, `process` or `network` entry point.
 * `append` adds a new destination to the end of the routing list, so that the message will be sent to this destination for processing after all of the destinations on this list have processed the message. The destination can be a `pipe`, `process` or `network` entry point.
-* `capture` specifies how to route messages emitted by processes as they proces this message. The `capture` statement is followed by a message type, then a route definition enclosed ini `{}`. The route definiton uses the same `route` reserved word. This does allows you to create nested `capture` statements, but this is bad practice and other solutions should be saught.
+* `capture` specifies how to route messages emitted by processes as they proces this message. The `capture` statement is followed by a message type, then a route definition enclosed in `{}`. The route definiton uses the same `route` reserved word. This does allows you to create nested `capture` statements, but this is bad practice and other solutions should be saught.
 * `remove` is followed by a list of destinations, and removes all of those destinations from the routing list. This is not often useful, but is provided for completeness.
 
 As well as using `capture` to globally catch all emitted messages of a specific type, you can also add a scope block after a routing destination to capture messages emitted from that destination.
@@ -476,6 +520,7 @@ namespace App {
 
 In this example, if `Pipe1` receives `Message1` then it will route it to `Process1` before anything that is already in the message's routing list. During the processing of this message, if `Process1` emits `Message2` then it will be routed to `Process2`, but if any other process emits `Message2` then it will be routed to `Process3`. This is as deep as you should go with your capture hierarchy, if you have a more complex scenario, the break up your routing into multiple pipes.
 
+<a name="logic"></a>
 # Logic
 
 A lot of programming language handbooks start by explaining how to write loops, variables and conditional statements, but I left this part for the end. This is because I am assuming that you already used at least 1 other programming language bfore, and already know how these things work. This is not a distinctive or unusual aspect of NPL.
@@ -486,6 +531,7 @@ Things that are obviously declarative can not contain program logic. So for exam
 
 In most other places in NPL I can use most of the JavaScript language. I say most of the language, because you cannot define classes and interfaces, and you can't do anything that would couple processes together - because that could be running on different compute instances. You can only exchange messages between processes, and you can only define how messages flow through the application in pipes.
 
+<a name="messages"></a>
 # Messages
 
 Messages are used to pass information between processes. Messages also have context that tells you something about the message, where it came from, the context in which is was created etc. The message context can be examined and mutated in your application code with the `context` reserved word.
@@ -504,6 +550,7 @@ The NPL runtime includes a `connection` called `emitter` that can emit messages 
 
 Because empty messages have context, and context must be mutable, this provides a back door into mutable messages. Please don't do this. I guess it's possible to write really bad code in almost any language, and this is one of the placed where that is possible in NPL.
 
+<a name="context"></a>
 # Context
 
 Wherever a message is in context (for example in a `process`) you can use the `context` reserved word to read the message context, and in some cases modify it.
@@ -515,6 +562,7 @@ The context scopes are:
 * `context.message` is a mutable context that has the same lifetime as the message, but is not automatically transferred to any other messages that are created during the processing of this message. Of course you can write code to copy values from the current message context to the new message context, but this requires explicit coding.
 * `context.network` is a mutable context that stays attached to the message as long as the message remains in the same network. If the message is sent between networks then this context is stripped off the message first. The main reason for this context scope is that networks are the partitions for vertical scaling. In other words, two networks are not guaranteed to run on the same compute instance, and messages sent between networks might need to be serialized and transmitted over the wire. You can put large datasets in the network context, and these will not be transmitted over the wire. It also makes sense for information that is only relevant to the network not to persist after the message leaves that network and is no longer relevant.
 
+<a name="sharing-code"></a>
 # Sharing code
 
 Like many programming systems, NPL has a package manager and public/private repositories of shared code that you can incorporate into your solution.
@@ -541,6 +589,7 @@ To import a package into your application you can use the `import` reserved word
 
 The package manager is covered in detail elsewhere.
 
+<a name="code-organization"></a>
 # Code orgamization
 
 When you run an PML program, you must pass the name of a source file containing an `application` definition. You can have as many of these files as you like. The file extension `.npl` is assumed by default.
@@ -549,6 +598,7 @@ All other files in the current directory, and all sub-directories with file exte
 
 When processing source files, any other `application` definitions that are encountered will be ignored.
 
+<a name="custom-connections"></a>
 # Custom connections
 
 NPL code is deliberately restricted in what is allowed, to promote clean, maintainable, flexible and scaleable code, and this works within the application, but is not possible at the edges.
@@ -560,3 +610,98 @@ Connections are not written in NPL code, but they can or course emit and consume
 Connections should not contain any application specific logic. They should be stripped down to the bare minimum needed to get information in and out of the application. The NPL runtime already contains a number of common connection types including common internet protocols like http, file system access etc.
 
 If you want to add connection types that are not already included in the NPL runtime, then you can write then in TypeScript, and compile them into the application.
+
+<a name="unit-testing"></a>
+# Unit testing
+
+Because processes have no state, and messages are immutable, it's very easy to write unit tests for NPL applications.
+Additionally, unit testing is a first class element of the language, and not a library that was added as an afterthought.
+
+Unlike other software development systems, unit tests are built eight into the code, and understood by the compiler, so the
+compiler can generate code for the tests in some environments, and omit this code in production builds automatically without
+any additional tooling.
+
+To run unit tests, execute the `npl test` command followed by a file or directory name. If you sepecify a file name then the
+tests in that source file are executed. If you specify a directory name then all source files in that directory and all
+subdirectories are tested. If you don't provide any file name or directory name, then it defaults to the current directory. That
+means that entering the command `npl test` will run all unit tests in the current directory and all sub-directories.
+
+Unit tests are not applicable to messages because they contain no funtionallity to test. To test a process, you include tests
+right in the code for the process. Each test sends a message to the process and captures all of the messages that it produces
+in response.
+
+For example:
+
+```npl
+namespace App {
+    enum Operation { add subtract multiply divide }
+
+    message MathQuestion {
+        number a
+        number b
+        Operation operation
+    }
+
+    message MathAnswer {
+        number answer
+    }
+
+    network Compute {
+        ingress egress MathQuestions { process DoMath }
+
+        process DoMath {
+            accept MathQuestion {
+                if (message.operation == Operation.add)
+                    emit MathAnswer { answer message.a + message.b }
+                elseif (message.operation == Operation.subtract)
+                    emit MathAnswer { answer message.a - message.b }
+                else
+                    emit Exception { text `Unknown math operation ${message.operation}`}
+            }
+
+            test 'should add numbers' {
+                emit MathQuestion {
+                    a 12
+                    b 20
+                    operation Operation.add
+                }
+                expect MathAnswer {
+                    answer 32
+                }
+            }
+
+            test 'should subtract numbers' {
+                emit MathQuestion {
+                    a 12
+                    b 20
+                    op Operation.subtract
+                }
+                expect MathAnswer {
+                    answer -8
+                }
+            }
+
+            test 'should error on unknown operation' {
+                emit MathQuestion {
+                    operation Operation.multiply
+                }
+                expect Exception {
+                    text 'Unknown math operation multiply'
+                }
+            }
+        }
+    }
+}
+```
+
+Notes:
+
+- There is no need for any mocks because processes cannot have dependencies.
+- Each test has a name or description. This will be used to report test failures.
+- Each test should start by emitting a specific type of message initialized with specific values.
+- Each test can expact any number of messages to be produced.
+- If tests are expecting multiple messages of the same type, just repeat the `expect` clause with the sane message type for however many messages you are expecting.
+- You can include further `emit` statements for situations where your process waits for multiple messages to be received before emitting a message in response.
+- Keeping the process definition and tests together like this has many advantages, especially in understanding what a process is supposed to do, and remembering to update the tests when the process is updated.
+- The only thing external to the process that can break the unit test are changes to the message definitions.
+- No dependencies means no mocks, whic also means no need to update mocks when the real implementation's behavior changes.
