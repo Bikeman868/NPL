@@ -2,12 +2,14 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { qualifiedIdentifier, whitespace } from '#interfaces/charsets.js';
+import { qualifiedIdentifier, identifier, whitespace } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
 export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
+      return parseMessageType(context);
+    case 'name':
       return parseIdentifier(context);
     case 'scope':
       return parseScope(context);
@@ -23,10 +25,10 @@ function parseAcceptDefinition(context: IContext): ParseResult {
   ]);
 }
 
-function parseIdentifier(context: IContext): ParseResult {
+function parseMessageType(context: IContext): ParseResult {
   let name = context.buffer.extractAny(qualifiedIdentifier);
 
-  const tokenType: TokenType = !!name ? 'QualifiedIdentifier' : 'Keyword';
+  const tokenType: TokenType = !!name ? (name =='empty' ? 'Keyword' : 'QualifiedIdentifier') : 'Keyword';
 
   if (!name) {
     name = context.buffer.extractCount(1);
@@ -36,6 +38,13 @@ function parseIdentifier(context: IContext): ParseResult {
       );
   }
 
+  context.setSubState('name');
+  return { text: name, tokenType: tokenType };
+}
+
+function parseIdentifier(context: IContext): ParseResult {
+  const name = context.buffer.extractAny(identifier);
+
   if (context.buffer.hasScope()) {
     context.setSubState('scope');
   } else {
@@ -43,5 +52,5 @@ function parseIdentifier(context: IContext): ParseResult {
     context.popState();
   }
 
-  return { text: name, tokenType: tokenType };
+  return { text: name, tokenType: 'Identifier' };
 }
