@@ -12,4 +12,6 @@ export type TokenType =
   | 'ParamStart'
   | 'ParamEnd'
   | 'Expression'
+  | 'OpenParenthesis'
+  | 'CloseParenthesis'
   | 'Constant';
