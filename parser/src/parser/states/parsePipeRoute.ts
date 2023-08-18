@@ -6,7 +6,7 @@ import { parseScope } from '../functions/parseScope.js';
 
 export function parsePipeRoute(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedReference(
         context,
         '',
@@ -22,15 +22,15 @@ export function parsePipeRoute(context: IContext): ParseResult {
 
 function parseRouteDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'append', state: 'pipeAppend', subState: 'scope' },
-    { keyword: 'prepend', state: 'pipePrepend', subState: 'scope' },
-    { keyword: 'clear', state: 'pipeClear', subState: 'scope' },
-    { keyword: 'capture', state: 'pipeCapture', subState: 'identifier' },
-    { keyword: 'remove', state: 'pipeRemove', subState: 'identifier' },
-    { keyword: 'if', state: 'pipeIf', subState: 'expression' },
-    { keyword: 'else', state: 'pipeElse', subState: 'scope' },
-    { keyword: 'elseif', state: 'pipeElseif', subState: 'expression' },
-    { keyword: 'while', state: 'pipeWhile', subState: 'expression' },
-    { keyword: 'for', state: 'pipeFor', subState: 'identifier' },
+    { keyword: 'append', state: 'pipeAppend', subState: 'start' },
+    { keyword: 'prepend', state: 'pipePrepend', subState: 'start' },
+    { keyword: 'clear', state: 'pipeClear', subState: 'start' },
+    { keyword: 'capture', state: 'pipeCapture', subState: 'start' },
+    { keyword: 'remove', state: 'pipeRemove', subState: 'start' },
+    { keyword: 'if', state: 'pipeIf', subState: 'start' },
+    { keyword: 'else', state: 'pipeElse', subState: 'start' },
+    { keyword: 'elseif', state: 'pipeElseif', subState: 'start' },
+    { keyword: 'while', state: 'pipeWhile', subState: 'start' },
+    { keyword: 'for', state: 'pipeFor', subState: 'start' },
   ]);
 }

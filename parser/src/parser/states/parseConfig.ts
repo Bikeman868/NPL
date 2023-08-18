@@ -11,7 +11,7 @@ import {
 
 export function parseConfig(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'scope':
+    case 'start':
       return parseScope(context);
     case 'definition':
       return parseConfigDefinition(context);

@@ -6,7 +6,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseNetwork(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedDefinition(context, 'network');
     case 'scope':
       return parseScope(context);
@@ -18,10 +18,10 @@ export function parseNetwork(context: IContext): ParseResult {
 
 function parseNetworkDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', state: 'networkEntry', subState: 'identifier' },
-    { keyword: 'egress', state: 'networkEntry', subState: 'identifier' },
-    { keyword: 'default', state: 'networkEntry', subState: 'identifier' },
-    { keyword: 'process', state: 'process', subState: 'identifier' },
-    { keyword: 'pipe', state: 'pipe', subState: 'identifier' },
+    { keyword: 'ingress', state: 'networkEntry', subState: 'start' },
+    { keyword: 'egress', state: 'networkEntry', subState: 'start' },
+    { keyword: 'default', state: 'networkEntry', subState: 'start' },
+    { keyword: 'process', state: 'process', subState: 'start' },
+    { keyword: 'pipe', state: 'pipe', subState: 'start' },
   ]);
 }

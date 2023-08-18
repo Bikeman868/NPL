@@ -54,7 +54,7 @@ export class Context implements IContext {
       () =>
         `${this.getDebugIndent()}${this._currentState.state}.${
           this._currentState.subState
-        } => ${state}.${subState}`,
+        } => ${state || this._currentState.state}.${subState || this._currentState.subState}`,
     );
 
     if (!this._isDryRun) {
@@ -67,8 +67,8 @@ export class Context implements IContext {
   }
 
   popState(): IParserState {
-    const state = this._currentState.state;
-    const subState = this._currentState.subState;
+    const oldState = this._currentState.state;
+    const oldSubState = this._currentState.subState;
 
     if (!this._isDryRun) {
       const popedState = this._stateStack.pop();
@@ -80,7 +80,7 @@ export class Context implements IContext {
       () =>
         `${this.getDebugIndent()}${this._currentState.state}.${
           this._currentState.subState
-        } <= ${state}.${subState}`,
+        } <= ${oldState}.${oldSubState}`,
     );
 
     return this._currentState;

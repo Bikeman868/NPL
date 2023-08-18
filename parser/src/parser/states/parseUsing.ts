@@ -4,7 +4,6 @@ import { qualifiedIdentifier, whitespace } from '#interfaces/charsets.js';
 
 export function parseUsing(context: IContext): ParseResult {
   const text = context.buffer.extractAny(qualifiedIdentifier);
-  context.buffer.skipToEol();
   context.buffer.skipAny(whitespace);
 
   if (!text)

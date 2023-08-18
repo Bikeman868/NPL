@@ -6,7 +6,7 @@ import { parseNamedDefinition } from '../functions/parseNamedDefinition.js';
 
 export function parseProcess(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedDefinition(context, 'accept');
     case 'scope':
       return parseScope(context);
@@ -18,6 +18,6 @@ export function parseProcess(context: IContext): ParseResult {
 
 function parseProcessDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'accept', state: 'processAccept', subState: 'identifier' },
+    { keyword: 'accept', state: 'processAccept', subState: 'start' },
   ]);
 }

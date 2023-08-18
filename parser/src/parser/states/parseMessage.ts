@@ -12,7 +12,7 @@ import {
 
 export function parseMessage(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedDefinition(context, 'message');
     case 'scope':
       return parseScope(context);

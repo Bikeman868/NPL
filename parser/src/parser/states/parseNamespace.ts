@@ -6,7 +6,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseNamespace(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedReference(context, 'namespace');
     case 'scope':
       return parseScope(context);
@@ -20,9 +20,9 @@ export function parseNamespace(context: IContext): ParseResult {
 
 function parseNamespaceDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'application', state: 'application', subState: 'identifier' },
-    { keyword: 'message', state: 'message', subState: 'identifier' },
-    { keyword: 'network', state: 'network', subState: 'identifier' },
-    { keyword: 'enum', state: 'enum', subState: 'identifier' },
+    { keyword: 'application', state: 'application', subState: 'start' },
+    { keyword: 'message', state: 'message', subState: 'start' },
+    { keyword: 'network', state: 'network', subState: 'start' },
+    { keyword: 'enum', state: 'enum', subState: 'start' },
   ]);
 }

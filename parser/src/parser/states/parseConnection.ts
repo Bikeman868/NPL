@@ -6,7 +6,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseConnection(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedReference(context, 'connection');
     case 'scope':
       return parseScope(context);
@@ -20,7 +20,7 @@ export function parseConnection(context: IContext): ParseResult {
 
 function parseConnectionDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', state: 'connectionEntry', subState: 'identifier' },
-    { keyword: 'egress', state: 'connectionEntry', subState: 'identifier' },
+    { keyword: 'ingress', state: 'connectionEntry', subState: 'start' },
+    { keyword: 'egress', state: 'connectionEntry', subState: 'start' },
   ]);
 }

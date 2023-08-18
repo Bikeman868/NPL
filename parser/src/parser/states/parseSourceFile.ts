@@ -4,7 +4,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseSourceFile(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'using', state: 'using', subState: 'identifier' },
-    { keyword: 'namespace', state: 'namespace', subState: 'identifier' },
+    { keyword: 'using', state: 'using', subState: 'start' },
+    { keyword: 'namespace', state: 'namespace', subState: 'start' },
   ]);
 }

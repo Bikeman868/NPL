@@ -5,7 +5,7 @@ import { parseQualifiedReference } from '../functions/parseQualifiedReference.js
 
 export function parseConnectionEntry(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseQualifiedReference(context, ['ingress', 'egress', 'network']);
     case 'scope':
       return parseEntryScope(context);

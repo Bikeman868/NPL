@@ -1,4 +1,5 @@
 export type TokenType =
+  | 'None'
   | 'Keyword'
   | 'Identifier'
   | 'QualifiedIdentifier'
@@ -11,7 +12,7 @@ export type TokenType =
   | 'Operator'
   | 'ParamStart'
   | 'ParamEnd'
-  | 'Expression'
   | 'OpenParenthesis'
   | 'CloseParenthesis'
+  | 'Expression'
   | 'Constant';

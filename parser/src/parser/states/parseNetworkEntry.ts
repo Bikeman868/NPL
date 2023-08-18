@@ -7,7 +7,7 @@ import { whitespace, qualifiedIdentifier, openScope } from '#interfaces/charsets
 
 export function parseNetworkEntry(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseQualifiedDefinition(context, [
         'ingress',
         'egress',

@@ -6,7 +6,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseApplication(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedDefinition(context, 'application');
     case 'scope':
       return parseScope(context);
@@ -20,6 +20,6 @@ export function parseApplication(context: IContext): ParseResult {
 
 function parseApplicationDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'connection', state: 'connection', subState: 'identifier' },
+    { keyword: 'connection', state: 'connection', subState: 'start' },
   ]);
 }

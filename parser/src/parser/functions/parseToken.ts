@@ -25,6 +25,7 @@ import { parseConstant } from '../states/parseConstant.js';
 import { parsePipeConditional } from '../states/parsePipeConditional.js';
 import { parsePipeElse } from '../states/parsePipeElse.js';
 import { parsePipeFor } from '../states/parsePipeFor.js';
+import { parsePipeRouteList } from '../states/parsePipeRouteList.js';
 import {
   newline,
   whitespace,
@@ -55,11 +56,11 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     // Pipes and routes
     ['pipe', parsePipe],
     ['pipeRoute', parsePipeRoute],
-    ['pipeAppend', parsePipeRoute],
-    ['pipePrepend', parsePipeRoute],
+    ['pipeAppend', parsePipeRouteList],
+    ['pipePrepend', parsePipeRouteList],
     ['pipeClear', parsePipeRoute],
     ['pipeCapture', parsePipeRoute],
-    ['pipeRemove', parsePipeRoute],
+    ['pipeRemove', parsePipeRouteList],
     ['pipeIf', parsePipeConditional],
     ['pipeElse', parsePipeElse],
     ['pipeElseif', parsePipeConditional],

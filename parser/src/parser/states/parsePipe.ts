@@ -6,7 +6,7 @@ import { parseNamedDefinition } from '../functions/parseNamedDefinition.js';
 
 export function parsePipe(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedDefinition(context, 'accept');
     case 'scope':
       return parseScope(context);
@@ -18,6 +18,6 @@ export function parsePipe(context: IContext): ParseResult {
 
 function parsePipeDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'route', state: 'pipeRoute', subState: 'identifier' },
+    { keyword: 'route', state: 'pipeRoute', subState: 'start' },
   ]);
 }

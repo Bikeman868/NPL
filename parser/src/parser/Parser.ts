@@ -19,14 +19,16 @@ export class Parser implements IParser {
     try {
       while (!context.buffer.isEof()) {
         const token = this.extractNextToken(context);
-        tokens.push(token);
-        if (token.length == 0) {
-          context.syntaxError(
-            'Unexpected character found, please check language syntax definition',
-          );
-          return tokens;
+        if (token.tokenType != 'None') {
+          tokens.push(token);
+          if (token.length == 0) {
+            context.syntaxError(
+              'Unexpected character found, please check language syntax definition',
+            );
+            return tokens;
+          }
+          if (predicate(token)) return tokens;
         }
-        if (predicate(token)) return tokens;
       }
     } catch (error: any) {
       context.syntaxError(
@@ -45,13 +47,15 @@ export class Parser implements IParser {
 
     while (!context.buffer.isEof()) {
       const token = this.extractNextToken(context);
-      if (token.length == 0) {
-        context.syntaxError(
-          'Unexpected character found, please check language syntax definition',
-        );
-        return null;
+      if (token.tokenType != 'None') {
+        if (token.length == 0) {
+          context.syntaxError(
+            'Unexpected character found, please check language syntax definition',
+          );
+          return null;
+        }
+        if (predicate(token)) return token;
       }
-      if (predicate(token)) return token;
     }
     return null;
   }

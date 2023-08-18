@@ -11,7 +11,7 @@ import { TokenType } from '#interfaces/TokenType.js';
 */
 export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseMessageType(context);
     case 'name':
       return parseIdentifier(context);
@@ -25,12 +25,12 @@ export function parseProcessAccept(context: IContext): ParseResult {
 
 function parseAcceptDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'emit', state: 'processEmit', subState: 'identifier' },
-    { keyword: 'if', state: 'processIf', subState: 'scope' },
-    { keyword: 'else', state: 'processElse', subState: 'scope' },
-    { keyword: 'elseif', state: 'processElseif', subState: 'scope' },
-    { keyword: 'while', state: 'processWhile', subState: 'scope' },
-    { keyword: 'for', state: 'processFor', subState: 'scope' },
+    { keyword: 'emit', state: 'processEmit', subState: 'start' },
+    { keyword: 'if', state: 'processIf', subState: 'start' },
+    { keyword: 'else', state: 'processElse', subState: 'start' },
+    { keyword: 'elseif', state: 'processElseif', subState: 'start' },
+    { keyword: 'while', state: 'processWhile', subState: 'start' },
+    { keyword: 'for', state: 'processFor', subState: 'start' },
   ]);
 }
 

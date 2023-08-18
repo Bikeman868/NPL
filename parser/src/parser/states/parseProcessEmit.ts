@@ -6,7 +6,7 @@ import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
 
 export function parseProcessEmit(context: IContext): ParseResult {
   switch (context.currentState.subState) {
-    case 'identifier':
+    case 'start':
       return parseNamedReference(context, 'emit');
     case 'scope':
       return parseScope(context);
@@ -19,8 +19,8 @@ export function parseProcessEmit(context: IContext): ParseResult {
 function parseEmitDefinition(context: IContext): ParseResult {
   // TODO: Only data is an object
   return parseScopeDefinition(context, [
-    { keyword: 'data', state: 'object', subState: 'scope' },
-    { keyword: 'context', state: 'object', subState: 'scope' },
-    { keyword: 'route', state: 'object', subState: 'scope' },
+    { keyword: 'data', state: 'object', subState: 'start' },
+    { keyword: 'context', state: 'object', subState: 'start' },
+    { keyword: 'route', state: 'object', subState: 'start' },
   ]);
 }
