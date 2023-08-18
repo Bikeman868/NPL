@@ -19,7 +19,7 @@ namespace App {
         }
 
         process Responder {
-            accept * { // Accept all message types
+            accept * msg { // Accept all message types
                 emit Response { 
                     data { text 'Hello, world' }
                 }

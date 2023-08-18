@@ -2,6 +2,8 @@
 
 This is not a formal definition of [the language syntax](SYNTAX.md), but a practical handbook that will get you writing code quickly.
 
+If you are familar with OOP, you might find this [comparison with OOP](OOP_COMPARISON.md) helpful.
+
 # Contents
 
 - [Hello World example](#hello-world)
@@ -265,13 +267,13 @@ namespace App {
 
         pipe Router {
             route httpListener.HttpRequest {
-                if (message.path.startsWith('/api')) {
+                if message.path.startsWith('/api') {
                     append { process Logger }
                     prepend { network Api.Request }
                     capture ApiResponse { 
                         prepend { process Json }
                     }
-                } else if (message.path.startsWith('/ux')) {
+                } else if message.path.startsWith('/ux') {
                     append { process Logger }
                     prepend { network Html.Request }
                     capture HtmlResponse { 
@@ -373,7 +375,7 @@ App:
 The `config` reserved word can also be used to access configuration values, so in my code I can write `config.requiredRole` to reference the value of this config. For example I can write something like
 
 ```npl
-if (context.origin.jwt.role == config.requiredRole)
+if context.origin.jwt.role == config.requiredRole
   prepend { process DoIt }
 else
   prepend { process AccessDenied }
@@ -441,7 +443,7 @@ process InvoiceCalculator {
             TaxResponse tax
             Exception ex
         }
-        if (tax) {
+        if tax {
             const subTotal = cart.items.sum(item => item.price * item.quantity)
             emit Invoice {
                 ...cart
@@ -718,9 +720,9 @@ namespace App {
 
         process DoMath {
             accept MathQuestion question {
-                if (question.operation == Operation.add)
+                if question.operation == Operation.add
                     emit MathAnswer { answer question.a + question.b }
-                elseif (question.operation == Operation.subtract)
+                elseif question.operation == Operation.subtract
                     emit MathAnswer { answer question.a - question.b }
                 else
                     emit Exception { text `Unknown math operation ${question.operation}`}

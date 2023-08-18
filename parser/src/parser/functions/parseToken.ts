@@ -22,6 +22,9 @@ import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
 import { parseEnum } from '../states/parseEnum.js';
 import { parseConfig } from '../states/parseConfig.js';
 import { parseConstant } from '../states/parseConstant.js';
+import { parsePipeConditional } from '../states/parsePipeConditional.js';
+import { parsePipeElse } from '../states/parsePipeElse.js';
+import { parsePipeFor } from '../states/parsePipeFor.js';
 import {
   newline,
   whitespace,
@@ -52,19 +55,27 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     // Pipes and routes
     ['pipe', parsePipe],
     ['pipeRoute', parsePipeRoute],
-    ['appendRoute', parsePipeRoute],
-    ['prependRoute', parsePipeRoute],
-    ['clearRoute', parsePipeRoute],
-    ['captureRoute', parsePipeRoute],
-    ['removeRoute', parsePipeRoute],
-    ['ifRoute', parsePipeRoute],
-    ['elseRoute', parsePipeRoute],
-    ['elseifRoute', parsePipeRoute],
+    ['pipeAppend', parsePipeRoute],
+    ['pipePrepend', parsePipeRoute],
+    ['pipeClear', parsePipeRoute],
+    ['pipeCapture', parsePipeRoute],
+    ['pipeRemove', parsePipeRoute],
+    ['pipeIf', parsePipeConditional],
+    ['pipeElse', parsePipeElse],
+    ['pipeElseif', parsePipeConditional],
+    ['pipeWhile', parsePipeConditional],
+    ['pipeFor', parsePipeFor],
 
     // Processes
     ['process', parseProcess],
     ['processAccept', parseProcessAccept],
     ['processEmit', parseProcessEmit],
+    ['processAwait', parseProcessEmit],
+    ['processIf', parseProcessEmit],
+    ['processElse', parseProcessEmit],
+    ['processElseif', parseProcessEmit],
+    ['processWhile', parseProcessEmit],
+    ['processFor', parseProcessEmit], 
 
     // Object initialization and expressions
     ['object', parseObject],

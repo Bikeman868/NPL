@@ -3,11 +3,11 @@ import { ParseResult } from '../functions/ParseResult.js';
 import { newline, separator } from '#interfaces/charsets.js';
 
 /*
- * Parses a mathematical expression up to eol, closing } or unbalanced closing )
- * Syntax error if more opening than closing ()
- * Supports unary and binary operations, qualified identifiers and method calls with parameters
-*/
-export function parseExpression(context: IContext): ParseResult {
+ * Parses else statements that follow the pattern
+ *   else { <scope-block> }
+ * Assumes the the cursor is initially positioned at the open { or end of line
+ */
+export function parsePipeElse(context: IContext): ParseResult {
   const text = context.buffer.extractToEol();
   if (!text) context.syntaxError('Computed expression expected');
   context.popState();

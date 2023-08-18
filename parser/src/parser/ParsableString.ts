@@ -132,40 +132,71 @@ export class ParsableString implements IParsable {
     for (var i = 0; i < count; i++) this.next();
   }
 
-  private extract(start: number): string {
-    return start === this._position.offset
-      ? ''
-      : this._buffer.slice(start, this._position.offset).replace(cr, '');
+  private extract(predicate: (ch: string) => boolean) {
+    let result = '';
+    while (this._position.offset < this._buffer.length) {
+      let ch = this.current();
+      if (!ch || !predicate(ch)) break;
+      result += ch;
+      this.next();
+    }
+    return result;
   }
 
   extractToAny(chars: Charset): string {
-    const startOffset = this._position.offset;
-    this.skipUntil(chars);
-    return this.extract(startOffset);
+    return this.extract(ch => {
+      for (let char of chars) {
+        if (ch == char) return false;
+      }
+      return true;
+    });
   }
 
   extractCount(count: number): string {
-    const startOffset = this._position.offset;
-    for (var i = 0; i < count; i++) this.next();
-    return this.extract(startOffset);
+    let result = '';
+    for (var i = 0; i < count; i++) {
+      result += this.current();
+      this.next();
+    }
+    return result;
   }
 
   extractAny(chars: Charset): string {
-    const startOffset = this._position.offset;
-    this.skipAny(chars);
-    return this.extract(startOffset);
+    return this.extract(ch => {
+      for (let char of chars) {
+        if (ch == char) return true;
+      }
+      return false;
+    });
   }
 
   extractToEol(): string {
-    const startOffset = this._position.offset;
-    this.skipToEol();
-    return this.extract(startOffset);
+    let result = '';
+    let scopeDepth = 0;
+    while (this._position.offset < this._buffer.length) {
+      if (this.peek(2) == lineCommentDelimiter) return result;
+
+      let ch = this.current();
+      if (!ch) return result;
+      if (ch == newline) return result;
+      if (ch == closeScope) {
+        if (scopeDepth == 0) return result;
+        scopeDepth--;
+      }
+      if (ch == openScope) scopeDepth++;
+
+      result += ch;
+      this.next();
+    }
+    return result;
   }
 
   extractUntil(matchingText: string): string {
     let result = '';
-    while(this.peek(matchingText.length) != matchingText)
-      result += this.extractCount(1)
+    while(this.peek(matchingText.length) != matchingText) {
+      result += this.current()
+      this.next()
+    }
     return result;
   }
 

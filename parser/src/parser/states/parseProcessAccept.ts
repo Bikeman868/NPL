@@ -2,9 +2,13 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { qualifiedIdentifier, identifier, whitespace } from '#interfaces/charsets.js';
+import { qualifiedIdentifier, identifier, whitespace, separator } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
+/*
+ * Parses `accept <message-type> <identifier> {}` statement within a `process` definition
+ * Assumes that the cursor is at the first character of the <message-type> and 
+*/
 export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'identifier':
@@ -22,6 +26,11 @@ export function parseProcessAccept(context: IContext): ParseResult {
 function parseAcceptDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
     { keyword: 'emit', state: 'processEmit', subState: 'identifier' },
+    { keyword: 'if', state: 'processIf', subState: 'scope' },
+    { keyword: 'else', state: 'processElse', subState: 'scope' },
+    { keyword: 'elseif', state: 'processElseif', subState: 'scope' },
+    { keyword: 'while', state: 'processWhile', subState: 'scope' },
+    { keyword: 'for', state: 'processFor', subState: 'scope' },
   ]);
 }
 
@@ -38,6 +47,7 @@ function parseMessageType(context: IContext): ParseResult {
       );
   }
 
+  context.buffer.skipAny(separator);
   context.setSubState('name');
   return { text: name, tokenType: tokenType };
 }

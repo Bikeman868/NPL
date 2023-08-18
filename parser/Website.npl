@@ -13,15 +13,14 @@ namespace App {
 
         pipe Router {
             route httpListener.HttpRequest {
-                /*
-                if (message.path.startsWith('/api')) {
+                if message.path.startsWith('/api') {
                     append { process Logger }
                     prepend { network Api.Request }
                     capture ApiResponse { 
                         prepend { process Json }
                     }
                 }
-                elseif (message.path.startsWith('/ux')) {
+                elseif message.path.startsWith('/ux') {
                     append { process Logger }
                     prepend { network Html.Request }
                     capture HtmlResponse { 
@@ -31,7 +30,6 @@ namespace App {
                 else {
                     prepend { process NotFound }
                 }
-                */
             }
         }
 

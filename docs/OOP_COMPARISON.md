@@ -40,7 +40,7 @@ The anwser is that you can't mutate any data structure, but you can create new d
 
 Lists implemented as arrays are not very efficient in functional languages, because you have to duplicate the array every time you modify it (although as noted above, you don't have to duplicate any of the data structures referenced by the array). However data structures that use references are extremely efficient, because the things that reference are immutable, and hence the references can always be copied safely.
 
-You can write a functional, immutable and efficient list class by making it a list of other lists. In this case if a list has a single reference to its only sub-list (which could contain manyt items), our `add` operation returns a new list with two sub-list references, one to the sub-list from the list we were adding to, and another to the list we are adding to it. This is illustrated below:
+You can write a functional, immutable and efficient list class by making it a list of other lists. In this case if a list has a single reference to its only sub-list (which could contain many items), our `add` operation returns a new list with two sub-list references, one to the sub-list from the list we were adding to, and another to the list we are adding to it. This is illustrated below:
 
 ![Concatenating immutable lists](immutable-list-concat.jpg)
 
@@ -50,7 +50,9 @@ There is some inneficiency here, but it's not as much as most programmers assume
 
 Immutability has many advantages. One of the major benefits that you will notice if you are comming from an OOP backround is that you don't have to make assumptions about the program state. Many of the bugs that get introduced into OOP programs come from false assumptions about the state of an object. You can get coverage reports from unit tests that ensure all code paths were followed, but what about all possible internal states of the object?
 
+So, what about that compiler we wanted to write? In this case the state of the compiler should be contained in a message, and the message should be passed around between processes. Each time we add to the compiler's model of the application it is compiling, we need to replace part of the model with a new, updated, version. If we use references (as per the list of sub-lists example above) then the operations of adding new identifiers, fixing up references and everything else the compiler has to do can all be done efficiently and immutably.
 
+If you are still not convinced, there are a number of programmers that have written real-time games with a functional programming language - for example [Purely Functional Retrogames](https://prog21.dadgum.com/23.html). I am not advocating writing a real-time game in a functional programming language, personally I would use Rust, but it does demonstrate that functional programming can be efficient even for applications with a lot of state.
 
 ## Encapsulation
 

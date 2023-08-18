@@ -17,7 +17,7 @@ const sourceFileText = sourceFileBytes.toString(
 // The parser requires parsable text
 const buffer = new ParsableString(sourceFileText);
 const context = new Context(buffer);
-//context.debugLogging = (context: IContext) => context.position.line >= 15;
+context.debugLogging = (context: IContext) => context.position.line >= 16;
 
 // Tokenise the source file
 const parser = new Parser();
