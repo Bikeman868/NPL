@@ -4,6 +4,7 @@ import {
   alpha,
   identifier,
   newline,
+  symbol,
   whitespace,
 } from '#interfaces/charsets.js';
 
@@ -87,5 +88,14 @@ describe('Parsable string', () => {
     buffer.skipAny(whitespace);
     expect(buffer.extractToEol()).toBe('expression {} ');
     expect(buffer.extractCount(2)).toBe('}\n');
+  });
+
+  it('should parse delimited strings', () => {
+    const buffer = new ParsableString('a="a string";');
+    expect(buffer.extractAny(identifier)).toBe('a');
+    expect(buffer.extractAny(symbol)).toBe('=');
+    expect(buffer.extractCount(1)).toBe('"');
+    expect(buffer.extractString('"')).toBe('a string');
+    expect(buffer.extractCount(1)).toBe(';');
   });
 });
