@@ -21,7 +21,6 @@ import { parseNetworkEntry } from '../states/parseNetworkEntry.js';
 import { parseConnectionEntry } from '../states/parseConnectionEntry.js';
 import { parseEnum } from '../states/parseEnum.js';
 import { parseConfig } from '../states/parseConfig.js';
-import { parseConstant } from '../states/parseConstant.js';
 import { parsePipeConditional } from '../states/parsePipeConditional.js';
 import { parsePipeElse } from '../states/parsePipeElse.js';
 import { parsePipeFor } from '../states/parsePipeFor.js';
@@ -82,7 +81,6 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['object', parseObject],
     ['config', parseConfig],
     ['expression', parseExpression],
-    ['constant', parseConstant],
   ]);
 
 export function parseToken(context: IContext): IToken {

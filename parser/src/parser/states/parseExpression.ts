@@ -4,22 +4,19 @@ import {
   type Charset,
   openScope,
   closeScope,
-  openArgs,
-  closeArgs,
+  openList,
+  closeList,
   newline,
   symbol,
   whitespace,
   digit,
   floatDigit,
-  singleQuote,
-  doubleQuote,
-  backQuote,
   identifier,
   qualifiedIdentifier,
   stringDelimiter,
 } from '#interfaces/charsets.js';
 
-const expressionEndDelimiters = [closeArgs, openScope, closeScope, newline];
+const expressionEndDelimiters = [closeList, openScope, closeScope, newline];
 
 /*
  * Parses a mathematical expression up to eol, opening or closing {} or unbalanced closing )
@@ -49,11 +46,11 @@ export function parseExpression(context: IContext): ParseResult {
 function parseStart(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
 
-  if (ch == openArgs) {
+  if (ch == openList) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.setSubState('startScoped');
-    return { tokenType: 'OpenParenthesis', text: openArgs };
+    return { tokenType: 'OpenParenthesis', text: ch };
   }
 
   if (expressionEndDelimiters.includes(ch)) {
@@ -69,11 +66,11 @@ function parseStart(context: IContext): ParseResult {
 function parseStartScoped(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
 
-  if (ch == closeArgs) {
+  if (ch == closeList) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.popState();
-    return { tokenType: 'CloseParenthesis', text: closeArgs };
+    return { tokenType: 'CloseParenthesis', text: ch };
   }
 
   context.setSubState('scoped');
@@ -97,7 +94,7 @@ function parseStartUnscoped(context: IContext): ParseResult {
 function parse(context: IContext, scoped: boolean): ParseResult {
   let ch = context.buffer.peek(1);
 
-  if (ch == openArgs) {
+  if (ch == openList) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.pushSubState('startScoped');
@@ -105,7 +102,7 @@ function parse(context: IContext, scoped: boolean): ParseResult {
   }
 
   if (scoped) {
-    if (ch == closeArgs) {
+    if (ch == closeList) {
       context.buffer.skipCount(1);
       context.buffer.skipAny(whitespace);
       context.popState();
@@ -118,12 +115,12 @@ function parse(context: IContext, scoped: boolean): ParseResult {
     }
   }
 
-  if (ch == closeArgs || (!scoped && expressionEndDelimiters.includes(ch))) {
+  if (ch == closeList || (!scoped && expressionEndDelimiters.includes(ch))) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.popState();
     return scoped
-      ? { tokenType: 'CloseParenthesis', text: closeArgs }
+      ? { tokenType: 'CloseParenthesis', text: closeList }
       : { tokenType: 'None', text: '' };
   }
 

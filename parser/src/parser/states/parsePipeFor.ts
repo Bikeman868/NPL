@@ -1,6 +1,6 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { newline, separator } from '#interfaces/charsets.js';
+import { parseExpression } from './parseExpression.js';
 
 /*
  * Parses for statement that follows one of the following patterns
@@ -9,8 +9,12 @@ import { newline, separator } from '#interfaces/charsets.js';
  * Assumes the the cursor is initially positioned at the first character of the identifier
  */
 export function parsePipeFor(context: IContext): ParseResult {
-  const text = context.buffer.extractToEol();
-  if (!text) context.syntaxError('Computed expression expected');
+  // TODO: Parse actual syntax
+  if (context.currentState.subState == 'start') {
+    context.setSubState('done')
+    context.pushState('expression');
+    return parseExpression(context);
+  }
   context.popState();
-  return { text, tokenType: 'Expression' };
+  return { tokenType: 'None', text: '' }
 }

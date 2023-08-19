@@ -50,12 +50,6 @@ export class TokenPrinter {
         case 'Keyword':
           this.printKeyword();
           break;
-        case 'ParamStart':
-          this.printParamStart();
-          break;
-        case 'ParamEnd':
-          this.printParamEnd();
-          break;
         case 'ScopeStart':
           this.printScopeStart();
           break;
@@ -65,10 +59,6 @@ export class TokenPrinter {
         case 'QualifiedIdentifier':
         case 'Identifier':
           this.printIdentifier();
-          break;
-        case 'Constant':
-        case 'Expression':
-          this.printExpression();
           break;
         case 'Comment':
           this.printComment();
@@ -146,18 +136,6 @@ export class TokenPrinter {
     this.write(' ');
   }
 
-  private printParamStart() {
-    this.setStyle(consoleEscape.red);
-    this.write('(');
-    this.resetStyle();
-  }
-
-  private printParamEnd() {
-    this.setStyle(consoleEscape.red);
-    this.write(')');
-    this.resetStyle();
-  }
-
   private printScopeStart() {
     this.setStyle(consoleEscape.yellow);
     this.write('{');
@@ -185,14 +163,6 @@ export class TokenPrinter {
     this.write(this.token.text);
     this.resetStyle();
     this.write(' ');
-  }
-
-  private printExpression() {
-    this.setStyle(consoleEscape.yellow);
-    this.write(this.token.text);
-    this.resetStyle();
-    if (this.nextIsSingleLineComment) this.write(' ');
-    else this.newLine();
   }
 
   private printString() {

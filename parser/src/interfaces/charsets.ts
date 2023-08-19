@@ -6,8 +6,10 @@ export const tab = '\t';
 export const space = ' ';
 export const openScope = '{';
 export const closeScope = '}';
-export const openArgs = '(';
-export const closeArgs = ')';
+export const openList = '(';
+export const closeList = ')';
+export const openArray = '[';
+export const closeArray = ']';
 export const lineCommentDelimiter = '//';
 export const blockCommentStart = '/*';
 export const blockCommentEnd = '*/';
@@ -107,6 +109,7 @@ export const symbol: Charset = [
   '<',
   '>',
   '~',
+  ',',
 ];
 export const intDigit: Charset = digit;
 export const floatDigit: Charset = [...digit, decimal, 'e', '+', '-'];

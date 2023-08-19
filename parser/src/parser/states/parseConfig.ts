@@ -5,9 +5,9 @@ import {
   closeScope,
   qualifiedIdentifier,
   whitespace,
-  newline,
   separator,
 } from '#interfaces/charsets.js';
+import { parseExpression } from './parseExpression.js';
 
 export function parseConfig(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -43,10 +43,7 @@ function parseConfigDefinition(context: IContext): ParseResult {
 }
 
 function parseConfigField(context: IContext): ParseResult {
-  const expression = context.buffer.extractToEol();
-  context.buffer.skipAny(whitespace);
-  context.setSubState('definition');
-
-  if (!expression) context.syntaxError('Expression constant expected');
-  return { text: expression, tokenType: 'Constant' };
+  context.setSubState('definition')
+  context.pushState('expression');
+  return parseExpression(context);
 }

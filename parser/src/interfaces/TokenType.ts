@@ -10,9 +10,5 @@ export type TokenType =
   | 'Number'
   | 'Boolean'
   | 'Operator'
-  | 'ParamStart'
-  | 'ParamEnd'
   | 'OpenParenthesis'
-  | 'CloseParenthesis'
-  | 'Expression'
-  | 'Constant';
+  | 'CloseParenthesis';
