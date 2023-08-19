@@ -144,7 +144,7 @@ export class ParsableString implements IParsable {
   }
 
   extractToAny(chars: Charset): string {
-    return this.extract(ch => {
+    return this.extract((ch) => {
       for (let char of chars) {
         if (ch == char) return false;
       }
@@ -162,7 +162,7 @@ export class ParsableString implements IParsable {
   }
 
   extractAny(chars: Charset): string {
-    return this.extract(ch => {
+    return this.extract((ch) => {
       for (let char of chars) {
         if (ch == char) return true;
       }
@@ -194,8 +194,8 @@ export class ParsableString implements IParsable {
   extractUntil(matchingText: string): string {
     let result = '';
     while (this.peek(matchingText.length) != matchingText) {
-      result += this.current()
-      this.next()
+      result += this.current();
+      this.next();
     }
     return result;
   }
@@ -212,7 +212,7 @@ export class ParsableString implements IParsable {
     while (this._position.offset < this._buffer.length) {
       let ch = this.current();
       if (ch == '\\') {
-        escape = true
+        escape = true;
       } else {
         if (escape) {
           switch (ch) {
@@ -251,7 +251,7 @@ export class ParsableString implements IParsable {
    * Moves the cursor to the opening { or eol. Retuns true if it is {
    */
   hasScope(): boolean {
-    this.skipAny(separator)
+    this.skipAny(separator);
     return this.current() == openScope;
   }
 

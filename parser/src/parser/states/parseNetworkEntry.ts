@@ -3,7 +3,11 @@ import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseQualifiedDefinition } from '../functions/parseQualifiedDefinition.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { whitespace, qualifiedIdentifier, openScope } from '#interfaces/charsets.js';
+import {
+  whitespace,
+  qualifiedIdentifier,
+  openScope,
+} from '#interfaces/charsets.js';
 
 export function parseNetworkEntry(context: IContext): ParseResult {
   switch (context.currentState.subState) {
@@ -37,7 +41,8 @@ function parseEntrypointDefinition(context: IContext): ParseResult {
 function parseEntrypointDestination(context: IContext): ParseResult {
   if (context.buffer.isBeginScope()) {
     context.syntaxError(
-      `Network entry points can not define routing or configuration, direct messages to a pipe instead`);
+      `Network entry points can not define routing or configuration, direct messages to a pipe instead`,
+    );
     return { text: openScope, tokenType: 'ScopeStart' };
   }
 

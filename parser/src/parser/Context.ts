@@ -49,7 +49,7 @@ export class Context implements IContext {
     return this._syntaxErrors;
   }
 
-  /** 
+  /**
    * Pushes the current state onto a stack, and changes the current state and sub-state
    * If the sub-state is not specified then the sub-state will be set to 'start'
    */
@@ -70,7 +70,7 @@ export class Context implements IContext {
     return this._currentState;
   }
 
-  /** 
+  /**
    * Pushes the current state on the stack and changes the sub-state
    */
   pushSubState(subState: string): IParserState {
@@ -110,7 +110,9 @@ export class Context implements IContext {
   }
 
   setState(state?: StateName, subState?: string): IParserState {
-    this.debug(() => `${this.getDebugIndent()}*.* --> ${state}.${subState || 'start'}`);
+    this.debug(
+      () => `${this.getDebugIndent()}*.* --> ${state}.${subState || 'start'}`,
+    );
 
     if (!this._isDryRun) {
       if (state) this._currentState.state = state;
@@ -162,7 +164,7 @@ export class Context implements IContext {
 
   debug(messageFunc: () => any): void {
     if (this.debugLogging(this)) {
-      const lineNumber = ("00" + this._position.line).slice(-3);
+      const lineNumber = ('00' + this._position.line).slice(-3);
       console.log(lineNumber + ' ' + messageFunc());
     }
   }

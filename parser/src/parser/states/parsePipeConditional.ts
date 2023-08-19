@@ -18,8 +18,10 @@ export function parsePipeConditional(context: IContext): ParseResult {
     case 'scope':
       return parseScope(context);
     case 'definition':
-      context.setState('pipeRoute', 'definition')
+      context.setState('pipeRoute', 'definition');
       return parsePipeRoute(context);
   }
-  throw new Error('Unknown pipe conditional sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown pipe conditional sub-state ' + context.currentState.subState,
+  );
 }

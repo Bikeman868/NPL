@@ -1,5 +1,5 @@
 import { SyntaxError } from '#interfaces/SyntaxError';
-import textStyle from  './consoleEscape.js'
+import textStyle from './consoleEscape.js';
 
 export class SyntaxErrorPrinter {
   private _output: (line: string) => void;
@@ -13,7 +13,11 @@ export class SyntaxErrorPrinter {
   constructor(output?: (line: string) => void) {
     this._indent = 0;
     this._line = '';
-    this._output = output || (line => { console.log(line); });
+    this._output =
+      output ||
+      ((line) => {
+        console.log(line);
+      });
   }
 
   private write(text: string) {

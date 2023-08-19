@@ -13,7 +13,7 @@ export const blockCommentStart = '/*';
 export const blockCommentEnd = '*/';
 export const decimal = '.';
 export const underscore = '_';
-export const singleQuote = '\'';
+export const singleQuote = "'";
 export const doubleQuote = '"';
 export const backQuote = '`';
 
@@ -92,7 +92,22 @@ export const identifier: Charset = [...alphanumeric, underscore];
 export const qualifiedIdentifier: Charset = [...identifier, decimal];
 export const separator: Charset = [space, tab];
 export const whitespace: Charset = [...separator, newline];
-export const symbol: Charset = ['!', '%', '^', '&', '*', '-', '+', '=', '/', '?', ':', '<', '>' ,'~'];
+export const symbol: Charset = [
+  '!',
+  '%',
+  '^',
+  '&',
+  '*',
+  '-',
+  '+',
+  '=',
+  '/',
+  '?',
+  ':',
+  '<',
+  '>',
+  '~',
+];
 export const intDigit: Charset = digit;
 export const floatDigit: Charset = [...digit, decimal, 'e', '+', '-'];
 export const stringDelimiter: Charset = [singleQuote, doubleQuote, backQuote];

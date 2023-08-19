@@ -13,8 +13,10 @@ export function parsePipeElse(context: IContext): ParseResult {
     case 'start':
       return parseScope(context);
     case 'definition':
-      context.setState('pipeRoute', 'definition')
+      context.setState('pipeRoute', 'definition');
       return parsePipeRoute(context);
   }
-  throw new Error('Unknown pipe else sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown pipe else sub-state ' + context.currentState.subState,
+  );
 }

@@ -1,12 +1,12 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
-import { 
+import {
   type Charset,
-  openScope, 
-  closeScope, 
+  openScope,
+  closeScope,
   openArgs,
-  closeArgs, 
-  newline, 
+  closeArgs,
+  newline,
   symbol,
   whitespace,
   digit,
@@ -26,7 +26,7 @@ const expressionEndDelimiters = [closeArgs, openScope, closeScope, newline];
  * Syntax error if more opening than closing ()
  * Supports unary and binary operations, qualified identifiers and method calls with parameters
  * Parentheses are represented by a nested hierarchy of expressions
-*/
+ */
 export function parseExpression(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'start':
@@ -40,7 +40,9 @@ export function parseExpression(context: IContext): ParseResult {
     case 'unscoped':
       return parse(context, false);
   }
-  throw new Error('Unknown expression sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown expression sub-state ' + context.currentState.subState,
+  );
 }
 
 // Start of parsing an expression
@@ -51,27 +53,27 @@ function parseStart(context: IContext): ParseResult {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.setSubState('startScoped');
-    return { tokenType: 'OpenParenthesis', text: openArgs }
+    return { tokenType: 'OpenParenthesis', text: openArgs };
   }
 
   if (expressionEndDelimiters.includes(ch)) {
     context.popState();
-    return { tokenType: 'None', text: '' }
+    return { tokenType: 'None', text: '' };
   }
 
-  context.setSubState('startUnscoped')
+  context.setSubState('startUnscoped');
   return parseStartUnscoped(context);
 }
 
 // Start parsing an expression that is enclosed in ()
 function parseStartScoped(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
-  
+
   if (ch == closeArgs) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.popState();
-    return { tokenType: 'CloseParenthesis', text: closeArgs }
+    return { tokenType: 'CloseParenthesis', text: closeArgs };
   }
 
   context.setSubState('scoped');
@@ -84,7 +86,7 @@ function parseStartUnscoped(context: IContext): ParseResult {
 
   if (expressionEndDelimiters.includes(ch)) {
     context.popState();
-    return { tokenType: 'None', text: '' }
+    return { tokenType: 'None', text: '' };
   }
 
   context.setSubState('unscoped');
@@ -98,8 +100,8 @@ function parse(context: IContext, scoped: boolean): ParseResult {
   if (ch == openArgs) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
-    context.pushSubState('startScoped')
-    return { tokenType: 'OpenParenthesis', text: ch }
+    context.pushSubState('startScoped');
+    return { tokenType: 'OpenParenthesis', text: ch };
   }
 
   if (scoped) {
@@ -107,12 +109,12 @@ function parse(context: IContext, scoped: boolean): ParseResult {
       context.buffer.skipCount(1);
       context.buffer.skipAny(whitespace);
       context.popState();
-      return { tokenType: 'CloseParenthesis', text: ch } 
-    }  
+      return { tokenType: 'CloseParenthesis', text: ch };
+    }
   } else {
     if (expressionEndDelimiters.includes(ch)) {
       context.popState();
-      return { tokenType: 'None', text: '' }
+      return { tokenType: 'None', text: '' };
     }
   }
 
@@ -120,12 +122,12 @@ function parse(context: IContext, scoped: boolean): ParseResult {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.popState();
-    return scoped 
-      ? { tokenType: 'CloseParenthesis', text: closeArgs } 
-      : { tokenType: 'None', text: '' } 
+    return scoped
+      ? { tokenType: 'CloseParenthesis', text: closeArgs }
+      : { tokenType: 'None', text: '' };
   }
 
-  const result: ParseResult = { tokenType: 'None', text: '' }
+  const result: ParseResult = { tokenType: 'None', text: '' };
 
   if (is(ch, symbol)) {
     result.tokenType = 'Operator';
@@ -140,9 +142,10 @@ function parse(context: IContext, scoped: boolean): ParseResult {
   } else if (is(ch, identifier)) {
     result.tokenType = 'QualifiedIdentifier';
     result.text = context.buffer.extractAny(qualifiedIdentifier);
-    if (result.text == 'true' || result.text == 'false') result.tokenType = 'Boolean';
+    if (result.text == 'true' || result.text == 'false')
+      result.tokenType = 'Boolean';
   } else {
-    context.syntaxError(`Unrecognized character in expression "${ch}"`)
+    context.syntaxError(`Unrecognized character in expression "${ch}"`);
   }
 
   context.buffer.skipAny(whitespace);

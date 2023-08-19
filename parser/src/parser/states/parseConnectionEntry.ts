@@ -16,6 +16,8 @@ export function parseConnectionEntry(context: IContext): ParseResult {
 }
 
 function parseEntryScope(context: IContext): ParseResult {
-  context.syntaxError('Connection ingress/egress can only be connected to one network entry point');
-  return { text: openScope, tokenType: 'ScopeStart' }
+  context.syntaxError(
+    'Connection ingress/egress can only be connected to one network entry point',
+  );
+  return { text: openScope, tokenType: 'ScopeStart' };
 }

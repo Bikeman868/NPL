@@ -1,6 +1,6 @@
 import { IToken } from '#interfaces/IToken.js';
 import consoleEscape from './consoleEscape.js';
-import textStyle from  './consoleEscape.js'
+import textStyle from './consoleEscape.js';
 
 export class TokenPrinter {
   private output: (line: string) => void;
@@ -73,6 +73,18 @@ export class TokenPrinter {
         case 'Comment':
           this.printComment();
           break;
+        case 'String':
+          this.printString();
+          break;
+        case 'Boolean':
+        case 'Number':
+          this.printLiteral();
+          break;
+        case 'OpenParenthesis':
+        case 'CloseParenthesis':
+        case 'Operator':
+          this.printOperator();
+          break;
         default:
           this.write(this.token.text);
           this.write(' ');
@@ -100,8 +112,7 @@ export class TokenPrinter {
 
   private setStyle(...escapeCodes: string[]) {
     if (this.includeConsoleColors)
-      for (const code of escapeCodes)
-        this.write(code);
+      for (const code of escapeCodes) this.write(code);
   }
 
   private resetStyle() {
@@ -114,13 +125,17 @@ export class TokenPrinter {
 
       const currentScope = this.scopeStack.at(-1);
       if (
-        (['namespace', 'application', 'connection'].includes(this.token.text)) ||
-        (currentScope == 'namespace' && ['network', 'message', 'enum'].includes(this.token.text)) ||
-        (currentScope == 'network' && ['process', 'pipe', 'ingress', 'egress'].includes(this.token.text))
+        ['namespace', 'application', 'connection'].includes(this.token.text) ||
+        (currentScope == 'namespace' &&
+          ['network', 'message', 'enum'].includes(this.token.text)) ||
+        (currentScope == 'network' &&
+          ['process', 'pipe', 'ingress', 'egress'].includes(this.token.text))
       ) {
         this.blankLine();
         this.nextScope = this.token.text;
-      } else if (['process', 'pipe', 'ingress', 'egress'].includes(this.token.text)) {
+      } else if (
+        ['process', 'pipe', 'ingress', 'egress'].includes(this.token.text)
+      ) {
         this.nextScope = this.token.text;
       }
     }
@@ -176,8 +191,33 @@ export class TokenPrinter {
     this.setStyle(consoleEscape.yellow);
     this.write(this.token.text);
     this.resetStyle();
-    if (this.nextIsSingleLineComment) this.write('');
+    if (this.nextIsSingleLineComment) this.write(' ');
     else this.newLine();
+  }
+
+  private printString() {
+    const escaped = this.token.text
+      .replace('\n', '\\n')
+      .replace('\t', '\\t')
+      .replace('\r', '\\r')
+      .replace('\f', '\\f')
+      .replace('\\', '\\')
+      .replace("'", "\\'");
+    this.setStyle(consoleEscape.yellow);
+    this.write("'");
+    this.write(escaped);
+    this.write("'");
+    this.resetStyle();
+  }
+
+  private printLiteral() {
+    this.setStyle(consoleEscape.yellow);
+    this.write(this.token.text);
+    this.resetStyle();
+  }
+
+  private printOperator() {
+    this.write(this.token.text);
   }
 
   private printComment() {

@@ -76,7 +76,7 @@ const stateMachines: Map<StateName, (context: IContext) => ParseResult> =
     ['processElse', parseProcessEmit],
     ['processElseif', parseProcessEmit],
     ['processWhile', parseProcessEmit],
-    ['processFor', parseProcessEmit], 
+    ['processFor', parseProcessEmit],
 
     // Object initialization and expressions
     ['object', parseObject],

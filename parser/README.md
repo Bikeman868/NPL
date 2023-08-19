@@ -63,7 +63,7 @@ npm test
 
 You can also run or debug tests by clicking in the margin if you install the Vitest VSCode extension.
 
-For this to work, make sure to install NodeJS in the OS that VSCode is running in, i.e. don't use WSL 
+For this to work, make sure to install NodeJS in the OS that VSCode is running in, i.e. don't use WSL
 and install Node into a Linux environment, this won't work for VSCode plugins that execute JavaScript.
 
 I also found that Vitest doesn't like monorepos. You can work around this by opening the './parser'

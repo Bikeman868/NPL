@@ -1,11 +1,12 @@
 import { IContext } from '#interfaces/IContext.js';
-import { 
-  closeScope, 
-  openScope, 
-  qualifiedIdentifier, 
-  separator, 
-  whitespace, 
-  keyword as keywordCharset} from '#interfaces/charsets.js';
+import {
+  closeScope,
+  openScope,
+  qualifiedIdentifier,
+  separator,
+  whitespace,
+  keyword as keywordCharset,
+} from '#interfaces/charsets.js';
 import { ParseResult } from './ParseResult.js';
 
 /**
@@ -24,7 +25,10 @@ import { ParseResult } from './ParseResult.js';
  * cursor on the first non-whitespace character after the initial keyword.
  * Under the cursor will either be the first keyword in the list or open {
  */
-export function parseScopedList(context: IContext, validKeywords: string[]): ParseResult {
+export function parseScopedList(
+  context: IContext,
+  validKeywords: string[],
+): ParseResult {
   switch (context.currentState.subState) {
     case 'start':
       return parseScopeStart(context, validKeywords);
@@ -37,43 +41,54 @@ export function parseScopedList(context: IContext, validKeywords: string[]): Par
     case 'identifier':
       return parseIdentifier(context, validKeywords);
   }
-  throw new Error('Unknown scoped list sub-state ' + context.currentState.subState);
+  throw new Error(
+    'Unknown scoped list sub-state ' + context.currentState.subState,
+  );
 }
 
-function parseScopeStart(context: IContext, validKeywords: string[]): ParseResult {
+function parseScopeStart(
+  context: IContext,
+  validKeywords: string[],
+): ParseResult {
   if (context.buffer.peek(1) == openScope) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.setSubState('scopedKeyword');
-    return { tokenType: 'ScopeStart', text: openScope }
+    return { tokenType: 'ScopeStart', text: openScope };
   }
 
   return parseKeyword(context, validKeywords);
 }
 
-function parseScopedKeyword(context: IContext, validKeywords: string[]): ParseResult {
+function parseScopedKeyword(
+  context: IContext,
+  validKeywords: string[],
+): ParseResult {
   if (context.buffer.peek(1) == closeScope) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
-    context.popState()
-    return { tokenType: 'ScopeEnd', text: closeScope }
+    context.popState();
+    return { tokenType: 'ScopeEnd', text: closeScope };
   }
 
   const keyword = context.buffer.extractAny(keywordCharset);
   checkKeyword(keyword, context, validKeywords);
 
   context.buffer.skipAny(separator);
-  context.setSubState('scopedIdentifier')
-  return { tokenType: 'Keyword', text: keyword }
+  context.setSubState('scopedIdentifier');
+  return { tokenType: 'Keyword', text: keyword };
 }
 
-function parseScopedIdentifier(context: IContext, validKeywords: string[]): ParseResult {
+function parseScopedIdentifier(
+  context: IContext,
+  validKeywords: string[],
+): ParseResult {
   const identifier = context.buffer.extractAny(qualifiedIdentifier);
   if (!identifier) throw new Error('Expecting a qualified identifier');
 
   context.buffer.skipAny(whitespace);
   context.setSubState('scopedKeyword');
-  return { tokenType: 'QualifiedIdentifier', text: identifier }
+  return { tokenType: 'QualifiedIdentifier', text: identifier };
 }
 
 function parseKeyword(context: IContext, validKeywords: string[]): ParseResult {
@@ -81,20 +96,27 @@ function parseKeyword(context: IContext, validKeywords: string[]): ParseResult {
   checkKeyword(keyword, context, validKeywords);
 
   context.buffer.skipAny(separator);
-  context.setSubState('identifier')
-  return { tokenType: 'Keyword', text: keyword }
+  context.setSubState('identifier');
+  return { tokenType: 'Keyword', text: keyword };
 }
 
-function parseIdentifier(context: IContext, validKeywords: string[]): ParseResult {
+function parseIdentifier(
+  context: IContext,
+  validKeywords: string[],
+): ParseResult {
   const identifier = context.buffer.extractAny(qualifiedIdentifier);
   if (!identifier) throw new Error('Expecting a qualified identifier');
 
   context.buffer.skipAny(whitespace);
   context.popState();
-  return { tokenType: 'QualifiedIdentifier', text: identifier }
+  return { tokenType: 'QualifiedIdentifier', text: identifier };
 }
 
-function checkKeyword(keyword: string, context: IContext, validKeywords: string[]) {
+function checkKeyword(
+  keyword: string,
+  context: IContext,
+  validKeywords: string[],
+) {
   if (validKeywords.includes(keyword)) return;
 
   let msg = 'Expecting ';
@@ -105,7 +127,6 @@ function checkKeyword(keyword: string, context: IContext, validKeywords: string[
     msg += '"' + validKeyword + '"';
   }
   if (keyword) msg += ' but found "' + keyword + '"';
-  else
-    msg += ' but found "' + context.buffer.extractToAny(whitespace) + '"';
+  else msg += ' but found "' + context.buffer.extractToAny(whitespace) + '"';
   context.syntaxError(msg);
 }

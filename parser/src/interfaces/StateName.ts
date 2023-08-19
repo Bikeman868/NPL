@@ -5,12 +5,10 @@ export type StateName =
   | 'application' // Parsing an `application <name>` statement
   | 'connection' // Parsing a `connection <qualified>` statement bringing a connection into an application
   | 'connectionEntry' // Parsing a connection ingress or egress
- 
   | 'enum' // Parsing a `enum <name>` statement defining an enum within the namespace
   | 'message' // Parsing a `message <name>` statement defining a message within the namespace
   | 'network' // Parsing a `network <name>` statement that defines a network within a namespace
   | 'networkEntry' // Parsing `network ingress` or `netword egress`
- 
   | 'pipe' // Parsing a `pipe <name>` defining a pipe within a network
   | 'pipeRoute' // Parsing a `route <message-type>` statement that defines message routing within a pipe
   | 'pipeAppend' // Parsing an append statement within a pipe route
@@ -23,7 +21,6 @@ export type StateName =
   | 'pipeElseif' // Parsing an elseif statement within a pipe route
   | 'pipeWhile' // Parsing a while statement within a pipe route
   | 'pipeFor' // Parsing a for statement within a pipe route
-
   | 'process' // Parsing a `process <name>` defining a process within a network
   | 'processAccept' // Parsing an accept statement that defines the message type to process
   | 'processEmit' // Parsing an emit statement that constructs and sends a new message
@@ -33,9 +30,7 @@ export type StateName =
   | 'processElseif' // Parsing elseif
   | 'processWhile' // Parsing a while loop
   | 'processFor' // Parsing a for loop
-    
   | 'object' // Parsing the body of an object definition with fields and dynamic expressions
   | 'config' // Parsing the body of a config override with fields and constant expressions
   | 'expression' // Parsing an expression that is evaluated each time the code is executed
-  | 'constant' // Parsing an expression that is evaluated once only at startup
-  
+  | 'constant'; // Parsing an expression that is evaluated once only at startup

@@ -2,13 +2,18 @@ import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { parseScope } from '../functions/parseScope.js';
 import { parseScopeDefinition } from '../functions/parseScopeDefinition.js';
-import { qualifiedIdentifier, identifier, whitespace, separator } from '#interfaces/charsets.js';
+import {
+  qualifiedIdentifier,
+  identifier,
+  whitespace,
+  separator,
+} from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
 /*
  * Parses `accept <message-type> <identifier> {}` statement within a `process` definition
- * Assumes that the cursor is at the first character of the <message-type> and 
-*/
+ * Assumes that the cursor is at the first character of the <message-type> and
+ */
 export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'start':
@@ -37,7 +42,11 @@ function parseAcceptDefinition(context: IContext): ParseResult {
 function parseMessageType(context: IContext): ParseResult {
   let name = context.buffer.extractAny(qualifiedIdentifier);
 
-  const tokenType: TokenType = !!name ? (name =='empty' ? 'Keyword' : 'QualifiedIdentifier') : 'Keyword';
+  const tokenType: TokenType = !!name
+    ? name == 'empty'
+      ? 'Keyword'
+      : 'QualifiedIdentifier'
+    : 'Keyword';
 
   if (!name) {
     name = context.buffer.extractCount(1);
