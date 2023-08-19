@@ -68,7 +68,7 @@ export function parseScopeDefinition(
       }
       if (keyword) msg += ' but found "' + keyword + '"';
       else
-        msg += '. Text at cursor is "' + context.buffer.extractToAny(whitespace) + '"';
+        msg += ' but found "' + context.buffer.extractToAny(whitespace) + '"';
       context.syntaxError(msg);
       if (!keyword)
         throw new Error(
