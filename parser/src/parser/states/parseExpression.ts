@@ -1,11 +1,19 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../functions/ParseResult.js';
 import { 
+  type Charset,
   openScope, 
   closeScope, 
   openArgs,
   closeArgs, 
   newline, 
+  symbol,
+  whitespace,
+  digit,
+  floatDigit,
+  quote,
+  identifier,
+  qualifiedIdentifier,
 } from '#interfaces/charsets.js';
 
 const expressionEndDelimiters = [closeArgs, openScope, closeScope, newline];
@@ -32,60 +40,98 @@ export function parseExpression(context: IContext): ParseResult {
   throw new Error('Unknown expression sub-state ' + context.currentState.subState);
 }
 
+// Start of parsing an expression
 function parseStart(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
+
   if (ch == openArgs) {
     context.buffer.skipCount(1);
+    context.buffer.skipAny(whitespace);
     context.setSubState('startScoped');
     return { tokenType: 'OpenParenthesis', text: openArgs }
   }
+
   if (expressionEndDelimiters.includes(ch)) {
     context.popState();
     return { tokenType: 'None', text: '' }
   }
+
   context.pushState(undefined, 'startUnscoped')
   return parseStartUnscoped(context);
 }
 
-// Start of an expression that is wrapped in ()
+// Start parsing an expression that is enclosed in ()
 function parseStartScoped(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
+  
   if (ch == closeArgs) {
     context.buffer.skipCount(1);
+    context.buffer.skipAny(whitespace);
     context.popState();
     return { tokenType: 'CloseParenthesis', text: closeArgs }
   }
+
   return parse(context, true);
 }
 
-// Start of an expression that ends at the end of the line
+// Start parsing expression that ends at the end of the line or the begining of a scope block
 function parseStartUnscoped(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
+
   if (ch == closeArgs || ch == closeScope || ch == newline) {
     context.popState();
     return { tokenType: 'None', text: '' }
   }
+
   return parse(context, false);
 }
 
+// General parsing of next element in the expression
 function parse(context: IContext, scoped: boolean): ParseResult {
-  const expression = context.buffer.extractToAny([openArgs, closeArgs, newline])
-  
   let ch = context.buffer.peek(1);
 
   if (ch == openArgs) {
     context.buffer.skipCount(1);
+    context.buffer.skipAny(whitespace);
     context.pushState(undefined, 'startScoped')
     return { tokenType: 'OpenParenthesis', text: openArgs }
   }
 
-  if (ch == closeArgs) {
+  if (ch == closeArgs || (!scoped && expressionEndDelimiters.includes(ch))) {
     context.buffer.skipCount(1);
+    context.buffer.skipAny(whitespace);
     context.popState();
     return scoped 
       ? { tokenType: 'CloseParenthesis', text: closeArgs } 
       : { tokenType: 'None', text: '' } 
   }
 
-  return { tokenType: 'Expression', text: expression}
+  const result: ParseResult = { tokenType: 'None', text: '' }
+
+  if (is(ch, symbol)) {
+    result.tokenType = 'Operator';
+    result.text = context.buffer.extractAny(symbol);
+  } else if (is(ch, digit)) {
+    result.tokenType = 'Number';
+    result.text = context.buffer.extractAny(floatDigit);
+  } else if (ch == quote) {
+    context.buffer.skipCount(1);
+    result.tokenType = 'String';
+    result.text = context.buffer.extractToAny([quote]);
+    context.buffer.skipCount(1);
+  } else if (is(ch, identifier)) {
+    result.tokenType = 'QualifiedIdentifier';
+    result.text = context.buffer.extractAny(qualifiedIdentifier);
+    if (result.text == 'true' || result.text == 'false') result.tokenType = 'Boolean';
+  } else {
+    context.syntaxError(`Unrecognized character in expression "${ch}"`)
+  }
+
+  context.buffer.skipAny(whitespace);
+  return result;
+}
+
+function is(char: string, charset: Charset): boolean {
+  for (const ch of charset) if (ch == char) return true;
+  return false;
 }
