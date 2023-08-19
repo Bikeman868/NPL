@@ -56,7 +56,7 @@ function parseStart(context: IContext): ParseResult {
     return { tokenType: 'None', text: '' }
   }
 
-  context.pushState(undefined, 'startUnscoped')
+  context.setSubState('startUnscoped')
   return parseStartUnscoped(context);
 }
 
@@ -71,6 +71,7 @@ function parseStartScoped(context: IContext): ParseResult {
     return { tokenType: 'CloseParenthesis', text: closeArgs }
   }
 
+  context.setSubState('scoped');
   return parse(context, true);
 }
 
@@ -78,11 +79,12 @@ function parseStartScoped(context: IContext): ParseResult {
 function parseStartUnscoped(context: IContext): ParseResult {
   let ch = context.buffer.peek(1);
 
-  if (ch == closeArgs || ch == closeScope || ch == newline) {
+  if (expressionEndDelimiters.includes(ch)) {
     context.popState();
     return { tokenType: 'None', text: '' }
   }
 
+  context.setSubState('unscoped');
   return parse(context, false);
 }
 
@@ -94,7 +96,21 @@ function parse(context: IContext, scoped: boolean): ParseResult {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
     context.pushState(undefined, 'startScoped')
-    return { tokenType: 'OpenParenthesis', text: openArgs }
+    return { tokenType: 'OpenParenthesis', text: ch }
+  }
+
+  if (scoped) {
+    if (ch == closeArgs) {
+      context.buffer.skipCount(1);
+      context.buffer.skipAny(whitespace);
+      context.popState();
+      return { tokenType: 'CloseParenthesis', text: ch } 
+    }  
+  } else {
+    if (expressionEndDelimiters.includes(ch)) {
+      context.popState();
+      return { tokenType: 'None', text: '' }
+    }
   }
 
   if (ch == closeArgs || (!scoped && expressionEndDelimiters.includes(ch))) {

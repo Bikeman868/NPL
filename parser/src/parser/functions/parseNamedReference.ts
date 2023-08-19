@@ -10,7 +10,7 @@ import { qualifiedIdentifier, whitespace } from '#interfaces/charsets.js';
  * Assumes that the keyword token already pushed a new scope
  * The scope is optional.
  * When scope is present, transitions to 'scope' sub-state with the cursor on the {
- * When no scope present, pops the state and leaves the curson on whatever comes next
+ * When no scope present, pops the state and leaves the curson on the first non-whitespace after the identifier
  */
 export function parseNamedReference(
   context: IContext,
