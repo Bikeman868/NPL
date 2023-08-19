@@ -193,9 +193,55 @@ export class ParsableString implements IParsable {
 
   extractUntil(matchingText: string): string {
     let result = '';
-    while(this.peek(matchingText.length) != matchingText) {
+    while (this.peek(matchingText.length) != matchingText) {
       result += this.current()
       this.next()
+    }
+    return result;
+  }
+
+  /** Exctracts a delimited string. Assumes that the opening delimiter was already
+   * consumed. Consumes up to an including the closing delimiter and returns the
+   * string within the delimiters.
+   * Supports \ as an escape to allow embedded delimiters. \\ inserts just one \
+   * Supports \n \r \f \t for standard control characters. Does not support \uxxxx
+   */
+  extractString(delimiter: string): string {
+    let result = '';
+    let escape = false;
+    while (this._position.offset < this._buffer.length) {
+      let ch = this.current();
+      if (ch == '\\') {
+        escape = true
+      } else {
+        if (escape) {
+          switch (ch) {
+            case 'n':
+              result += '\n';
+              break;
+            case 'r':
+              result += '\r';
+              break;
+            case 'f':
+              result += '\f';
+              break;
+            case 't':
+              result += '\t';
+              break;
+            default:
+              result += ch;
+              break;
+          }
+          escape = false;
+        } else {
+          if (ch == delimiter) {
+            this.next(); // Skip the closing delimiter
+            break;
+          }
+          result += ch;
+        }
+      }
+      this.next();
     }
     return result;
   }

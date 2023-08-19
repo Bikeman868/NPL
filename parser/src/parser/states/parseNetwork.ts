@@ -18,10 +18,10 @@ export function parseNetwork(context: IContext): ParseResult {
 
 function parseNetworkDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'ingress', state: 'networkEntry', subState: 'start' },
-    { keyword: 'egress', state: 'networkEntry', subState: 'start' },
-    { keyword: 'default', state: 'networkEntry', subState: 'start' },
-    { keyword: 'process', state: 'process', subState: 'start' },
-    { keyword: 'pipe', state: 'pipe', subState: 'start' },
+    { keyword: 'ingress', state: 'networkEntry' },
+    { keyword: 'egress', state: 'networkEntry' },
+    { keyword: 'default', state: 'networkEntry' },
+    { keyword: 'process', state: 'process' },
+    { keyword: 'pipe', state: 'pipe' },
   ]);
 }

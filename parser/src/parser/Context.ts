@@ -49,18 +49,41 @@ export class Context implements IContext {
     return this._syntaxErrors;
   }
 
-  pushState(state?: StateName, subState?: string): IParserState {
+  /** 
+   * Pushes the current state onto a stack, and changes the current state and sub-state
+   * If the sub-state is not specified then the sub-state will be set to 'start'
+   */
+  pushState(state: StateName, subState?: string): IParserState {
     this.debug(
       () =>
         `${this.getDebugIndent()}${this._currentState.state}.${
           this._currentState.subState
-        } => ${state || this._currentState.state}.${subState || this._currentState.subState}`,
+        } => ${state}.${subState || 'start'}`,
     );
 
     if (!this._isDryRun) {
       this._stateStack.push(new ParserState(this._currentState));
       if (state) this._currentState.state = state;
-      if (subState) this._currentState.subState = subState;
+      this._currentState.subState = subState || 'start';
+    }
+
+    return this._currentState;
+  }
+
+  /** 
+   * Pushes the current state on the stack and changes the sub-state
+   */
+  pushSubState(subState: string): IParserState {
+    this.debug(
+      () =>
+        `${this.getDebugIndent()}${this._currentState.state}.${
+          this._currentState.subState
+        } => ${this._currentState.state}.${subState}`,
+    );
+
+    if (!this._isDryRun) {
+      this._stateStack.push(new ParserState(this._currentState));
+      this._currentState.subState = subState;
     }
 
     return this._currentState;
@@ -87,11 +110,11 @@ export class Context implements IContext {
   }
 
   setState(state?: StateName, subState?: string): IParserState {
-    this.debug(() => `${this.getDebugIndent()}*.* --> ${state}.${subState}`);
+    this.debug(() => `${this.getDebugIndent()}*.* --> ${state}.${subState || 'start'}`);
 
     if (!this._isDryRun) {
       if (state) this._currentState.state = state;
-      if (subState) this._currentState.subState = subState;
+      this._currentState.subState = subState || 'start';
     }
     return this._currentState;
   }

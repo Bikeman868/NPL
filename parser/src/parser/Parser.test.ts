@@ -202,7 +202,7 @@ describe('Parser', () => {
         {
           line: 2,
           column: 1,
-          message: 'Expecting "config", "using" or "namespace", but found "{"',
+          message: 'Expecting "config", "using" or "namespace" but found "{"',
         },
       ],
       syntaxCheck('namespace name\n{\n}'),

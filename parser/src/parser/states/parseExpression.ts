@@ -11,9 +11,12 @@ import {
   whitespace,
   digit,
   floatDigit,
-  quote,
+  singleQuote,
+  doubleQuote,
+  backQuote,
   identifier,
   qualifiedIdentifier,
+  stringDelimiter,
 } from '#interfaces/charsets.js';
 
 const expressionEndDelimiters = [closeArgs, openScope, closeScope, newline];
@@ -95,7 +98,7 @@ function parse(context: IContext, scoped: boolean): ParseResult {
   if (ch == openArgs) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
-    context.pushState(undefined, 'startScoped')
+    context.pushSubState('startScoped')
     return { tokenType: 'OpenParenthesis', text: ch }
   }
 
@@ -130,11 +133,10 @@ function parse(context: IContext, scoped: boolean): ParseResult {
   } else if (is(ch, digit)) {
     result.tokenType = 'Number';
     result.text = context.buffer.extractAny(floatDigit);
-  } else if (ch == quote) {
+  } else if (is(ch, stringDelimiter)) {
     context.buffer.skipCount(1);
     result.tokenType = 'String';
-    result.text = context.buffer.extractToAny([quote]);
-    context.buffer.skipCount(1);
+    result.text = context.buffer.extractString(ch);
   } else if (is(ch, identifier)) {
     result.tokenType = 'QualifiedIdentifier';
     result.text = context.buffer.extractAny(qualifiedIdentifier);

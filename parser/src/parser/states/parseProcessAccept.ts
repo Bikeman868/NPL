@@ -25,12 +25,12 @@ export function parseProcessAccept(context: IContext): ParseResult {
 
 function parseAcceptDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'emit', state: 'processEmit', subState: 'start' },
-    { keyword: 'if', state: 'processIf', subState: 'start' },
-    { keyword: 'else', state: 'processElse', subState: 'start' },
-    { keyword: 'elseif', state: 'processElseif', subState: 'start' },
-    { keyword: 'while', state: 'processWhile', subState: 'start' },
-    { keyword: 'for', state: 'processFor', subState: 'start' },
+    { keyword: 'emit', state: 'processEmit' },
+    { keyword: 'if', state: 'processIf' },
+    { keyword: 'else', state: 'processElse' },
+    { keyword: 'elseif', state: 'processElseif' },
+    { keyword: 'while', state: 'processWhile' },
+    { keyword: 'for', state: 'processFor' },
   ]);
 }
 

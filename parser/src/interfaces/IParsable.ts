@@ -20,6 +20,7 @@ export interface IParsable {
   extractToAny(chars: Charset): string;
   extractUntil(matchingText: string): string;
   extractToEol(): string;
+  extractString(delimiter: string): string;
 
   hasScope(): boolean;
   isEndScope(): boolean;

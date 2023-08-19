@@ -13,12 +13,12 @@ export function parsePipeConditional(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'start':
       context.setSubState('scope');
-      context.pushState('expression', 'start');
+      context.pushState('expression');
       return parseExpression(context);
     case 'scope':
       return parseScope(context);
     case 'definition':
-      context.setState('pipeRoute', 'start')
+      context.setState('pipeRoute', 'definition')
       return parsePipeRoute(context);
   }
   throw new Error('Unknown pipe conditional sub-state ' + context.currentState.subState);

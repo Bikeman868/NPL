@@ -22,15 +22,15 @@ export function parsePipeRoute(context: IContext): ParseResult {
 
 function parseRouteDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'append', state: 'pipeAppend', subState: 'start' },
-    { keyword: 'prepend', state: 'pipePrepend', subState: 'start' },
-    { keyword: 'clear', state: 'pipeClear', subState: 'start' },
-    { keyword: 'capture', state: 'pipeCapture', subState: 'start' },
-    { keyword: 'remove', state: 'pipeRemove', subState: 'start' },
-    { keyword: 'if', state: 'pipeIf', subState: 'start' },
-    { keyword: 'else', state: 'pipeElse', subState: 'start' },
-    { keyword: 'elseif', state: 'pipeElseif', subState: 'start' },
-    { keyword: 'while', state: 'pipeWhile', subState: 'start' },
-    { keyword: 'for', state: 'pipeFor', subState: 'start' },
+    { keyword: 'append', state: 'pipeAppend' },
+    { keyword: 'prepend', state: 'pipePrepend' },
+    { keyword: 'clear', state: 'pipeClear' },
+    { keyword: 'capture', state: 'pipeCapture' },
+    { keyword: 'remove', state: 'pipeRemove' },
+    { keyword: 'if', state: 'pipeIf' },
+    { keyword: 'else', state: 'pipeElse' },
+    { keyword: 'elseif', state: 'pipeElseif' },
+    { keyword: 'while', state: 'pipeWhile' },
+    { keyword: 'for', state: 'pipeFor' },
   ]);
 }

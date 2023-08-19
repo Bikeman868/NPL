@@ -21,7 +21,7 @@ import { ParseResult } from './ParseResult.js';
  *   }
 
  * Parsing should start in the 'start' sub-scope with the
- * cursor on the first non-whitespace character after the first keyword.
+ * cursor on the first non-whitespace character after the initial keyword.
  * Under the cursor will either be the first keyword in the list or open {
  */
 export function parseScopedList(context: IContext, validKeywords: string[]): ParseResult {
@@ -44,6 +44,7 @@ function parseScopeStart(context: IContext, validKeywords: string[]): ParseResul
   if (context.buffer.peek(1) == openScope) {
     context.buffer.skipCount(1);
     context.buffer.skipAny(whitespace);
+    context.setSubState('scopedKeyword');
     return { tokenType: 'ScopeStart', text: openScope }
   }
 
@@ -100,7 +101,7 @@ function checkKeyword(keyword: string, context: IContext, validKeywords: string[
   for (let i = 0; i < validKeywords.length; i++) {
     const validKeyword = validKeywords[i];
     if (i > 0 && i == validKeywords.length - 1) msg += ' or ';
-    else if (i > 0) msg == ', ';
+    else if (i > 0) msg += ', ';
     msg += '"' + validKeyword + '"';
   }
   if (keyword) msg += ' but found "' + keyword + '"';

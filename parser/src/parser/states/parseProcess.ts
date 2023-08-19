@@ -18,6 +18,7 @@ export function parseProcess(context: IContext): ParseResult {
 
 function parseProcessDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'accept', state: 'processAccept', subState: 'start' },
+    { keyword: 'accept', state: 'processAccept' },
+    { keyword: 'test', state: 'object' }, // TODO: Test is not an object
   ]);
 }

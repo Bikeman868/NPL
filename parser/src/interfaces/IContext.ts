@@ -13,7 +13,8 @@ export interface IContext {
 
   debugLogging: (context: IContext) => boolean;
 
-  pushState(state?: StateName, subState?: string): IParserState;
+  pushState(state: StateName, subState?: string): IParserState;
+  pushSubState(subState: string): IParserState;
   popState(): IParserState;
   setState(state?: StateName, subState?: string): IParserState;
   setSubState(subState: string): IParserState;

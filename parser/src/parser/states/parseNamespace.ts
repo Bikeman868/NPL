@@ -20,9 +20,9 @@ export function parseNamespace(context: IContext): ParseResult {
 
 function parseNamespaceDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'application', state: 'application', subState: 'start' },
-    { keyword: 'message', state: 'message', subState: 'start' },
-    { keyword: 'network', state: 'network', subState: 'start' },
-    { keyword: 'enum', state: 'enum', subState: 'start' },
+    { keyword: 'application', state: 'application' },
+    { keyword: 'message', state: 'message' },
+    { keyword: 'network', state: 'network' },
+    { keyword: 'enum', state: 'enum' },
   ]);
 }

@@ -20,6 +20,6 @@ export function parseApplication(context: IContext): ParseResult {
 
 function parseApplicationDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'connection', state: 'connection', subState: 'start' },
+    { keyword: 'connection', state: 'connection' },
   ]);
 }

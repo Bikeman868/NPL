@@ -47,7 +47,7 @@ export function parseScopeDefinition(
 
   if (keyword == 'config') {
     if (context.buffer.hasScope()) {
-      context.pushState('config', 'start');
+      context.pushState('config');
     }
   } else {
     let isValid = false;
@@ -68,7 +68,7 @@ export function parseScopeDefinition(
       }
       if (keyword) msg += ' but found "' + keyword + '"';
       else
-        msg += ', but found "' + context.buffer.extractToAny(whitespace) + '"';
+        msg += '. Text at cursor is "' + context.buffer.extractToAny(whitespace) + '"';
       context.syntaxError(msg);
       if (!keyword)
         throw new Error(

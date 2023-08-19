@@ -17,10 +17,9 @@ export function parseProcessEmit(context: IContext): ParseResult {
 }
 
 function parseEmitDefinition(context: IContext): ParseResult {
-  // TODO: Only data is an object
   return parseScopeDefinition(context, [
-    { keyword: 'data', state: 'object', subState: 'start' },
-    { keyword: 'context', state: 'object', subState: 'start' },
-    { keyword: 'route', state: 'object', subState: 'start' },
+    { keyword: 'data', state: 'object' },
+    { keyword: 'context', state: 'object' }, // TODO: Context is not an object
+    { keyword: 'route', state: 'object' }, // TODO: Route is not an object
   ]);
 }

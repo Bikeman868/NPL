@@ -18,6 +18,6 @@ export function parsePipe(context: IContext): ParseResult {
 
 function parsePipeDefinition(context: IContext): ParseResult {
   return parseScopeDefinition(context, [
-    { keyword: 'route', state: 'pipeRoute', subState: 'start' },
+    { keyword: 'route', state: 'pipeRoute' },
   ]);
 }
