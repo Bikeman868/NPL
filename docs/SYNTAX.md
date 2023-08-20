@@ -1,240 +1,386 @@
 # NPL Syntax
 
-This document defines what is valid for an NPL program. The syntax is defined using the following notation:
+This document defines what is valid for an NPL program.
 
-- The syntax is a set of definitions of terms, where these terms are referenced elsewhere in the syntax. Each term is written as `term = definition`.
-- Words in *italics* are the name of another term defined elsewhere in the syntax. For example *keyword* means that you must put a keyword here, where the keyword term is defined elsewhere in the syntax.
-- Parentheses are used to group syntax elements. For example `!(quote)*` means anything other than a quote zero or more times.
-- Parentheses or terms followed by a `?` means that you must have at least 1 but you can have more than one.
-- Parentheses or terms followed by `*`  means that you can repeat this zero or more times.
-- Parentheses or terms preceeded by `!` that means that you can have anything except this.
-- Syntax in `[]` are optional, i.e. they can appear 0 or 1 time.
-- The `|` symbol represents alternatives. You must have exactly one of the alternative forms of the syntax.
-- Other symbols are literals. For example curly braces, quotes, commas etc must appear exactly as shown.
-- Words not in italics are literal words in the syntax.
+Note that this document defines the syntax. It is possible for code to be syntactically correct but structurally invalid. For 
+example having multiple application definitions within a source file is structurally invalid but syntactially correct.
 
-Note that comments can appear in most of the places you would expect, but this is not explicitly called out in the
-stntax definitions below, because it would be an optional comment element between every other element of the syntax.
-NPL supports C-like comments, with `//` commenting to the end of the line, and `/*` and `*/` providing multi-line comments.
+## Comments
 
-Note that this document defines the syntax. It is possible for code to be syntactically correct but structurally invalid. For example having multiple application definitions within a source file is structurally invalid but syntactially correct.
+Comments can appear in most of the places you would expect, but this is not explicitly called out in the
+stntax definitions below. NPL supports C-like comments, with `//` commenting to the end of the line, and `/*` and `*/` 
+providing multi-line comments.
+
+## Whitespace
+
+Anywhere where a space is required, you can put one or more spaces, or tabs.
+
+There are a few places in the syntax of NPL where line breaks are significant. In these places, the \n character is not
+whitespace, but has significance. In most places, where newline is not part of the syntax, line breaks are treated the
+same as spaces.
+
+The linefeed character is ignored everywhere, so you can save your source files in Linux or Windows format.
+
+## Identifiers
+
+Identifiers are names that you give to things in your program. Identifiers are case sensitive, and comprise
+letters, digits and underscores. The first letter of the identifier name can not be a digit.
+
+Qualified identifiers are a list of identifers separated by the decimal character.
+
+Examples of valid identifiers are: _count person1 person_record
+
+Examples of valid qualified identifiers are: message.data.id npl.connections.emitter
+
+## Scope blocks
+
+A scope block is a section of code enclosed in `{}`. Scope blocks can be nested as deeply as required. When the
+compiler needs to resolve an identifier, it searches the current scope first, then the outer scopes from inside to outside.
+
+When the outermost scope has been searched, if the identifier has not been resolved, then namespaces defined by `using`
+statements are searched.
+
+Scope blocks are not only used to define an area of code to search when resolving identifiers, they are also used to 
+define blocks of code that are executed only in certain contexts. For example `if` statements can be followed by a scope
+block, and the code in that block is only executed if the `if` statement evaluates to `true`.
 
 ## Source code files
 
-Each source code file must conform to the following syntax.
+Each source code file can start with any number of `using` statements, including none, followed by one or more `namespace`
+statements. You can put as much whitespace and comments as you like around these statements.
 
-_source-file_ = [_whitespace_] _using_* _namespace_?
+## Using
+Using statements start with the reserved word `using`, followed by at least one space, then the qualified identifier for
+a namespace, followed by a linebreak. You can not put multiple `using` statements on one line.
 
-_using_ = `using` _separator_ qualified-identifier_ _new-line_ [_whitespace_]
+These are valid `using` statements:
 
-_namespace_ = `namespace` _separator_ _qualified-identifier_ _open-scope_ _namespace-definition_ _close-scope_ [_whitespace_]
+```npl
+using myapp
+using some.other.namespace
+using app.shared // Shared code
+```
 
-_namespace-definition_ = (_whitespace_ | _application_ | _network_ | _message_ | _enum_)*
+## Namespace
 
-## Namespace Type Definitions
+Namespace statements start with the reserved word `namespace`, followed by at least one space, then the qualified identifier name of
+the namespace, followed by a scope block. You can have whitespace between the namespace name and the opening `{` of the scope block.
+You can not have a linebreak before the opening `{` of the scope block.
 
-_application_ = `application` _separator_ _identifier_ [_open-scope_ _application-definition_ _close-scope_] _new-line_
+The scope block may contain any number of `application`, `network`, `message` and `enum` statements.
 
-_message_ = `message` _separator_ _identifier_ [_open-scope_ _message-definition_ _close-scope_] _new-line_
+These are valid `namespace` statements:
 
-_network_ = `network` _separator_ _identifier_ [_open-scope_ _network-definition_ _close-scope_] _new-line_
+```npl
+namespace app {}
 
-_enum_ = `enum` _separator_ _identifier_ [_open-scope_ (_identifier_ _whitespace_)* _close-scope_] _new-line_
+namespace drivers{}
 
-### Application definitions
+namespace app.data {
 
-_application-definition_ = (_whitespace_ | _connection_)*
+}
+```
 
-_connection_ = `connection` _separator_ _qualified-identifier_ [_separator_] [_open-scope_ _connection-definition_ _close-scope_] _new-line_
+## Application
 
-_connection-definition_ = [_config_] _entry-type_ [_separator_ _entry-type_] [_separator_ `network`] _qualified_identifier_ _new-line_
+Application statements start with the reserved word `application`, followed by at least one space, then the name of the application
+as an identifier. This is usually followed by a scope block, but it's also permitted to have an application placeholder with no 
+scope block, but in this case the application will not do anything if you run it.
 
-### Message definitions
+When you run an NPL program, you must specify a source file that contains exactly one `application` statement. Any `application`
+statements in other source files will be ignored.
 
-_message-definition_ = (_whitespace_ | _message-field_)*
+When a scope block is present, it can contain a `config` statement, and any number of `connection` statements.
 
-_message-field_ = _type_ _separator_ _identifier_ _new-line_
+This is an example of valid a `application` statement:
 
-### Network and Pipe definitions
+```npl
+namespace app {
+    application IntegrationTest {
+        config {
+            url 'https://myservice.com/api'
+        }
 
-_network-definition_ = [_config_] (_whitespace_ | _entry-point_ | _process_ | _pipe_)*
+        connection npl.connection.httpListener {
+            config { port 80 }
+            ingress egress network http.router
+        }
+    }
+}
+```
 
-_entry-point_ = _entry-type_ [_separator_ _entry-type_] [_separator_ _entry-name_] [_open-scope_ _route_ _close_scope_] _new-line_
+## Message
 
-_entry-type_ = `ingress` | `egress`
+Message statements start with the reserved word `message`, followed by at least one space, then the name of the message
+as an identifier, followed by an optional scope block. Messages must be defined within a `namespace`.
 
-_entry-name_ = `default` | _identifier_
+If you want to define some messages so that their identifiers will be resolvable, but you are not ready to define the
+fields of the messages yet, you can omit the scope block, and the message type will exist with no fields. For example:
 
-_process_ = `process` _separator_ _identifier_ [_open-scope_ _process-definition_ _close-scope_] _new-line_
+```npl
+namespace app {
+    message message1
+    message message2
+}
+```
 
-_pipe_ = `pipe` _separator_ _identifier_ [_open-scope_ pipe-definition_ _close-scope_] _new-line_
+More typically, you will define messages with some fields, because they are not useful otherwise. In this case the
+opening `{` for the scope block must be on the same line as the `message` keyword, and each field must be on a separate 
+line. Line breaks are significant.
 
-_route_ = [_destination_] (_new-line_ _destination_)*
+Each message field comprises a type name, followed by one or more spaces or tabs, followed by the field name identifier.
 
-_destintion_ = (`process` | `pipe` | `network`) _separator_ _qualified-identifier_ [_open-scope_ _route_definition_ _close_scope_]  _new-line_
+These are examples of valid `meessage` statements:
 
-_route-definition_ = [_route-command_] (_new-line_ _route-command_)*
+```npl
+namespace app {
+    enum record_type {
+        person
+        address
+    }
 
-_route-command_ = _routing-logic_ | _prepend-command_ | _append-command_ | _clone-command_ | _clear-command_ | _remove-command_ | _capture-command_
+    message message1 {
+        record_type type
+        string id
+        string name
+        date start_date
+    }
 
-_routing-logic_ = _routing-if_ | _routing-else_ | _routing-else-if_ | _routing-while_ | _routing-for_
+    message message2 {
+        message1 original_message
+        string[] categories
+        map<string, string> tags
+    }
+}
+```
 
-_routing-if_ = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+The type name can be:
+- The qualified identifier for another message type
+- The qualified identifier for an `enum` type
+- One of the following reserved words: `string`, `number`, `boolean`, `date`
+- Any of the above followed by `[]` to define a list of values
+- `map<K, V>` where `K` can be any of `string`, `number`, or `date` and `V` can be any other type name.
 
-_routing-else-if_ = `elseif` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+Note that type restrictions exist because messages are transmitted between networks, and these networks
+can be vertically scaled across clusters of compute instances.
 
-_routing-else_ = `else` _open-scope_ _route_definition_ _close_scope_ _new-line_
+Note that messages are immutable once created, as are lists and maps, but new lists and maps can be 
+very efficiently created out of existing ones. For example you can create a new list by combining two
+existing lists, and the contents of the lists will not be copied.
 
-_routing-while_ = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+## Network
 
-_routing-for_ = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _route_definition_ _close_scope_ _new-line_
+Network statements start with the reserved word `network`, followed by at least one space, then the name of the network
+as an identifier, followed by an optional scope block. Networks must be defined within a `namespace`.
 
-_prepend-command_ = `prepend` _open-scope_ _route_ _close_scope_ _new-line_
+If you want to define some networks so that their identifiers will be resolvable, but you are not ready to define the
+behavior of the network yet, you can omit the scope block, and the network will exist with no entry points. For example:
 
-_append-command_ = `append` _open-scope_ _route_ _close_scope_ _new-line_
+```npl
+namespace app {
+    network network1
+    network network2
+}
+```
 
-_clear-command_ = `clear` _new-line_
+More typically, you will define entry points, processes and pipes within the network, because they are not useful 
+otherwise. In this case the opening `{` for the scope block must be on the same line as the `network` keyword.
 
-_remove-command_ = `remove` _open-scope_ _route_ _close_scope_ _new-line_
+The following statement types can be defined within the scope block of a network: `config`, `ingress`, `egress`,
+`pipe` or `process`.
 
-_capture-command_ = `capture` _separator_ _qualified-identifer_ [_open-scope_ _route_ _close_scope_] _new-line_
+These are examples of valid `network` statements:
 
-_clone-command_ = `clone` _open-scope_ _route_ _close_scope_ _new-line_
+```npl
+namespace app {
+    network network1 {
+        config {
+            timeout_seconds 20
+        }
 
-_pipe-definition_ = [_config_] [_pipe-route_] (_new-line_ _pipe-route_)*
+        ingress default {
+        }
 
-_pipe-route_ = `route` _separator_ _message-type_ [_open-scope_ _route_ _close_scope_] _new-line_
+        egress ingress entryPoint1 {
+        }
 
-_message-type_ = `*` | `empty` | _qualified-identifier_
+        pipe pipe1
+        pipe pipe2
+        process process1
+        process process2
+    }
+}
+```
 
-### Process definitions
+## Network entry point
 
-_process-definition_ = [_config_] [_message-processing_] (_new-line_ _message-processing_)*
+Network entry points are defined within the scope block of a `network`. They comprise the keyword `ingress`, `egress`
+or both in either order, followed by the name of the entry point, or the reserved word `default`. This is followed by a 
+scope block containing a list of the networks, processes and pipes that accept or emit messages though this entry point.
 
-_message-processing_ = `accept` _message-type_ _separator_ _identifier [_open-scope_ _statements_ _close-scope_] _new-line_
+If you only have one element in the list, the scope block is allowed to be all on one line, but if you have multiple
+elements, then each element must be on a separate line with the closing `}` on a line by itself.
 
-_statements_ = [_process-statement_] (_new-line_ _process-statement_)*
+These are examples of valid network entry point syntax:
 
-_process-statement_ = _process-logic_ | _emit-command_ | _clone-command_ | _clear-command_
+```npl
+namespace app {
+    network network1 {
+        ingress incomming
 
-_process-logic_ = _process-if_ | _process-else_ | _process-else-if_ | _process-while_ | _process-for_
+        egress outgoing
 
-_emit-command_ = `emit` _separator_ _qualified-identifier_ [_open-scope_ _message-init_ _close-scope_]
+        egress ingress default { process process1 }
 
-_message-init_ = (_message-data_ | _message-route_ | _message-context_)*
+        egress logging { 
+            process process1 
+            process process2
+            pipe pipe1 
+        }
 
-_message-data_ = `data` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
+        ingress egress input1 { network network2.entrypoint1 }
 
-_message-route_ = `route` _open-scope_ [_route_] (_new-line_ _route_)* _close-scope_ _new-line_
+        ingress splitEntrypoint { netwoek network3 }
+        egress splitEntrypoint { network network4 } 
+    }
+}
+```
 
-_message-context_ = `context` _open-scope_ [_field-value_] (_new-line_ _field-value_)* _close-scope_ _new-line_
+For entry points that are `ingress`, messages received by the entry point will be sent to the first process
+or pipe in the list that knows how to process it. For entry points that are `egress`, all messages emitted
+by all processes and pipes in the list will be emitted by the entry point.
 
-_field-value_ = _identifier_ _separator_ _expression_
+When an entry point list includes networks, each network will receive a copy of each incomming message if
+the entry point is an `ingress` and will forward all emitted messages from these networks if the entry point
+is an `egress`.
 
-_process-if_ = `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+You can not have two `ingress` entry points with the same name on the same network. You also can not have
+two `egress` entry points with the same name on the same network, but you can have separate `ingress` and
+`egress` definitions for the same entry point name.
 
-_process-else-if_ = `else` _separator_ `if` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+Note that the entry point with the `default` reserved word in place of the entry point name is referenced
+whenever the name of the network is not qualified by the entry point name. For example 
+`network network1.entryPoint1` refers to `entryPoint1` on the `network1` network, and `network network1` 
+refers to the default entry point for `network1`.
 
-_process-else_ = `else` _open-scope_ _statements_ _close_scope_ _new-line_
+## Enum
 
-_process-while_ = `while` _open_paren_ _expression_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+Enum statements start with the reserved word `enum`, followed by at least one space, then the name of the enum
+as an identifier, followed by an optional scope block. Enums must be defined within a `namespace`.
 
-_process-for_ = `for` _open_paren_ _identifier_ _separator_ `of` _separator_ _qualified_identifier_ _close_paren_ _open-scope_ _statements_ _close_scope_ _new-line_
+If you want to define some enums so that their identifiers will be resolvable, but you are not ready to define the
+values of the enum yet, you can omit the scope block. For example:
+
+```npl
+namespace app {
+    enum enum1
+    enum enum2
+}
+```
+
+The scope block of the `enum` should contain a list of identifiers separated by whitespace. For example:
+
+```npl
+namespace app {
+    enum enum1 { value1 value2 value3 }
+    enum enum2 { 
+        value1 
+        value2 
+        value3
+    }
+}
+```
+
+## Connection
+
+Connection statements start with the reserved word `connection`, followed by at least 1 space, followed by
+the qualified identifier of a connection type and a scope block. There are many connection types built into
+the NPL runtime, and others can be added from shaed modules. You can not create new connection types within
+your NPL program.
+
+Connections can only be defined within an `application`, and define how your application communicates with the
+rest of the world. This includes network ports, files, APIs, data streams, databases etc.
+
+Connections are generic and reusable accross multiple applications. Although the `config` statement within a
+`connection` scope block is optional, very few connections are useful without some configuration.
+
+To configure different connections for different situations (for example local vs production) you can create
+a source file for each situation, where each source file contains an `application` statement that is
+specific to that situation. You can also add `config` statements to your application and override the
+values by providing a yaml file when you run the program.
+
+As well as configuring your connection, you also need to route messages to/from the connection to a network
+entry point within your application.
+
+To configure the messages incomming from the connection to the application, use `ingress network` followed 
+by the qualified identifier of the network or network entry point. If the qualified identifier refers to a 
+network, then the default entry point will be used.
+
+To configure the messages outgoing from the application to the connection, use `egress network` followed 
+by the qualified identifier of the network or network entry point. If the qualified identifier refers to a 
+network, then the default entry point will be used.
+
+You can also combine `ingress` and `egress` in the same statement, and the reserved work `network` is
+optional, because it must always refer to network entry point.
+
+These are examples of valid `connection` statements:
+
+```npl
+namespace app {
+    application IntegrationTest {
+        config {
+            url 'https://myservice.com/api'
+        }
+
+        connection npl.connection.httpListener {
+            config { port 80 }
+            ingress egress network http.router
+        }
+
+        connection npl.connection.emitter {
+            ingress network1
+        }
+
+        connection npl.connection.consoleLogger {
+            egress network2.entryPoint1
+        }
+    }
+}
+```
 
 ## Config
 
-_config_ = _whitespace_ `config` _open-scope_ [_config-value_] (_new-line_ _config-value_)* _close_scope_ _new_line_
+## Process
 
-_config-value_ = _whitespace_ _identifier_ _separator_ _constant-expression_
+## Pipe
+
+## Route
 
 ## Expressions
 
-_expression_ = _constant-expression_ | _computed-expression_ | _array-expression_ | _map-expression_
+## Accept
 
-_constant-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _constant-value_ [_whitespace_] [_binary-operator_ _separator_ _constant-expression_] [_close-paren_]
+## Emit
 
-_computed-expression_ = [_unary_operator_] [_open-paren_] [_unary_operator_] _computed-value_ [_whitespace_] [_binary-operator_ _separator_ _computed-expression_] [_close-paren_]
+## If
 
-_array-expression_ = _qualified-identifier_ _open-array_ _computed-expression_ _close-array_
+## Else
 
-_map-expression_ = _identifier_ (_decimal_ _identifier_)?
+## Elseif
 
-_computed-value_ = _constant-value_ | _qualified-identifier_ | _method-call_
+## While
 
-_constant-value_ = _number_ | _string_ | _enum-value_ | _env-value_
+## For
 
-_enum-value_ = _qualified-identifier_
+## Append
 
-_env-value_ = `%` _identifier_ `%`
+## Prepend
 
-_method-call_ = _qualified-identifier_ _open-paren_ [_expression_] (_comma-separator_ _expression_)* _close-paren_
+## Clear
 
-_binary-operator_ = `<` | `>` | `<=` | `>=` | `==` | `!=` | `===` | `!==` | `+` | `-` | `/` | `*` | `%` | `<<` | `>>` | `|` | `||` | `&` | `&&`
+## Capture
 
-## Types
+## Var
 
-_type_ = _primitive-type_ | _message-type_ | _array-type_ | _map-type_ | `any`
+## Test
 
-_primitive-type_ = `number` | `string` | `date`
-
-_message-type_ = _qualified-identifier_
-
-_array-type_ = _type_ _open-array_ _close-array_
-
-_map-type_ = `map<` _primitive_type_ `,` _type_ `>`
-
-## The small stuff
-
-_linebreak_ = `/0x0a`
-
-_space_ = `/0x20`
-
-_tab_ = `/0x09`
-
-_quote_ = `/0x27`
-
-_decimal_ = `/0x2e`
-
-_open-square_ = `/0x5b`
-
-_close-square_ = `/0x5d`
-
-_open_round_ = `/0x28`
-
-_close_round_ = `/0x29`
-
-_underscore_ = `/0x5f`
-
-_alpha_ = `a` | `b` | ... | `Y` | `Z`
-
-_numeric_ = `0` | `1` | ... | `9`
-
-_alphanumeric_ = _alpha_ | _numeric
-
-_number_ = (_numeric_)? [ _decimal_ (_numeric_)* ]
-
-_string_ = _quote_ !(_quote_ | _linebreak_)* _quote_
-
-_identifier_ = (_alpha_ | _underscore_) (_alphanumeric_ | _underscore_)*
-
-_qualified-identifier_ = _identifier_ (_decimal_ _idendifier_)*
-
-_whitespace_ = (_space_ | _tab_ | _linebreak_)?
-
-_separator_ = (_space_ | _tab_)?
-
-_new-line_ = [_whitespace_] _linebreak_ [_whitespace_]
-
-_open-paren_ = (_space_ | _tab_)* _open_round_ (_space_ | _tab_)*
-
-_close_paren_ = (_space_ | _tab_)* _close_round_ (_space_ | _tab_)*
-
-_open-array_ = (_space_ | _tab_)* _open_square_ (_space_ | _tab_)*
-
-_close_array_ = (_space_ | _tab_)* _close_square_ (_space_ | _tab_)*
-
-_open-scope_ = [_whitespace_] `{` [_whitespace_]
-
-_close-scope_ = [_whitespace_] `}`
-
-_comma-separator_ = (_space_ | _tab_)* `,` (_space_ | _tab_)*
