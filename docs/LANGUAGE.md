@@ -46,9 +46,9 @@ namespace app {
             process Responder
         }
         process Responder {
-            accept * msg {
+            accept * {
                 emit console.line { 
-                    data { text 'Hello, world' }
+                    message { text 'Hello, world' }
                 }
             }
         }
@@ -119,9 +119,9 @@ The process declaration:
 
 ```npl
 process Responder {
-    accept * msg {
+    accept * {
         emit console.line { 
-            data { text 'Hello, world' }
+            message { text 'Hello, world' }
         }
     }
 }
@@ -132,9 +132,9 @@ Defines a process that will accept messages, process them, and optionally emit o
 The process definition is enclosed in `{}` and comprises a number of clauses that define the behavior of the process. Note that processes can not have internal state, only message processing
 logic. Conversely messages have state but no functionality. In NPL state travels with the message.
 
-The `accept` reserved word is followed by the name of a message or `*` (which means that it will accept any type of message) and an identifier to use to refer to this message within the message handling code.
+The `accept` reserved word is followed by the name of a message or `*` (which means that it will accept any type of message).
 
-In this case `accept * msg {}` defines the processing steps to perform when a message of any type is received, and  `emit console.line { text 'Hello, world' }` sends a `console.line` type message with it's `text` field set to the string literal "Hello, world".
+In this case `accept * {}` defines the processing steps to perform when a message of any type is received, and  `emit console.line { message { text 'Hello, world' } }` sends a `console.line` type message with it's `text` field set to the string literal "Hello, world".
 
 Note that the process does not know where the incomming message came from, or where the response that it emitted will be sent next. Processes know nothing about the structure of the program, and are wired together by routing logic.
 
@@ -308,7 +308,7 @@ The route definition comprises routing logic to apply to this message type. The 
 
 * `context` to access the message contexts (for example `context.origin.jwt`). The message context can be mutated.
 * `message` which functions a bit like `this` in other languages, and refers to the message being routed. The fields of the message can be read, but messages are immutable.
-* `route` to alter the path that the message will take through the network.
+* Routing commands like `append`, `prepend`, `remove` and `clear` to alter the path that the message will take through the network.
 * `clone` to make a copy of the message with a different route.
 
 Routing is a big subject that is covered in detail elsewhere. In this example we are using `prepend` to add a new destination to the beginning of the route, changing where the message will go next.
@@ -408,51 +408,64 @@ In this scenario you can write:
 
 ```npl
 process InvoiceCalculator {
-    accept Cart cart {
+    accept Cart {
         emit TaxRequest {
-            region cart.region
-            country cart.country
+            message {
+                region message.region
+                country message.country
+            }
         }
         await { TaxResponse tax }
-        const subTotal = cart.items.sum(item => item.price * item.quantity)
+        const subTotal = message.items.sum(item => item.price * item.quantity)
         emit Invoice {
-            ...cart
-            taxRate tax.rate
-            subTotal subTotal
-            total subTotal * (1 + tax.rate / 100)
+            message {
+                ...message
+                taxRate tax.rate
+                subTotal subTotal
+                total subTotal * (1 + tax.rate / 100)
+            }
         }
     }
 }
 ```
 
 This assumes that somewhere in the system there is a process that accept `TaxRequest` messages and returns `TaxResponse` messages.
-This process doesn't konw, or need to know how this mechansism works.
+This process doesn't know, or need to know how this mechansism works.
 
-The `await` keyword can also wait for one of several message types by making a list. You can also put several `await` statements in the code, and the processing will wait for all of these messages to be available beofre continuing.
+The `await` keyword can also wait for one of several message types by making a list. You can also put several `await` statements in the code, and the processing will wait for all of these messages to be available before continuing.
 
 To illustrate this, imagine that the tax process will return either a `TaxResponse` or an `Exception` and we want to continue processing whichever the response is:
 
 ```npl
 process InvoiceCalculator {
-    accept Cart cart {
+    accept Cart {
         emit TaxRequest {
-            region cart.region
-            country cart.country
+            message {
+                region message.region
+                country message.country
+            }
         }
         await { 
             TaxResponse tax
             Exception ex
         }
         if tax {
-            const subTotal = cart.items.sum(item => item.price * item.quantity)
+            const subTotal = message.items.sum(item => item.price * item.quantity)
             emit Invoice {
-                ...cart
-                taxRate tax.rate
-                subTotal subTotal
-                total subTotal * (1 + tax.rate / 100)
+                message {
+                    ...message
+                    taxRate   tax.rate
+                    subTotal  subTotal
+                    total     subTotal * (1 + tax.rate / 100)
+                }
             }
         } else {
-            emit Exception { text 'Unable to get tax information' }
+            emit Exception { 
+                message { text 'Unable to get tax information' }
+                context { 
+                    origin { process 'InvoiceCalculator' }
+                }
+            }
         }
     }
 }
@@ -524,8 +537,13 @@ pipe Pipe1 {
     }
     route Message3 {
         clone {
-            field1 'new field 1 value'
-            field2 'new field 2 value'
+            message {
+                field1 'new field 1 value'
+                field2 'new field 2 value'
+            }
+            prepend {
+                process process2
+            }
         }
         clear
     }
@@ -540,7 +558,7 @@ This illustrates a few patterns and techniques as follows:
 
 * `Message1` routing simply adds a new destination to the front of the route. This is where the message will be sent next. Simple routing statements like this can be all on 1 line if you want.
 * `Message2` routing makes multiple routing changes. These must be separated by line breaks. The `prepend` statement also routes to multiple destinations, in this case the destintions must be separated by line breaks.
-* `Message3` routing makes a copy of the original message (including its route), where the copy has some modified field values. It also clears the route on the original message so that it will not be processed any further. This is as close as you can get to mutating a message.
+* `Message3` routing makes a copy of the original message (including its route), where the copy has some modified field values. It also clears the route on the original message so that it will not be processed any further. This is as close as you can get to mutating a message. You can also do this within a process, but the process can't modify the route.
 * `*` routing applies to any other type of message. In this case we clear the route to prevent any further processing of this message, then send the message to the `NotImplementedLogger` process. Note that the `prepend` statement must come after `clear` or the prepend would also be cleared.
 
 <a name="routing-route"></a>
@@ -552,7 +570,7 @@ There are also places where a new message context is created, for example when a
 
 Newly created messages by default, are routed to the originator of the message that is currently in context, so it is uncommon to modify the route here. If processes emit messages with a custom route set by the process, this makes the process tightly coupled to the program structure, which makes it less flexible and less reusable.
 
-The `clone` reserved word makes a copy of the message in context, but modifies some of the fields. Inside the clone defintion, you can also use `route` to alter the route of the clone.
+The `clone` reserved word makes a copy of the message in context, but modifies some of the fields. Inside the clone defintion, you can also use routing commands to alter the route of the clone.
 
 The `route` statement supports the following operations on the message route:
 
@@ -719,43 +737,64 @@ namespace App {
         ingress egress MathQuestions { process DoMath }
 
         process DoMath {
-            accept MathQuestion question {
-                if question.operation == Operation.add
-                    emit MathAnswer { answer question.a + question.b }
-                elseif question.operation == Operation.subtract
-                    emit MathAnswer { answer question.a - question.b }
-                else
-                    emit Exception { text `Unknown math operation ${question.operation}`}
+            accept MathQuestion {
+                if message.operation == Operation.add {
+                    emit MathAnswer { 
+                        message { answer question.a + question.b }
+                    }
+                }
+                elseif message.operation == Operation.subtract {
+                    emit MathAnswer {
+                        message { answer question.a - question.b }
+                    }
+                }
+                else {
+                    emit Exception { 
+                        message { text `Unknown math operation ${message.operation}`}
+                    }
+                }
             }
 
             test 'should add numbers' {
                 emit MathQuestion {
-                    a 12
-                    b 20
-                    operation Operation.add
+                    message {
+                        a 12
+                        b 20
+                        operation Operation.add
+                    }
                 }
                 expect MathAnswer {
-                    answer 32
+                    message {
+                        answer 32
+                    }
                 }
             }
 
             test 'should subtract numbers' {
                 emit MathQuestion {
-                    a 12
-                    b 20
-                    operation Operation.subtract
+                    message {
+                        a 12
+                        b 20
+                        operation Operation.subtract
+                    }
                 }
                 expect MathAnswer {
-                    answer -8
+                    message {
+                        answer -8
+                    }
                 }
             }
 
             test 'should error on unknown operation' {
                 emit MathQuestion {
-                    operation Operation.multiply
+                    message {
+                        operation Operation.multiply
+                    }
                 }
                 expect Exception {
-                    text 'Unknown math operation multiply'
+                    message {
+                        text 'Unknown math operation multiply'
+                    }
                 }
             }
         }
@@ -773,4 +812,4 @@ Notes:
 - You can include further `emit` statements for situations where your process waits for multiple messages to be received before emitting a message in response.
 - Keeping the process definition and tests together like this has many advantages, especially in understanding what a process is supposed to do, and remembering to update the tests when the process is updated.
 - The only thing external to the process that can break the unit test are changes to the message definitions.
-- No dependencies means no mocks, whic also means no need to update mocks when the real implementation's behavior changes.
+- No dependencies means no mocks, which also means no need to update mocks when the real implementation's behavior changes.

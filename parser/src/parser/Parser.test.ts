@@ -19,9 +19,9 @@ namespace App {
         }
 
         process Responder {
-            accept * msg { // Accept all message types
+            accept * { // Accept all message types
                 emit Response { 
-                    data { text 'Hello, world' }
+                    message { text 'Hello, world' }
                 }
             }
         }
@@ -105,7 +105,7 @@ describe('Parser', () => {
     expect(keywords[i++].text).toBe('accept');
     expect(keywords[i++].text).toBe('*');
     expect(keywords[i++].text).toBe('emit');
-    expect(keywords[i++].text).toBe('data');
+    expect(keywords[i++].text).toBe('message');
     expect(keywords[i++].text).toBe('namespace');
     expect(keywords[i++].text).toBe('application');
     expect(keywords[i++].text).toBe('connection');

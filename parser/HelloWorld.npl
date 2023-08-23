@@ -27,9 +27,9 @@ namespace app { // Namespace can be defined in multiple source files
             process Responder // All messages are handled by the 'Responder' process
         }
         process Responder {
-            accept * msg { // Accept all message types
+            accept * { // Accept all message types
                 emit console.text { // Produce a new message of type npl.connection.console.text
-                    data { text 'Hello, world' } // Set the message field values
+                    message { text 'Hello, world' } // Set the message field values
                 }
             }
         }

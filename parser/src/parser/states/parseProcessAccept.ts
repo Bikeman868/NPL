@@ -11,15 +11,13 @@ import {
 import { TokenType } from '#interfaces/TokenType.js';
 
 /*
- * Parses `accept <message-type> <identifier> {}` statement within a `process` definition
+ * Parses `accept <message-type> {}` statement within a `process` definition
  * Assumes that the cursor is at the first character of the <message-type> and
  */
 export function parseProcessAccept(context: IContext): ParseResult {
   switch (context.currentState.subState) {
     case 'start':
       return parseMessageType(context);
-    case 'name':
-      return parseIdentifier(context);
     case 'scope':
       return parseScope(context);
     case 'definition':
@@ -56,14 +54,6 @@ function parseMessageType(context: IContext): ParseResult {
       );
   }
 
-  context.buffer.skipAny(separator);
-  context.setSubState('name');
-  return { text: name, tokenType: tokenType };
-}
-
-function parseIdentifier(context: IContext): ParseResult {
-  const name = context.buffer.extractAny(identifier);
-
   if (context.buffer.hasScope()) {
     context.setSubState('scope');
   } else {
@@ -71,5 +61,5 @@ function parseIdentifier(context: IContext): ParseResult {
     context.popState();
   }
 
-  return { text: name, tokenType: 'Identifier' };
+  return { text: name, tokenType: tokenType };
 }
