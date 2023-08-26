@@ -526,14 +526,14 @@ This is an example pipe definition:
 
 ```npl
 pipe Pipe1 {
-    route Message1 { prepend { process Process1 } }
+    route Message1 { prepend { process process1 } }
     route Message2 { 
         prepend { 
-            process Process1
-            process Process2
-            pipe Pipe2
+            process process1
+            process process2
+            pipe pipe2
         }
-        append  { pipe Pipe2 }
+        append  { pipe pipe2 }
     }
     route Message3 {
         clone {
@@ -549,7 +549,7 @@ pipe Pipe1 {
     }
     route * {
         clear
-        prepend { process NotImplementedLogger }
+        prepend { process notImplementedLogger }
     }
 }
 ```
