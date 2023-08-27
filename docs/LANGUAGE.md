@@ -70,7 +70,8 @@ namespace App {
             egress network Hello
         }
     }
-}```
+}
+```
 
 Note that if you wanted to write a hello world web page instead, then you would only need to modify the application definition, all of the rest of the code could remain unchanged.
 
