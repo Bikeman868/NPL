@@ -9,14 +9,17 @@ upper and lower case letters, digits and underscores. Identifers may not have a 
 the first character.
 
 We recommend three formats for identifiers:
-- Camel case in which the first character is lower case and other words within the identifier are capitalized. For example `thisIsCamelCase`
+- Camel case in which the first character is lower case and other words within the identifier 
+are capitalized. For example `thisIsCamelCase`
 - Pascal case in which the first character of every word is upper case. For example `ThisIsPascalCase`.
 - Camel case prefixed with underscore. For example `_myInternalThing`.
 
-In all three formats acronyms should not be capitalized. So for example you should use `Html` and not use `HTML`. You should use `Dto` and not use `DTO`.
+In all three formats acronyms should not be capitalized. So for example you should use `Html` and 
+not use `HTML`. You should use `Dto` and not use `DTO`.
 
 Our general recommendation is to use Pascal case for the names of types and camel case
-for the names of instances. For example if I define a message type I might call it `HtmlRequest`. This defines the fields that messages of this type have. If I have a
+for the names of instances. For example if I define a message type I might call it `HtmlRequest`.
+This defines the fields that messages of this type have. If I have a
 field or variable that contains a reference to a message of this type, then I could name
 it `htmlRequest`. This helps to avoid name collisions and general confusion over what
 it a type and what is a value.
@@ -89,7 +92,7 @@ building real-world applications.
 ### Boomerang pattern
 
 In this pattern a process emits a message that has a very specific response, and waits for
-that response befor continuing to process. This pattern is useful for situations like
+that response before continuing to process. This pattern is useful for situations like
 fetching data from a database. The process emits a message describing the data that it
 needs and receives a response with the data without knowing anything about where the
 data came from.
@@ -97,16 +100,18 @@ data came from.
 Below is an example of emitting a message containing a GraphQL query and waiting for
 the response. The example is not a complete working program, but illustrates:
 - Separating areas of functionality using namespaces
-- Dividing the code up into networks. Each network can run ona  different compute instance at runtime
+- Dividing the code up into networks. Each network can run on a different compute instance at runtime
 - The large scale program structure is defined by the networks.
 - Structure within a network is defined by the pipes.
 - Processes are independant of program structure.
-- You to easily restructure the program to accomodate new requirements.
+
+From this you can observe that:
+- You can easily restructure the program to accomodate new requirements.
 - You can A/B test a new structure by having pipes examine feature flags.
 
 ```npl
 // The data namespace contains networks for reading and writing persistent stores
-// Start by defining messages and networks, the interface to the data subsystem
+// Start by defining messages and networks which are the interface to the data subsystem
 namespace data {
     message GraphQlRequest {
         string graphQl
@@ -136,14 +141,15 @@ namespace data {
 
 // Define messages, networks and routing for the main application
 namespace app {
-    // This message is not defined yet and will be empty for now
+    // This is a placeholder for an invoice message which we will define later
     message Invoice
 
     network InvoiceLogic {
+        // The default entry point for this network is routed by the Main pipe
         ingress egress default { pipe Main }
 
-        // This pipe modifies the message route to capture GraphQL requests and route
-        // them to the GraphQl network in the data namespace
+        // The DataAccess pipe modifies the message route to capture GraphQL 
+        // requests and routethem to the GraphQl network
         pipe DataAccess {
             route * {
                 capture data.GraphQlRequest {
@@ -158,7 +164,7 @@ namespace app {
                     // Process invoices with the TaxCalculator process
                     process TaxCalculator
 
-                    // Before calling TaxCalculator modify the message route to capture
+                    // Before calling TaxCalculator modify the message's route to capture
                     // GraphQlRequest messages and route them to the GraphQl network
                     pipe DataAccess
                 }
@@ -193,7 +199,7 @@ squash the route for the original incomming message so that it is not processed 
 ```npl
 process Test {
     accept Message1 {
-        clone {
+        emit clone {
             message {
                 field1 message.field1 + "_suffix"
             }
@@ -210,15 +216,16 @@ process Test {
 ```
 
 In this example the process accepts messages of type `Message1`, clones the message (including 
-the message's route and context) but modified `field1` appending `"_suffix"` to it. After making
+the message's route and context) but modifies `field1`, appending `"_suffix"` to it. After making
 the clone, the route of the original incomming message is cleared so that is will undergo no more
 processing.
 
 Note that this code explicitly copies the message context of the message to demonstrate how you
-would do this if you wanted a modified context for the cloned message. If you do not include this
-code, then the cloned message will be an exact copy the original message. The reserved word `clone`
-on a line by itself with no scope block will simply emit another message that is completely identical
-to the incomming message.
+would do this, but this is not typical. If you do not include the `context` statement within the
+`clone` statment, the cloned message will be an exact copy the original message.
+
+Writing `emit clone` on a line by itself with no scope block will simply emit another 
+message that is completely identical to the incomming message.
 
 Note that if we placed rhw `clear` before `clone` then we would have cleared the route on the
 incomming message before copying it, and the cloned message would also have no route going forward.

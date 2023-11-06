@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes how NPL works for those that like to get under the hood. If you want to read about what it does, instead of how it does it, then take a look at the [language guide](LANGUAGE.md).
+This document describes how NPL works for those that like to get under the hood. If you want to read about what it does, instead of how it does it, then take a look at the [Language Handbook](LANGUAGE.md).
 
 # Concept
 
@@ -55,10 +55,12 @@ Messages contain:
 Comparing this to the OOP techniques that are very familiar to most programmers:
 - Processes are similar to classes. Where classes contain multiple public methods, Processes know how to process multiple types of message.
 - In OOP, classes are instantiated to create objects. These objects contain data and the methods of the class mutate this data. In NPL, Processes contain the processing instructions ony, and contain no data. The data is passed between Processes in Messages.
-- In OOP you could simulate some aspects of NPL by having two types of class, where one type of class only defines properties, and the other type of class only contains static methods and can not be instantiated. In this case the property only classes (sometimes referred to as DTOs) are like NPL Messages and, and the static classes are like NPL processes. In this simulation there is no equivalent to the NPL Pipes and Nttworks.
+- In OOP you could simulate some aspects of NPL by having two types of class, where one type of class only defines properties, and the other type of class only contains static methods and can not be instantiated. In this case the property only classes (sometimes referred to as DTOs) are like NPL Messages and, and the static classes are like NPL processes. In this simulation there is no equivalent to the NPL Pipes, Networks and message routing.
 - In OOP the data and the operations on that data are bound together into a class. In NPL the data and operations to perform on the data are deliberately separated into Messages and Processes where many Processes act on the same data.
 - In OOP, class methods call methods of other obejcts. This means that each class must be aware of the overall structure of the application, and restructuring the application is complex and risky. In NPL Processes have no idea of the application structure, or which Process will be called next, this is the responsibiliity of the Pipes. This is like Dependency Injection taken to the next level.
 - In OOP the calling sequence is defined by a method's processing logic making an explicit call to another method. In NPL the calling sequence is bound to the data, and represented by a Route within the Message.
+
+There is a [comparison with OOP](OOP_COMPARISON.md) document if you want to explore this in more depth.
 
 # Runtime environment
 
