@@ -1,0 +1,37 @@
+// This using statement lets us abbreviate `npl.connection.console` to just `console`
+using npl.connection
+
+namespace app {
+    /* This simple hello world application demonstrates some of the
+       basic prinicples of NPL. Try modifying this app and see what happens
+    */
+    application HelloWorld { // Only 1 application definition is allowed
+        connection emitter { // npl.connection.emitter periodically emits messages
+            config { 
+                count 1 // Emit 1 message and stop
+                interval 0 // Infinite delay between messages
+                message empty // Emit an empty message
+            }
+            ingress network Hello // Send recieved messages to the Hello network default entry point
+        }
+        connection console { // npl.connection.console lets you send text to the console output
+            config { mode console.lines } // Configure the console to output a line of text for each message
+            egress network Hello // Collect output from the default entry point on the Hello network
+        }
+    }
+}
+
+namespace app { // Namespace can be defined in multiple source files
+    network Hello { // This network responds to messages with 'Hello world'
+        ingress egress default { // Default entry point for incoming and outgoing messages
+            process Responder // All messages are handled by the 'Responder' process
+        }
+        process Responder {
+            accept * { // Accept all message types
+                emit console.text { // Produce a new message of type npl.connection.console.text
+                    message { text 'Hello, world' } // Set the message field values
+                }
+            }
+        }
+    }
+} 
