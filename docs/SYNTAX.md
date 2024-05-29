@@ -17,14 +17,14 @@ example having multiple application definitions within a source file is structur
 ## Comments
 
 Comments can appear in most of the places you would expect, but this is not explicitly called out in the
-stntax definitions below. NPL supports C-like comments, with `//` commenting to the end of the line, and `/*` and `*/` 
+syntax definitions below. NPL supports C-like comments, with `//` commenting to the end of the line, and `/*` and `*/` 
 providing multi-line comments.
 
 ## Whitespace
 
 Anywhere where a space is required, you can put one or more spaces, or tabs.
 
-There are a few places in the syntax of NPL where line breaks are significant. In these places, the \n character is not
+There are a few places in the syntax of NPL where line breaks are significant. In these places, the newline character is not
 whitespace, but has significance. In most places, where newline is not part of the syntax, line breaks are treated the
 same as spaces.
 
@@ -63,7 +63,7 @@ statements. You can put as much whitespace and comments as you like around these
 
 ## Using
 Using statements start with the reserved word `using`, followed by at least one space, then the qualified identifier for
-a namespace, followed by a linebreak. You can not put multiple `using` statements on one line.
+a namespace, followed by a newline. You can not put multiple `using` statements on one line.
 
 These are valid `using` statements:
 
@@ -77,7 +77,7 @@ using app.shared // Shared code
 
 Namespace statements start with the reserved word `namespace`, followed by at least one space, then the qualified identifier name of
 the namespace, followed by a scope block. You can have whitespace between the namespace name and the opening `{` of the scope block.
-You can not have a linebreak before the opening `{` of the scope block.
+Unlike many curly brace languages, in NPL you can not have newline characters before the opening `{` of the scope block.
 
 The scope block may contain any number of `application`, `network`, `message` and `enum` statements.
 
@@ -95,7 +95,7 @@ namespace app.data {
 
 ## Application
 
-Application statements start with the reserved word `application`, followed by at least one space, then the name of the application
+Application statements start with the reserved word `application` followed by at least one space, then the name of the application
 as an identifier. This is usually followed by a scope block, but it's also permitted to have an application placeholder with no 
 scope block, but in this case the application will not do anything if you run it.
 
@@ -113,9 +113,9 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.httpListener {
+        connection npl.connection.HttpListener {
             config { port 80 }
-            ingress egress network http.router
+            ingress egress network http.Router
         }
     }
 }
@@ -168,7 +168,7 @@ namespace app {
         date? start_date
     }
 
-    message message2 {
+    message Message2 {
         Message1 original_message
         deprecated string[] categories
         map<string, string> tags
@@ -182,10 +182,10 @@ The type name can be:
 - One of the following reserved words: `string`, `number`, `boolean`, `date`
 - Any of the above with a `?` suffix to indicate that the field is optional
 - Any of the above followed by `[]` to define a list of values. This can not be combined with the `?` suffix
-- `map<K, V>` where `K` can be any of `string`, `number`, or `date` and `V` can be any other type name.
+- `map<K, V>` where `K` can be any of `string`, `number`, or `date` and `V` can be any other type name including another message type.
 
 Note that type restrictions exist because messages are transmitted between networks, and these networks
-can be vertically scaled across clusters of compute instances. This means that messages can be serialized and
+can be vertically scaled across clusters of compute nodes. This means that messages can be serialized and
 transimitted over the wire in some configurations.
 
 When deploying an application with modifictions to the message fields, NPL is strict about whet it produces
@@ -323,12 +323,17 @@ namespace app {
 }
 ```
 
-The scope block of the `enum` should contain a list of identifiers separated by whitespace. For example:
+The scope block of the `enum` should contain a list of identifiers separated by whitespace. This list can span 
+multiple lines if it is within a scope block. If the enum values are all on one line then the scope block
+is optional.
+
+Examples of valid enum syntax:
 
 ```npl
 namespace app {
     enum Enum1 { value1 value2 value3 }
-    enum Enum2 { 
+    enum Enum2 value1 value2 value3
+    enum Enum3 { 
         value1 
         value2 
         value3
@@ -341,7 +346,7 @@ namespace app {
 Connection statements start with the reserved word `connection`, followed by at least 1 space, followed by
 the qualified identifier of a connection type and a scope block. There are many connection types built into
 the NPL runtime, and others can be added from shared modules. You can not create new connection types within
-your NPL program.
+your NPL program; these must be written in TypeScript.
 
 Connections can only be defined within an `application`, and define how your application communicates with the
 rest of the world. This includes network ports, files, APIs, data streams, databases etc.
@@ -377,16 +382,16 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.httpListener {
+        connection npl.connection.HttpListener {
             config { port 80 }
-            ingress egress network http.router
+            ingress egress network http.Router
         }
 
-        connection npl.connection.emitter {
+        connection npl.connection.Emitter {
             ingress network1
         }
 
-        connection npl.connection.consoleLogger {
+        connection npl.connection.ConsoleLogger {
             egress network2.entryPoint1
         }
     }
@@ -412,7 +417,7 @@ scope block, but bear in mind if your code refers to a config value that is not 
 will search outward through the nested scopes to resolve the name.
 
 The value part is a constant expression that must be able to be evaluated at compile time. This usually means that it
-is a literal. The literal can be a string, date, number or boolean. It can also be an array of any of these types.
+is a literal. The literal can be a string, date, number or boolean. It can also be an array or map of any of these types.
 
 For the most part, you can define any config values you like in `config` statements. The only case where this is not
 exactly the same, is in a `config` statement for a `connection`. In this case you define the `config` with the same
@@ -441,7 +446,7 @@ namespace app {
                         message {
                             tenant tenant
                             text config.text
-                            tomeout config.timeout
+                            timeout config.timeout
                         }
                     }
                 }
@@ -454,7 +459,7 @@ namespace app {
 ## Process
 
 A process statement starts with the reserved word `process` within a `network` scope block, and is followed by at least 
-one space, then the name of the process a valid identifier. If you just want to declare the process name, you can stop 
+one space, then the name of the process as a valid identifier. If you just want to declare the process name, you can stop 
 here, or you can add a scope block to define the process. If defining the process, the opening `{` must be on the same
 line as the `process` reserved word.
 
@@ -473,7 +478,7 @@ namespace app {
             }
 
             accept DebugMessage {
-                emit console.text {
+                emit console.Text {
                     message { ...message }
                 }
             }
@@ -486,7 +491,7 @@ namespace app {
 
             test 'should emit console text' {
                 emit empty
-                expect console.text {
+                expect console.Text {
                     message { text 'Hello, world' }
                 }
             }
@@ -518,7 +523,7 @@ These are valid `pipe` statements:
 namespace app {
     network http {
         pipe router {
-            route httpListener.httpRequest {
+            route httpListener.HttpRequest {
                 append { process logger }
             }
         }
@@ -534,13 +539,13 @@ Route statements start with the reserved word `route` within the scope block of 
 followed by at least one space, then the qualified identifier name of a `message` definition, then a `{` to start the scope
 block. The `{` must be on the same line as the `route` reserved word.
 
-Route statements are always in the context of a message typpe, and the fields of this message can be referred to in your code 
+Route statements are always in the context of a message type, and the fields of this message can be referred to in your code 
 using the syntax `message.<field-name>` where `message` is a reserved word, and <field-name> is the name of a field defined 
 within the message.
 
 Additionally, if the message field is another message, then you can use `.` separators to traverse the hierarchy. If the message
 field is an array or map, then you can index the elements of the array or map with `<field-name>[<index>]`. The index can be a 
-numbr or a string for maps, and must be a number for arrays.
+number, date or a string for maps, and must be a number for arrays.
 
 Inside the route scope block you can use the following reserved words. These are defined in sections below:
 
@@ -552,6 +557,8 @@ Inside the route scope block you can use the following reserved words. These are
 - `clone` to replace the message with modified copy.
 - `if`, `elseif` and `else` to add conditional routing logic. The conditional scope block is syntactically identical to the scope block of the `route`.
 - `while` and `for` to repeat routing logic. The loop's scope block is syntactically identical to the scope block of the `route`.
+
+Note that this document only defines the syntax. Details of how to use these statements is contained in the [Language Handbook](./LANGUAGE.md)
 
 ## Expressions
 
@@ -566,7 +573,7 @@ other constant expressions.
 Expression syntax in NPL is very similar to [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators) with the following exceptions:
 - There are no functions, so function pointers and lambda expressions are not supported.
 - Data structures are immutable, so pre/post increment and decrement operators only work with `var` identifiers.
-- Object syntax is not supported. You can not write `{ x: 1, y: 2 }` type expressions.
+- Object syntax is not supported. You can not write `{ x: 1, y: 2 }` expressions.
 - Since there are no objects in NPL, there is no `new`, `this`, or `super` operator.
 - There is no object destructuring support in NPL, but you can use the destructuring operator `...` to initialize a message with fields from another message.
 - NPL does not have a concept of `null`. Messages with optional fields can contain the value `undefined` as per JavaScript.
@@ -575,7 +582,7 @@ NPL has some additional reserved words that can be used in expressions as follow
 
 - `config.<field-name>` can be used to refer to a configured simple value.
 - `config.<field-name>[<index>]` can be used to refer to a configured array element or map value.
-- `message.<field-name>` can be used within a pipe route or process to access the fields of the message.
+- `message.<field-name>` can be used within a pipe route or process to access the fields of the message that is being routed.
 - `context.origin.<field-name>` can be used within a pipe route or process to access the the origin context for this message.
 - `context.message.<field-name>` can be used within a pipe route or process to access the the message context.
 - `context.network.<field-name>` can be used within a pipe route or process to access the the network context for this message.
@@ -598,7 +605,7 @@ two `\\` characters. The `\` can also be used to add control characters in the u
 containg a newline character. Similarly you can use `\r`, `\t` and `\f`.
 
 - **date** literals are rare in code, but maybe useful in unit tests. For places where you need them, date variables
-can be initialized with a string that conforms to ISO-8601.
+can be initialized with a string that conforms to RFC 3339.
 
 - **boolean** literals must use the reserved words `true` and `false`.
 
@@ -609,7 +616,7 @@ be on a separate line (recommended) or enclosed in parentheses (in our opinion l
 a separate line, and the key must be separated from the value by at least one space. If the key is an expression
 then it must be enclosed in parentheses.
 
-Note that strings delimited with single or double quotes must be closed before the end of the source line, but
+Note that strings delimited with single or double quotes must be closed before the end of the line, but
 strings delimited with back ticks can contain multiple lines of text. Strings with back ticks also support string
 interpolation where `${<expression>}` is replaced by the result of the evaluating the expression.
 
@@ -663,7 +670,7 @@ You cannot have two `accept` statement within a process for the same message typ
 type of message. Within the scope block you can refer to the fields of this message with `message.<field-name>`
 
 Note that the `empty` message has no fields, so any `message.<field-name>` expressions will produce compillation errors. Using
-a `*` allows you to defining processing for all other message types (not captured by any other `accept` statement). In this case
+a `*` allows you to define processing for all other message types (not captured by any other `accept` statement). In this case
 `message.<field-name>` are not checked by the compiler, and accessing fields that don't exist on the message will return `undefined`.
 
 Inside the accept scope block you can use the following reserved words. These are defined in other parts of this document:
@@ -787,8 +794,9 @@ Syntax 1 is: `if` followed by at least 1 space, followed by an expression, then 
 
 Syntax 2 is: `if` followed by an expression enclosed in `()` followed by a single statement all on one line.
 
-Syntax 3 is: `if` followed by an expression, followed by the open scope `{` symbol all on one line, then multiple statements on 
-successive lines, and finally a closing `}`. In this syntax the expression can optionally be enclosed in `()`.
+Syntax 3 is: `if` followed by at least 1 space, followed by an expression, followed by the open scope `{` symbol all 
+on one line, then multiple statements on successive lines, and finally a closing `}`. In this syntax the expression
+can optionally be enclosed in `()`.
 
 These syntax options are illustrated by these valid examples:
 
@@ -975,7 +983,8 @@ You can also clear the routing table for a specific message by writing `<message
 
 The `capture` keyword is used to add a capture instruction to a message routing table of the message that is
 being routed. You can only use this statement within the scope block of a `route` statement. Capture 
-instructions set up routing for messages that are emitted during the processing.
+instructions set up routing for messages that are emitted during the processing of the messaging that
+we are routing.
 
 Every message has a route attached to it. The route comprises a list of destinations, a global capture list
 and a capture list associated with each destination on the route. When a message is processed by a
@@ -1014,8 +1023,9 @@ This code means that for all messages routed to this pipe, add an entry to the g
 list of the message saying that any `GraphQlRequest` messages that are emitted during its
 processing should be sent only to the `graphQl` network's default entry point.
 
-To unpack this a little, `route * {}` sets up a routing rule in the pipe for all message types,
-where the contents of the scope block defines how to modify the message's routing table.
+To unpack this a little, `route * {}` sets up a routing rule in the pipe for all other message 
+types not explicitly routed, where the contents of the scope block defines how to modify the 
+message's routing table.
 
 The `capture GraphQlRequest {}` part means add a new entry in the global capture list for messages of
 type `GraphQlRequest`, or replace the existing one, where the code inside the scope block defines 
@@ -1124,7 +1134,7 @@ pipe pipe1 {
 }
 ```
 
-This example defines a route for messages of type `Message1` by cloning the message with a couple of cganged
+This example defines a route for messages of type `Message1` by cloning the message with a couple of changed
 fields, adding `process2` to the front of the route, and clearing the route for the original message so that
 is does not propagate any further through the network.
 
@@ -1134,7 +1144,7 @@ You can use an `await` statement in a process scope block to suspend processing 
 of messages have been received. You can only await messages that were received in response to messages that
 were emitted by this process so that the processing context is preserved.
 
-NPL applications are designed to process millions of messages concurrently. If you application emits a message
+NPL applications are designed to process millions of messages concurrently. If your application emits a message
 in the context of processing a specific message, and awaits a response, then the response will be processed
 in the context of the message that was being processed when the request was emitted. This is what the `await`
 reserved word is for.

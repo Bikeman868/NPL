@@ -181,7 +181,7 @@ have a similar behavior though, because you can route many different kinds of me
 perform processing logic that is specific to the type of message. This is somewhat like method or function overloading.
 
 The concept of abstract or virtual methods being overriden in derived classes is not really a thing in NPL either,
-because there is no support for inheritance. The main use of this type of polymorphims can be illustrated by the 
+because there is no support for inheritance. The main use of this type of polymorphim can be illustrated by the 
 example of adding a virtual `toString()` method to `Object`, so that any object can be converted to a string 
 representation without knowing what kind of object it is.
 
@@ -196,7 +196,7 @@ Abstraction is the idea that we can define a contract, and have multiple implemt
 OOP languages the contract is often defined with the `interface` reserved word, and the implementations of the 
 contract use words like `implements`.
 
-Again, there is no direct equivalent. Interfaces define a collection of methods that take certain parameters and 
+Again, there is no direct equivalent in NPL. Interfaces define a collection of methods that take certain parameters and 
 return perticular types. If you think of the parameters to a method being similar to a message in NPL, then every 
 NPL message is an interface with just one method, and any process that is able to process that message implements 
 the intarface.

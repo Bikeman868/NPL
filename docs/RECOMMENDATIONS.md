@@ -94,13 +94,13 @@ building real-world applications.
 In this pattern a process emits a message that has a very specific response, and waits for
 that response before continuing to process. This pattern is useful for situations like
 fetching data from a database. The process emits a message describing the data that it
-needs and receives a response with the data without knowing anything about where the
+needs, and receives a response containing the data without knowing anything about where the
 data came from.
 
 Below is an example of emitting a message containing a GraphQL query and waiting for
 the response. The example is not a complete working program, but illustrates:
 - Separating areas of functionality using namespaces
-- Dividing the code up into networks. Each network can run on a different compute instance at runtime
+- Dividing the code up into networks. Each network can run on a different compute cluster at runtime
 - The large scale program structure is defined by the networks.
 - Structure within a network is defined by the pipes.
 - Processes are independant of program structure.
@@ -149,7 +149,7 @@ namespace app {
         ingress egress default { pipe Main }
 
         // The DataAccess pipe modifies the message route to capture GraphQL 
-        // requests and routethem to the GraphQl network
+        // requests and route them to the GraphQl network
         pipe DataAccess {
             route * {
                 capture data.GraphQlRequest {
@@ -222,7 +222,7 @@ processing.
 
 Note that this code explicitly copies the message context of the message to demonstrate how you
 would do this, but this is not typical. If you do not include the `context` statement within the
-`clone` statment, the cloned message will be an exact copy the original message.
+`clone` statment, the cloned message context will be an exact copy the original message context.
 
 Writing `emit clone` on a line by itself with no scope block will simply emit another 
 message that is completely identical to the incomming message.
