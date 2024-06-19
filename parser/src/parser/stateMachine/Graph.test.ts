@@ -17,14 +17,20 @@ function expectPath(context: IContext, path: string[]) {
     for (let i = 0; i < path.length; i++) expect(context.getPathElement(i)).toBe(path[i]);
 }
 
-function expectToken(token: ParseResult | undefined, text: string, tokenType: TokenType) {
-    expect(token).not.toBeUndefined();
-    expect(token?.text).toBe(text);
-    expect(token?.tokenType).toBe(tokenType);
+function expectToken(context: IContext, token: ParseResult | undefined, text: string, tokenType: TokenType) {
+    const position = context.buffer.getPosition();
+    let contextInfo = `L${position.line} C${position.column}`;
+    for (let syntaxError of context.syntaxErrors) {
+        contextInfo += '\n' + syntaxError;
+    }
+
+    expect(token, contextInfo).not.toBeUndefined();
+    expect(token?.text, contextInfo).toBe(text);
+    expect(token?.tokenType, contextInfo).toBe(tokenType);
 }
 
 function checkNext(context: IContext, graph: Graph, text: string, tokenType: TokenType, path?: string[]) {
-    expectToken(parseNextToken(context, graph), text, tokenType);
+    expectToken(context, parseNextToken(context, graph), text, tokenType);
     if (path != undefined) expectPath(context, path);
 }
 
