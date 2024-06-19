@@ -90,7 +90,8 @@ namespace app.persistence {
     }
 }
 
-// Define the persistence network
+// Define the persistence network. It knows how to emit database queries for each
+// database operation.
 namespace app.persistence {
     using npl.persistence
     network data {
@@ -106,17 +107,24 @@ namespace app.persistence {
                         query 'select code, name, transitions from graph'
                     }
                 }
+                
                 await QueryResult queryResult
-                /*
-                const stateTransitionGraph queryResult.rows.map(row => app.stateGraph.State { 
-                        message {
-                            code row['code']
-                            name row['name']
-                            transitions JSON.parse(row['transitions'])
+
+                var stateTransitionGraph []
+                
+                for row of queryResult.rows {
+                    set stateTransitionGraph [
+                        ...stateTransitionGraph
+                        app.stateGraph.State { 
+                            message {
+                                code row['code']
+                                name row['name']
+                                transitions JSON.parse(row['transitions'])
+                            }
                         }
-                    }
-                )
-                */
+                    ]
+                }
+                
                 emit app.stateGraph.Graph {
                     message {
                         states stateTransitionGraph

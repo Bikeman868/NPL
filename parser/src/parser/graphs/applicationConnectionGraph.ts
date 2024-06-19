@@ -1,6 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
     parseOpenScope,
@@ -9,9 +7,15 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph } from './configGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { 
+    applicationConnectionGraphBuilder,
+    parseIngressKeyword,
+    parseEgressKeyword,
+    configGraph,
+} from './index.js';
 
+// prettier-ignore
 /* Examples
 
     connection npl.io.Emitter emitter {
@@ -24,12 +28,7 @@ import { eolGraph } from './eolGraph.js';
     }<EOL>
 
 */
-
-const parseIngress = buildKeywordParser(['ingress'], 'Keyword');
-const parseEgress = buildKeywordParser(['egress'], 'Keyword');
-
-// prettier-ignore
-export const applicationConnectionGraph: Graph = new GraphBuilder('connection')
+applicationConnectionGraphBuilder
     .graph.start
         .transition('"connection"', buildKeywordParser(['connection'], 'Keyword'), skipSeparators, 'type')
     .graph.state('type')
@@ -42,14 +41,14 @@ export const applicationConnectionGraph: Graph = new GraphBuilder('connection')
     .graph.state('statements')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
-        .transition('ingress', parseIngress, skipSeparators, 'ingress')
-        .transition('egress', parseEgress, skipSeparators, 'egress')
+        .transition('ingress', parseIngressKeyword, skipSeparators, 'ingress')
+        .transition('egress', parseEgressKeyword, skipSeparators, 'egress')
         .subGraph('config', configGraph, 'statements')
     .graph.state('ingress')
-        .transition('egress', parseEgress, skipSeparators, 'ingress-egress')
+        .transition('egress', parseEgressKeyword, skipSeparators, 'ingress-egress')
         .transition('network name', parseQualifiedIdentifier, skipSeparators, 'statements')
     .graph.state('egress')
-        .transition('ingress', parseIngress, skipSeparators, 'ingress-egress')
+        .transition('ingress', parseIngressKeyword, skipSeparators, 'ingress-egress')
         .transition('network name', parseQualifiedIdentifier, skipSeparators, 'statements')
     .graph.state('ingress-egress')
         .transition('network name', parseQualifiedIdentifier, skipSeparators, 'statements')

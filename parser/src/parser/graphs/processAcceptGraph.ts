@@ -10,13 +10,12 @@ import {
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
 import { processAwaitGraph } from './processAwaitGraph.js';
-import { emitGraph } from './emitGraph.js';
-import { constGraph } from './constGraph.js';
 import { varGraph } from './varGraph.js';
 import { eolGraph } from './eolGraph.js';
 import { processRouteGraph } from './processRouteGraph.js';
 import { conditionalExpressionGraph } from './expressionGraph.js';
 import { setGraph } from './setGraph.js';
+import { constGraph, emitGraph } from './index.js';
 
 const parseAccept = buildKeywordParser(['accept'], 'Keyword');
 const parseEmpty = buildKeywordParser(['empty'], 'Keyword');

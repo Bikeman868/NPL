@@ -7,9 +7,9 @@ import {
     parseString,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { emitGraph } from './emitGraph.js';
 import { eolGraph } from './eolGraph.js';
 import { expectGraph } from './expectGraph.js';
+import { emitGraph } from './index.js';
 
 const parseTest = buildKeywordParser(['test'], 'Keyword');
 

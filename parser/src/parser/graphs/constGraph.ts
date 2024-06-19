@@ -1,6 +1,6 @@
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { buildKeywordParser, parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
 import { expressionGraph } from './expressionGraph.js';
+import { constGraphBuilder, parseConstKeyword } from './index.js';
 import { messageLiteralGraph } from './messageLiteralGraph.js';
 
 // prettier-ignore
@@ -15,9 +15,9 @@ import { messageLiteralGraph } from './messageLiteralGraph.js';
     }
 
 */
-export const constGraph = new GraphBuilder('const')
+constGraphBuilder
     .graph.start
-        .transition('"const"', buildKeywordParser(['const'], 'Keyword'), skipSeparators, 'name')
+        .transition('"const"', parseConstKeyword, skipSeparators, 'name')
     .graph.state('name')
         .transition('const name', parseIdentifier, skipSeparators, 'value')
     .graph.state('value')

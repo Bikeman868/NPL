@@ -5,8 +5,8 @@ import {
     comma,
     openSquareBracket,
     closeSquareBracket,
-    closeCurlyBracket,
 } from '#interfaces/charsets.js';
+import { Graph } from 'parser/stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildSymbolParser,
@@ -17,6 +17,7 @@ import {
     skipSeparators,
 } from '../stateMachine/SyntaxParser.js';
 import { eolGraph } from './eolGraph.js';
+import { messageLiteralGraph } from './messageLiteralGraph.js';
 
 const parseStartSubExpression = buildSymbolParser(openRoundBracket, 'StartSubExpression');
 const parseEndSubExpression = buildSymbolParser(closeRoundBracket, 'EndSubExpression');
@@ -30,12 +31,12 @@ const parseEndFunctionCall = buildSymbolParser(closeRoundBracket, 'EndCallParams
 const termGraphBuilder = new GraphBuilder('expression-term');
 const binaryOperatorGraphBuilder = new GraphBuilder('binary-operator');
 const unaryOperatorGraphBuilder = new GraphBuilder('unary-operator');
-const closeTerminatedExpressionGraphBuilder = new GraphBuilder('close-terminated-expression');
+const subExpressionGraphBuilder = new GraphBuilder('close-terminated-expression');
 const expressionGraphBuilder = new GraphBuilder('eol-terminated-expression');
 const conditionalExpressionGraphBuilder = new GraphBuilder('conditional-expression');
-const parameterExpressionGraphBuilder = new GraphBuilder('parameter-expression');
 const indexExpressionGraphBuilder = new GraphBuilder('array-index-expression');
 const functionCallGraphBuilder = new GraphBuilder('function-call');
+const literalListGraphBuilder = new GraphBuilder('literal-list');
 
 // prettier-ignore
 /* Examples:
@@ -62,24 +63,19 @@ termGraphBuilder
         .transition('boolean literal', parseBoolean, skipSeparators)
         .transition('date literal', parseString, skipSeparators)
         .transition('identifier', parseQualifiedIdentifier, skipSeparators)
-        .transition(openRoundBracket, parseStartSubExpression, skipSeparators, 'sub-expression')
-        .transition(openSquareBracket, parseStartListLiteral, skipSeparators, 'literal-list')
+        .subGraph('literal-list', literalListGraphBuilder.build())
+        .subGraph('sub-expression', subExpressionGraphBuilder.build())
         .subGraph('unary', unaryOperatorGraphBuilder.build(), 'unary')
-    .graph.state('sub-expression')
-        .subGraph('sub-expression', closeTerminatedExpressionGraphBuilder.build())
-    .graph.state('literal-list')
-        .transition(closeSquareBracket, parseEndListLiteral, skipSeparators)
-        .subGraph('list-blank-line', eolGraph, 'literal-list')
-        .subGraph('list-element', expressionGraphBuilder.build(), 'literal-list')
     .graph.state('unary')
         .transition('string literal', parseString, skipSeparators)
         .transition('number literal', parseNumber, skipSeparators)
         .transition('boolean literal', parseBoolean, skipSeparators)
         .transition('date literal', parseString, skipSeparators)
         .transition('identifier', parseQualifiedIdentifier, skipSeparators)
-        .transition(openRoundBracket, parseStartSubExpression, skipSeparators, 'sub-expression')
-        .transition(openSquareBracket, parseStartListLiteral, skipSeparators, 'literal-list')
-    .graph.build();
+        .subGraph('unary-literal-list', literalListGraphBuilder.build())
+        .subGraph('unary-sub-expression', subExpressionGraphBuilder.build())
+        .subGraph('double-unary', unaryOperatorGraphBuilder.build(), 'unary')
+.graph.build();
 
 // prettier-ignore
 binaryOperatorGraphBuilder
@@ -105,13 +101,35 @@ unaryOperatorGraphBuilder
 // prettier-ignore
 /* Examples 
 
-    'hello' + ', ' + 'world')
+    [ 'hello'
+      'world'
+    ]
 
-    myArray[10])
+    []
 
 */
-closeTerminatedExpressionGraphBuilder
+literalListGraphBuilder
     .graph.start
+        .transition(openSquareBracket, parseStartListLiteral, skipSeparators, 'elements')
+    .graph.state('elements')
+        .transition(closeSquareBracket, parseEndListLiteral, skipSeparators)
+        .subGraph('list-blank-line', eolGraph, 'elements')
+        .subGraph('list-element', expressionGraphBuilder.build(), 'elements')
+    .graph.build();
+
+// prettier-ignore
+/* Examples 
+
+    ('hello' + ', ' + 'world')
+
+    (myArray[10])
+
+*/
+subExpressionGraphBuilder
+    .graph.start
+        .transition(openRoundBracket, parseStartSubExpression, skipSeparators, 'term')
+    .graph.state('term')
+        .transition(closeRoundBracket, parseEndSubExpression, skipSeparators)
         .subGraph('term', termGraphBuilder.build(), 'operator')
     .graph.state('operator')
         .transition(closeRoundBracket, parseEndSubExpression, skipSeparators)
@@ -194,7 +212,7 @@ functionCallGraphBuilder
     }<EOL>
 
 */
-export const expressionGraph = expressionGraphBuilder
+export const expressionGraph: Graph = expressionGraphBuilder
     .graph.start
         .subGraph('term', termGraphBuilder.build(), 'operator')
     .graph.state('operator')
@@ -216,7 +234,7 @@ export const expressionGraph = expressionGraphBuilder
     (1 + 2) * (5 + 6) {
 
 */
-export const conditionalExpressionGraph = conditionalExpressionGraphBuilder
+export const conditionalExpressionGraph: Graph = conditionalExpressionGraphBuilder
     .graph.start
         .subGraph('term', termGraphBuilder.build(), 'operator')
     .graph.state('operator')

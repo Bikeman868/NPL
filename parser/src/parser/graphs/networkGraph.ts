@@ -11,8 +11,8 @@ import {
 import { processGraph } from './processGraph.js';
 import { pipeGraph } from './pipeGraph.js';
 import { destinationListGraph } from './destinationListGraph.js';
-import { configGraph } from './configGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { configGraph } from './index.js';
 
 /* Examples
 

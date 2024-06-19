@@ -1,7 +1,11 @@
-import { Graph } from '../stateMachine/Graph.js';
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { buildKeywordParser, parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { 
+    buildKeywordParser, 
+    parseQualifiedIdentifier, 
+    skipSeparators,
+} from '../stateMachine/SyntaxParser.js';
+import { destinationGraphBuilder } from './index.js';
 
+// prettier-ignore
 /* Examples
 
     network network1
@@ -11,9 +15,7 @@ import { buildKeywordParser, parseQualifiedIdentifier, skipSeparators } from '..
     process ns1.ns2.process1
 
 */
-
-// prettier-ignore
-export const destinationGraph: Graph = new GraphBuilder('routing-destination')
+destinationGraphBuilder
     .graph.start
         .transition('"network", "process", "pipe"', buildKeywordParser(['network', 'process', 'pipe'], 'Keyword'), skipSeparators, 'name')
     .graph.state('name')

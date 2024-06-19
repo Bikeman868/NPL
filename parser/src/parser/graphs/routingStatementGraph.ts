@@ -8,9 +8,9 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { destinationGraph } from './destinationGraph.js';
 import { eolGraph } from './eolGraph.js';
 import { conditionalExpressionGraph } from './expressionGraph.js';
+import { destinationGraph } from './index.js';
 
 const parseCapture = buildKeywordParser(['capture'], 'Keyword');
 const parseEmpty = buildKeywordParser(['empty'], 'Keyword');

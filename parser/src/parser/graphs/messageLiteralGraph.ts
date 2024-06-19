@@ -10,6 +10,7 @@ import { eolGraph } from './eolGraph.js';
 
 const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral');
 
+// prettier-ignore
 /* Examples
 
     namespace1.MyMessage { 
@@ -25,14 +26,15 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
     }<EOL>
 
 */
-export const messageLiteralGraph = new GraphBuilder('message-literal').graph.start
-    .transition('message type', parseStartMessageLiteral, skipSeparators, 'message')
+export const messageLiteralGraph = new GraphBuilder('message-literal')
+    .graph.start
+        .transition('message type', parseStartMessageLiteral, skipSeparators, 'message')
     .graph.state('message')
-    .transition(closeCurlyBracket, parseEndMessage, skipSeparators, 'end')
-    .subGraph('blank-line', eolGraph, 'message')
-    .subGraph('message-message', messageMessageGraph, 'message')
-    .subGraph('message-context', messageContextGraph, 'message')
-    .subGraph('message-route', messageRouteGraph, 'message')
+        .transition(closeCurlyBracket, parseEndMessage, skipSeparators, 'end')
+        .subGraph('blank-line', eolGraph, 'message')
+        .subGraph('message-message', messageMessageGraph, 'message')
+        .subGraph('message-context', messageContextGraph, 'message')
+        .subGraph('message-route', messageRouteGraph, 'message')
     .graph.state('end')
-    .subGraph('end', eolGraph)
+        .subGraph('end', eolGraph)
     .graph.build();

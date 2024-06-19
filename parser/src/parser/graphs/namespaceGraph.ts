@@ -11,9 +11,8 @@ import {
 import { usingGraph } from './usingGraph.js';
 import { messageDefinitionGraph } from './messageDefinitionGraph.js';
 import { networkGraph } from './networkGraph.js';
-import { enumGraph } from './enumGraph.js';
-import { applicationGraph } from './applicationGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { applicationGraph, enumGraph } from './index.js';
 
 const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 

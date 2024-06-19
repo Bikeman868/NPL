@@ -8,8 +8,8 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { dataTypeGraph } from './dataTypeGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { dataTypeGraph } from './index.js';
 
 const parseMessage = buildKeywordParser(['message'], 'Keyword');
 

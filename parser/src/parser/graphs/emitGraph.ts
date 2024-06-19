@@ -11,7 +11,9 @@ import { eolGraph } from './eolGraph.js';
 import { messageMessageGraph } from './messageMessageGraph.js';
 import { messageContextGraph } from './messageContextGraph.js';
 import { messageRouteGraph } from './messageRouteGraph.js';
+import { emitGraphBuilder, parseEmitKeyword, parseEmptyKeyword } from './index.js';
 
+// prettier-ignore
 /* Examples
     emit empty<EOL>
 
@@ -56,16 +58,11 @@ import { messageRouteGraph } from './messageRouteGraph.js';
         }
     }<EOL>
 */
-
-const parseEmit = buildKeywordParser(['emit'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-
-// prettier-ignore
-export const emitGraph = new GraphBuilder('emit')
+emitGraphBuilder
     .graph.start
-        .transition('"emit"', parseEmit, skipSeparators, 'message-type')
+        .transition('"emit"', parseEmitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmpty, skipSeparators, 'definition')
+        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'definition')
         .transition('message or message type', parseQualifiedIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'constructor')

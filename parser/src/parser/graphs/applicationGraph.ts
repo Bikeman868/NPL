@@ -1,6 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
     skipSeparators,
@@ -8,10 +6,14 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph } from './configGraph.js';
-import { applicationConnectionGraph } from './applicationConnectionGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { 
+    applicationConnectionGraph, 
+    applicationGraphBuilder,
+    configGraph,
+} from './index.js';
 
+// prettier-ignore
 /* Examples
 
     application app
@@ -26,9 +28,7 @@ import { eolGraph } from './eolGraph.js';
     }<EOL>
 
 */
-
-// prettier-ignore
-export const applicationGraph: Graph = new GraphBuilder('application')
+applicationGraphBuilder
     .graph.start
         .transition('"application"', buildKeywordParser(['application'], 'Keyword'), skipSeparators, 'name')
     .graph.state('name')

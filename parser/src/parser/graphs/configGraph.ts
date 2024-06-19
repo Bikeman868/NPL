@@ -1,16 +1,15 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
     skipSeparators,
     parseOpenScope,
     parseCloseScope,
-    parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
 import { eolGraph } from './eolGraph.js';
-import { expressionGraph } from './expressionGraph.js';
+import { configFieldGraph, configGraphBuilder } from './index.js';
 
+
+// prettier-ignore
 /* Examples
 
     config timeout 20<EOL>
@@ -20,17 +19,7 @@ import { expressionGraph } from './expressionGraph.js';
         protocol 'http'
     }<EOL>
 */
-
-// prettier-ignore
-const configFieldGraph: Graph = new GraphBuilder('config-field')
-    .graph.start
-        .transition('field name', parseIdentifier, skipSeparators, 'field-value')
-    .graph.state('field-value')
-        .subGraph('default value', expressionGraph)
-    .graph.build();
-
-// prettier-ignore
-export const configGraph: Graph = new GraphBuilder('config')
+configGraphBuilder
     .graph.start
         .transition('"config"', buildKeywordParser(['config'], 'Keyword'), skipSeparators, 'definition')
     .graph.state('definition')

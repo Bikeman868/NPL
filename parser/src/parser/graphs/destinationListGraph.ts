@@ -2,8 +2,8 @@ import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseCloseScope, parseOpenScope, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { destinationGraph } from './destinationGraph.js';
 import { eolGraph } from './eolGraph.js';
+import { destinationGraph } from './index.js';
 
 /* Examples
     process process1<EOL>
