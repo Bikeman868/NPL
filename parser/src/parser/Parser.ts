@@ -1,69 +1,58 @@
 import { IContext } from '#interfaces/IContext.js';
 import { IParser } from '#interfaces/IParser.js';
 import { IToken } from '#interfaces/IToken.js';
-import { parseToken } from './functions/parseToken.js';
+import { parseToken } from './parseToken.js';
 
 export class Parser implements IParser {
-  extractNextToken(context: IContext): IToken {
-    return parseToken(context);
-  }
+    extractNextToken(context: IContext): IToken | undefined {
+        return parseToken(context);
+    }
 
-  parseUntil(
-    context: IContext,
-    predicate: (token: IToken) => boolean,
-  ): IToken[] {
-    if (context.isDryRun)
-      throw new Error('Dry run only works with `extractNextToken`');
+    parseUntil(context: IContext, predicate: (token: IToken) => boolean): IToken[] {
+        if (context.isDryRun) throw new Error('Dry run only works with `extractNextToken`');
 
-    const tokens: IToken[] = [];
-    try {
-      while (!context.buffer.isEof()) {
-        const token = this.extractNextToken(context);
-        if (token.tokenType != 'None') {
-          tokens.push(token);
-          if (token.length == 0) {
+        const tokens: IToken[] = [];
+        try {
+            while (!context.buffer.isEof()) {
+                const token = this.extractNextToken(context);
+                if (!token) break;
+                if (token.tokenType != 'None') {
+                    tokens.push(token);
+                    if (token.length == 0) {
+                        context.syntaxError('Unexpected character found, please check language syntax definition');
+                        return tokens;
+                    }
+                    if (predicate(token)) return tokens;
+                }
+            }
+        } catch (error: any) {
             context.syntaxError(
-              'Unexpected character found, please check language syntax definition',
+                `The parser encountered an unrecoverable error (${error.message}), please fix syntax errors before this point and try again`,
             );
-            return tokens;
-          }
-          if (predicate(token)) return tokens;
         }
-      }
-    } catch (error: any) {
-      context.syntaxError(
-        `The parser encountered an unrecoverable error (${error.message}), please fix syntax errors before this point and try again`,
-      );
+        return tokens;
     }
-    return tokens;
-  }
 
-  skipUntil(
-    context: IContext,
-    predicate: (token: IToken) => boolean,
-  ): IToken | null {
-    if (context.isDryRun)
-      throw new Error('Dry run only works with `extractNextToken`');
+    skipUntil(context: IContext, predicate: (token: IToken) => boolean): IToken | null {
+        if (context.isDryRun) throw new Error('Dry run only works with `extractNextToken`');
 
-    while (!context.buffer.isEof()) {
-      const token = this.extractNextToken(context);
-      if (token.tokenType != 'None') {
-        if (token.length == 0) {
-          context.syntaxError(
-            'Unexpected character found, please check language syntax definition',
-          );
-          return null;
+        while (!context.buffer.isEof()) {
+            const token = this.extractNextToken(context);
+            if (!token) break;
+            if (token.tokenType != 'None') {
+                if (token.length == 0) {
+                    context.syntaxError('Unexpected character found, please check language syntax definition');
+                    return null;
+                }
+                if (predicate(token)) return token;
+            }
         }
-        if (predicate(token)) return token;
-      }
+        return null;
     }
-    return null;
-  }
 
-  parse(context: IContext): IToken[] {
-    if (context.isDryRun)
-      throw new Error('Dry run only works with `extractNextToken`');
+    parse(context: IContext): IToken[] {
+        if (context.isDryRun) throw new Error('Dry run only works with `extractNextToken`');
 
-    return this.parseUntil(context, () => false);
-  }
+        return this.parseUntil(context, () => false);
+    }
 }

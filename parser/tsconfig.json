@@ -1,14 +1,14 @@
 {
-  "extends": "../tsconfig.base.json",
-  "compilerOptions": {
-    "baseUrl": "src",
-    "rootDir": "src",
-    "outDir": "dist",
-    "paths": {
-      "#exceptions/*": ["./exceptions/*"],
-      "#interfaces/*": ["./interfaces/*"],
-      "#utils/*": ["./utils/*"]
-    }
-  },
-  "include": ["./src/**/*.ts"]
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "baseUrl": "src",
+        "rootDir": "src",
+        "outDir": "dist",
+        "paths": {
+            "#exceptions/*": ["./exceptions/*"],
+            "#interfaces/*": ["./interfaces/*"],
+            "#utils/*": ["./utils/*"]
+        }
+    },
+    "include": ["./src/**/*.ts"]
 }

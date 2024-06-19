@@ -36,13 +36,13 @@ Identifiers are names that you give to things in your program. Identifiers are c
 letters, digits and underscores. The first letter of the identifier name can not be a digit.
 
 You cannot use a reserved word as an identifier in places where the compiler cannot differentiate between the
-two. To be safe it is advisable to avoid using keywords as identifiers altogether to avoid confusion.
+two. To be safe, it is advisable to avoid using keywords as identifiers altogether to avoid confusion.
 
 Qualified identifiers are a list of identifers separated by the decimal character.
 
 Examples of valid identifiers are: _count person1 person_record
 
-Examples of valid qualified identifiers are: message.id npl.connections.emitter
+Examples of valid qualified identifiers are: message.id npl.scheduling.emitter
 
 ## Scope blocks
 
@@ -54,7 +54,185 @@ statements are searched.
 
 Scope blocks are not only used to define an area of code to search when resolving identifiers, they are also used to 
 define blocks of code that are executed only in certain contexts. For example `if` statements can be followed by a scope
-block, and the code in that block is only executed if the `if` statement evaluates to `true`.
+block, and the code in that block is only executed if the `if` expression evaluates to `true`.
+
+NPL is quite strict about where the opening `{` is placed to provide shorthand syntax for cases where there is only one
+thing inside of the scope block. If you are declaring something that has a scope block, the opening `{` must appear on the
+same line as the declaration.
+
+Because of this rule, you can omit the `{}` when there are zero or one statement inside the scope block. In this case the
+statement must be all on one line.
+
+The following veriations are all valid for multiple statements:
+
+```npl
+<keyword> <identifier> {
+    <statement>
+    <statement>
+    <statement>
+}
+```
+
+```npl
+<identifier> {
+    <statement>
+    <statement>
+    <statement>
+}
+```
+
+```npl
+<keyword> {
+    <statement>
+    <statement>
+    <statement>
+}
+```
+
+The following veriations are all valid for a single statement:
+
+```npl
+<identifier> { <statement> }
+```
+
+```npl
+<identifier> <statement>
+```
+
+The following veriations are all valid for an empty scope block:
+
+```npl
+<keyword> {}
+``
+
+```npl
+<keyword> <identifier> {}
+``
+
+```npl
+<keyword> {
+}
+``
+
+```npl
+<keyword> <identifier> {
+}
+``
+
+```npl
+<keyword>
+``
+
+```npl
+<keyword> <identifier>
+``
+
+Note that you can never put multiple statements on one line. NPL does not use a terminator like semi-colon to separate
+statements. Statements are separated by line breaks. 
+
+## Syntax patterns
+
+### Declarations
+
+When declaring a new identifier, the general syntax pattern is <type> <identifier> <scope-block>
+
+For example:
+
+```npl
+message MyMessageType {
+    string field1
+    string field2
+}
+
+process process1 {
+    accept MessageType1 message1
+    accept app.interface.MessageType2 message2
+}
+```
+
+Note that the opening `{` of the <scope-block> must be on the same line as the <keyword>
+
+Note that the `{}` is optional if you only have one statement
+
+Note that you can not omit multiple nested pairs of `{}` on the same line.
+
+### Scope config
+
+When a scope block follows an identifier declaration, it can contain a `config` statement to define some
+values that are configurable within that scope. See the section on configuration for more details.
+
+For example:
+```npl
+namespace app {
+    config {
+        timeout 10
+    }
+
+    process myProcess {
+        config {
+            directory './data'
+        }
+    }
+}
+```
+
+You can only include `config` statements where the scope block has a name, because otherwise there is no
+way specify the runtime values for these configurations.
+
+### Message instances
+
+Message types define the characteristics of a type of message, and also serve to constructor a message, similar to a
+constructor in object oriented languages. In general <message-type> <scope-block> will create a new message.
+
+For example to define a message type, then construct an instance of that message type, we can write:
+
+```npl
+message MyMessage {
+    string field1
+}
+
+const myMessage MyMessage {
+    message {
+        field1 "some value"
+    }
+}
+
+emit myMessage
+```
+
+Becasue of the scope block rules, this can be abbreviated, although messages with one field are rately that useful:
+
+```npl
+message MyMessage string field1
+
+const myMessage MyMessage { 
+    message field1 "some value"
+}
+```
+
+You can also construct a new message as a modified copy of an existing message instance using the same syntax, but 
+using a message reference in place of the message type. For example:
+
+
+```npl
+message MyMessage {
+    string field1
+    string field2
+}
+
+const message1 MyMessage {
+    message {
+        field1 "field1 value"
+        field2 "field2 value"
+    }
+}
+
+const message2 message1 {
+    message {
+        field1 "new field1 value"
+    }
+}
+```
 
 ## Source files
 
@@ -65,12 +243,19 @@ statements. You can put as much whitespace and comments as you like around these
 Using statements start with the reserved word `using`, followed by at least one space, then the qualified identifier for
 a namespace, followed by a newline. You can not put multiple `using` statements on one line.
 
+In the case where you put multiple `namespace` statements in one source file, you can put the `using` statements inside the
+`namespace` definition to reduce the scope of where the `using` statement applies.
+
 These are valid `using` statements:
 
 ```npl
 using myapp
 using some.other.namespace
 using app.shared // Shared code
+
+namespace app {
+    using npl.data
+}
 ```
 
 ## Namespace
@@ -79,7 +264,7 @@ Namespace statements start with the reserved word `namespace`, followed by at le
 the namespace, followed by a scope block. You can have whitespace between the namespace name and the opening `{` of the scope block.
 Unlike many curly brace languages, in NPL you can not have newline characters before the opening `{` of the scope block.
 
-The scope block may contain any number of `application`, `network`, `message` and `enum` statements.
+The scope block may contain any number of `using`, `application`, `network`, `message` and `enum` statements.
 
 These are valid `namespace` statements:
 
@@ -89,7 +274,7 @@ namespace app {}
 namespace drivers{}
 
 namespace app.data {
-
+    using npl.data
 }
 ```
 
@@ -113,7 +298,7 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.HttpListener {
+        connection npl.connection.HttpListener httpListener{
             config { port 80 }
             ingress egress network http.Router
         }
@@ -124,7 +309,7 @@ namespace app {
 ## Message
 
 Message statements start with the reserved word `message`, followed by at least one space, then the name of the message
-identifier, followed by an optional scope block. Messages can be defined within a `namespace`, `network` or `process`. 
+type, followed by an optional scope block. Messages can be defined within a `namespace`, `network` or `process`. 
 Messages defined within the scope block of a `namespace` can be referenced anywhere in the program. From other namespaces
 you can use the fully qualified identifier, or add a `using` statement to reduce typing. Messages defined within a network
 are only accessible within that network. Messages defined within a process are only accessible within that process.
@@ -143,6 +328,8 @@ namespace app {
 More typically, you will define messages with some fields, because they are not useful otherwise. In this case the
 opening `{` for the scope block must be on the same line as the `message` keyword, and each field must be on a separate 
 line. Line breaks are significant.
+
+If your message type only has one field, then you can put the whole declaration on a single line, and in this case the `{}` are optional.
 
 Each message field comprises an optional qualifier, the type name, and the field name identifier. These elements must be separated
 by at least 1 space, but must not be separated by a line break. The optional qualifiers are `new` and `deprecated` are only
@@ -171,8 +358,14 @@ namespace app {
     message Message2 {
         Message1 original_message
         deprecated string[] categories
-        map<string, string> tags
+        map<string string> tags
     }
+
+    message Message3 string theOnly field
+
+    message Message4 { string theOnly field }
+
+    message Message5
 }
 ```
 
@@ -182,7 +375,7 @@ The type name can be:
 - One of the following reserved words: `string`, `number`, `boolean`, `date`
 - Any of the above with a `?` suffix to indicate that the field is optional
 - Any of the above followed by `[]` to define a list of values. This can not be combined with the `?` suffix
-- `map<K, V>` where `K` can be any of `string`, `number`, or `date` and `V` can be any other type name including another message type.
+- `map<K V>` where `K` can be any of `string`, `number`, or `date` and `V` can be any other type name including another message type.
 
 Note that type restrictions exist because messages are transmitted between networks, and these networks
 can be vertically scaled across clusters of compute nodes. This means that messages can be serialized and
@@ -283,7 +476,7 @@ namespace app {
             pipe pipe1 
         }
 
-        ingress egress input1 { network network2.entrypoint1 }
+        ingress egress input1 network network2.entrypoint1
 
         ingress splitEntrypoint { netwoek network3 }
         egress splitEntrypoint { network network4 } 
@@ -344,12 +537,13 @@ namespace app {
 ## Connection
 
 Connection statements start with the reserved word `connection`, followed by at least 1 space, followed by
-the qualified identifier of a connection type and a scope block. There are many connection types built into
-the NPL runtime, and others can be added from shared modules. You can not create new connection types within
-your NPL program; these must be written in TypeScript.
+the qualified identifier of a connection type, the name of the connection (to facilitate configuration)
+and a scope block. There are many connection types built into the NPL runtime, and others can be added 
+from shared modules. You can not create new connection types within your NPL program, but you can write 
+new connection types in TypeScript.
 
 Connections can only be defined within an `application`, and define how your application communicates with the
-rest of the world. This includes network ports, files, APIs, data streams, databases etc.
+the world outside of your application. This includes network ports, files, APIs, data streams, databases etc.
 
 Connections are generic and reusable accross multiple applications. Although the `config` statement within a
 `connection` scope block is optional, very few connections are useful without some configuration.
@@ -382,18 +576,14 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.HttpListener {
+        connection npl.io.HttpListener httpListener {
             config { port 80 }
-            ingress egress network http.Router
+            ingress egress network http.router
         }
 
-        connection npl.connection.Emitter {
-            ingress network1
-        }
+        connection npl.scheduling.Emitter emitter { ingress network1 }
 
-        connection npl.connection.ConsoleLogger {
-            egress network2.entryPoint1
-        }
+        connection npl.io.ConsoleLogger consoleLogger egress network2.entryPoint1
     }
 }
 ```
@@ -437,10 +627,10 @@ namespace app {
     }
 
     network network1 {
-        config { timeout 20 }
+        config timeout 20
 
         process process1 {
-            accept empty trigger {
+            accept empty {
                 for (var tenant of config.tenants) {
                     emit MyMessage { 
                         message {
@@ -459,7 +649,7 @@ namespace app {
 ## Process
 
 A process statement starts with the reserved word `process` within a `network` scope block, and is followed by at least 
-one space, then the name of the process as a valid identifier. If you just want to declare the process name, you can stop 
+one space, then the name of the process. If you just want to declare the process name, you can stop 
 here, or you can add a scope block to define the process. If defining the process, the opening `{` must be on the same
 line as the `process` reserved word.
 
@@ -477,9 +667,9 @@ namespace app {
                 string text
             }
 
-            accept DebugMessage {
+            accept DebugMessage debugMessage {
                 emit console.Text {
-                    message { ...message }
+                    message { ...debugMessage }
                 }
             }
 
@@ -535,17 +725,56 @@ namespace app {
 
 ## Route
 
-Route statements start with the reserved word `route` within the scope block of a `pipe`. The `route` reserved word must be
-followed by at least one space, then the qualified identifier name of a `message` definition, then a `{` to start the scope
-block. The `{` must be on the same line as the `route` reserved word.
+There are two types of `route` statement, one that can be used within the scope block of a `pipe` and another that can be used
+within the `accept` scope block of a process. In general you should try to keep all of your routing within pipes so that
+processes can be fully reusable.
 
-Route statements are always in the context of a message type, and the fields of this message can be referred to in your code 
+### Pipe routes
+
+Within a `pipe`, route statements start with the reserved word `route`. The `route` reserved word must be followed by at least
+one space, then the qualified identifier name of a `message` type, a `*` or the reserved word `empty`. This must be followed
+by a `{` to start the scope block. The `{` must be on the same line as the `route` reserved word.
+
+Pipe routing statements are always in the context of a message type, and the fields of this message can be referred to in your code 
 using the syntax `message.<field-name>` where `message` is a reserved word, and <field-name> is the name of a field defined 
 within the message.
 
 Additionally, if the message field is another message, then you can use `.` separators to traverse the hierarchy. If the message
 field is an array or map, then you can index the elements of the array or map with `<field-name>[<index>]`. The index can be a 
 number, date or a string for maps, and must be a number for arrays.
+
+For example:
+```npl
+pipe myPipe {
+    route Query {
+        if message.language == 'GraphQL'
+            prepend process graphQlProcess
+        else
+            prepend process sqlProcess
+    }
+}
+```
+
+### Process routing
+
+You are strongly encouraged to perform all message routing logic in pipes, but we do allow routing changes to be
+made within a process to support edge cases.
+
+Within the `accept` block of a `process`, route statements start with the reserved word `route`. The `route` reserved word must
+be followed by at least one space, then a message identifier. This must be followed by a `{` to start the scope block. The `{` 
+must be on the same line as the `route` reserved word.
+
+For example:
+```npl
+process myProcess {
+    accept Query query {
+        emit query { language 'SQL' } // Emit a clone of `query` with language field changed to `SQL`
+        route query { clear } // Clear the route for the incomming message to supress any further processing
+    }
+}
+```
+
+### Routing statements
 
 Inside the route scope block you can use the following reserved words. These are defined in sections below:
 
@@ -554,7 +783,6 @@ Inside the route scope block you can use the following reserved words. These are
 - `clear` to delete all destinations from the message's route.
 - `capture` to re-route messages that are emitted during the processing of this message.
 - `remove` to delete specific destinations from the message's route.
-- `clone` to replace the message with modified copy.
 - `if`, `elseif` and `else` to add conditional routing logic. The conditional scope block is syntactically identical to the scope block of the `route`.
 - `while` and `for` to repeat routing logic. The loop's scope block is syntactically identical to the scope block of the `route`.
 
@@ -582,14 +810,55 @@ NPL has some additional reserved words that can be used in expressions as follow
 
 - `config.<field-name>` can be used to refer to a configured simple value.
 - `config.<field-name>[<index>]` can be used to refer to a configured array element or map value.
-- `message.<field-name>` can be used within a pipe route or process to access the fields of the message that is being routed.
-- `context.origin.<field-name>` can be used within a pipe route or process to access the the origin context for this message.
-- `context.message.<field-name>` can be used within a pipe route or process to access the the message context.
-- `context.network.<field-name>` can be used within a pipe route or process to access the the network context for this message.
 - `<message-reference>.message.<field-name>` can be used to access the data fields associated with a message reference.
 - `<message-reference>.context.origin.<field-name>` can be used to access the origin context associated with a message reference.
 - `<message-reference>.context.message.<field-name>` can be used to access the message context associated with a message reference.
 - `<message-reference>.context.network.<field-name>` can be used to access the network context associated with a message reference.
+
+### Message expressions
+
+Whenever the value of an expression is expected to be a message, you can either construct a message using the message type
+identifier, or using an identifier that refers to a message instance, followed by a scope block.
+
+For example the `emit` keyword emits a message from a process. This keyword must be followed by an expression that is a message.
+If you already have an identifier that refers to a message, you can put that identifier after the `emit` keyword to emit that
+message, or you can write an expression that consuructs a new message instance.
+
+To construct a message entirely from scratch, use the message type identifier followed by a scope block as follows:
+
+```npl
+message MyMessageType {
+    string name
+}
+
+process myProcess {
+    accept * {
+        emit MyMessageType {
+            message {
+                name 'This is my name'
+            }
+        }
+    }
+}
+```
+
+To construct a message as a modified copy of an existing message instance, use the message reference followed by a scope block as follows:
+
+```npl
+message MyMessageType {
+    string name
+}
+
+process myProcess {
+    accept MyMessageType myMessage {
+        emit myMessage {
+            message {
+                name 'Updated name'
+            }
+        }
+    }
+}
+```
 
 ### Literal values
 
@@ -631,23 +900,25 @@ namespace app {
             boolean aBoolean
             date aDate
             string[] anArray
-            map<string, number> aMap
+            map<string number> aMap
         }
 
         process process1 {
             accept * {
                 emit Message1 {
-                    aNumber 34.6
-                    aBoolean true
-                    aDate "2023-08-16T09:00Z"
-                    anArray {
-                        "Element 0"
-                        'Element 1'
-                        "Element 2"
-                    }
-                    aMap {
-                        "some key" 12
-                        ("hello" + "world") 96.2
+                    message {
+                        aNumber 34.6
+                        aBoolean true
+                        aDate "2023-08-16T09:00Z"
+                        anArray {
+                            "Element 0"
+                            'Element 1'
+                            "Element 2"
+                        }
+                        aMap {
+                            "some key" 12
+                            ("hello" + "world") 96.2
+                        }
                     }
                 }
             }
@@ -659,27 +930,29 @@ namespace app {
 ## Accept
 
 Accept statements must be inside the scope block of a `process`, and define a message type that the process can accept
-and process. The statement consists of the `accept` reserved word, and a message type separated by at least one space 
-followed by a scope block that defines how to process these messages.
+and process. The statement consists of the `accept` reserved word, a message type and an optional identifier separated
+by spaces, followed by a scope block that defines how to process these messages.
 
 The message type can be the qualified identifier for a message type, the reserved word `empty` or `*`. The empty message
 is a special message type that has no fields but does have context and routing. Putting a `*` for the message type
 means that the process can accept messages of any type.
 
 You cannot have two `accept` statement within a process for the same message type, each `accept` must be for a distinct
-type of message. Within the scope block you can refer to the fields of this message with `message.<field-name>`
+type of message. Within the scope block you can refer to the fields of this message with `<message-identifier>.<field-name>`
+if you included an optional identifier.
 
-Note that the `empty` message has no fields, so any `message.<field-name>` expressions will produce compillation errors. Using
-a `*` allows you to define processing for all other message types (not captured by any other `accept` statement). In this case
-`message.<field-name>` are not checked by the compiler, and accessing fields that don't exist on the message will return `undefined`.
+Note that the `empty` message has no fields, so it only makes sense to include the optional message identifier if you want to
+access the `context` or `route` of the message. Using a `*` allows you to define processing for all other message types
+(not captured by any other `accept` statement). In this case `<message-identifier>.<field-name>` are not checked by the 
+compiler, and accessing fields that don't exist on the message will return `undefined`.
 
 Inside the accept scope block you can use the following reserved words. These are defined in other parts of this document:
 
+- `const` to define a local immutable value to store intermediate results from expressions.
 - `var` to define a local mutable value to store intermediate results from expressions.
-- `emit` to produce a new message and emit it from the process.
+- `emit` to emit a message from the process.
 - `await` to suspend processing until a response to your `emit` is received.
-- `clone` to emit a modified version of another message.
-- `clear` to delete the route for the message being processed, so that it receives no further processing.
+- `route` to change the route associated with a message instance.
 - `if`, `elseif` and `else` to add conditional processing logic. The conditional scope block is syntactically identical to the scope block of the `accept`.
 - `while` and `for` to repeat processing logic. The loop's scope block is syntactically identical to the scope block of the `accept`.
 
@@ -687,8 +960,8 @@ The following is an example of a process that can process any kind of message:
 
 ```npl
 process dateAppender {
-    accept * {
-        var dateText = message.text + ' ' + date().toString()
+    accept * someMessage{
+        var dateText = someMessage.text + ' ' + date().toString()
         emit Response { 
             message { text dateText }
         }
@@ -698,14 +971,20 @@ process dateAppender {
 
 ## Emit
 
-Emit statements start with the reserved word `emit` followed by at least one space, then a message type qualified 
-identifer followed by a scope block. As usual in NPL, the opening `{` of the scope block must be on the same line 
-as the `emit` keyword because you can omit the scope block to accept a message but do no processing on it.
+Emit statements start with the reserved word `emit` followed by at least one space, then an expression that
+evaluates to a message.
 
 Emit statements can only exist within the scope blocks of `accept` or `test` statements.
 
-Inside the scope block you can have two further scope blocks. The `message` scope block defines the fields of
-the message to emit, and the `context` scope block optionally adjusts the context of the new message.
+Very often, the expression after the `emit` statement is an expression that constructs a new message. You can
+consutruct a message from scratch using the message type identifier followed by a scope block that initializes
+the message, or you can use a message instance followed by a scope block to clone an existing message modifying
+some of it's properties along the way.
+
+Inside the scope block you can have three further scope blocks. The `message` scope block defines the fields of
+the message to emit, the `context` scope block optionally adjusts the context of the new message, and the `route`
+scope block optionally defines how the message should be routed. Note that `route` should be used sparignly, as
+routing is supposed to happen within pipes so that processes are fully reusable.
 
 Inside the `message` scope block should be a list of the fields of the message on separate lines. As usual in
 NPL, if there is only one field it can be all on one line, otherwise the fields must be separated by line breaks.
@@ -714,8 +993,8 @@ Each field definition is in two parts separated by spaces. The first part can be
 field, or the `...` operator and a message reference. The second part is an expression that is evaluated to provide
 the value for that field.
 
-The message reference can be the reserved word `message` (to refer to the message that was captured by the
-`accept` statement) an identifier associated with an `await` statement, a `var` or `const` that contains a message
+The message reference can be any identifier that refers to a message, and can be the identifier from the
+`accept` statement, an identifier associated with an `await` statement, a `var` or `const` that contains a message
 reference, or a field within any message that is itself a message.
 
 Inside the `context` scope block you can set the context of the new message. By default new messages will inherit
@@ -723,7 +1002,7 @@ the origin and network context of the message that is being processed, i.e. the 
 statement. In a lot of cases this is sufficient and no `context` block is needed.
 
 The `context` scope block supports three further scope blocks inside of it `origin`, `network` and `message`. These
-scope blocks behave like `map<string, string>` but have specific lifecycles.
+scope blocks behave like `map<string string>` but have specific lifecycles.
 
 The `origin` context of a message can only be set when a message is created, and defaults to the `origin` context
 of the message being processed. The origin context contains information that should be preseved thoughout the
@@ -761,12 +1040,12 @@ emit MyMessage {
     }
 }
 
-accept Message1 {
+accept Message1 message1 {
     await { Message3 message3 }
 
-    emit Message2 {
+    emit message3 {
         message {
-            ...message // Copies all fields from accepted message
+            ...message1 // Copies all fields from accepted message
             taxPercent message3.taxRate * 100
             maxCount config.maxCount
         }
@@ -801,10 +1080,14 @@ can optionally be enclosed in `()`.
 These syntax options are illustrated by these valid examples:
 
 ```npl
-    if message.path.startsWith('/ux')
-        append { process logger }
+    if message.path.startsWith('/ux') {
+        append {
+            process logger
+            pipe uxRouting
+        }
+    }
 
-    if (message.path.startsWith('/ux')) append { process logger }
+    if (message.path.startsWith('/ux')) append process logger
 
     if message.path.startsWith('/ux') {
         clear
@@ -814,7 +1097,7 @@ These syntax options are illustrated by these valid examples:
 
     if (message.path.startsWith('/ux')) {
         clear
-        if (message.verb == 'POST) append { process logger }
+        if (message.verb == 'POST) append process logger
     }
 ```
 
@@ -863,7 +1146,9 @@ This is an example of a valid `while` statement
 ```npl
 var x 10
 while x > 0 {
-    emit MyMessage { message { index x-- } }
+    emit MyMessage { 
+        message { index x-- }
+    }
 }
 ```
 
@@ -974,17 +1259,14 @@ In which case the `using` statements are not required.
 
 ## Clear
 
-The reserved word `clear` can be used in the scope block of a `route` or `accept` statement, and clears the
-routing table for the message that is being routed or processed.
-
-You can also clear the routing table for a specific message by writing `<message-identifier>.clear`
+The reserved word `clear` can be used in the scope block of a `route` statement, and clears the
+routing table for the message.
 
 ## Capture
 
-The `capture` keyword is used to add a capture instruction to a message routing table of the message that is
-being routed. You can only use this statement within the scope block of a `route` statement. Capture 
-instructions set up routing for messages that are emitted during the processing of the messaging that
-we are routing.
+The `capture` keyword is used to add a capture instruction to a message. You can only use this statement 
+within the scope block of a `route` statement. Capture instructions set up routing for messages that are 
+emitted during the processing of the messaging that we are routing.
 
 Every message has a route attached to it. The route comprises a list of destinations, a global capture list
 and a capture list associated with each destination on the route. When a message is processed by a
@@ -1028,8 +1310,9 @@ types not explicitly routed, where the contents of the scope block defines how t
 message's routing table.
 
 The `capture GraphQlRequest {}` part means add a new entry in the global capture list for messages of
-type `GraphQlRequest`, or replace the existing one, where the code inside the scope block defines 
-how to modify the routing table of any `GraphQlRequest` messages that are emitted during processing.
+type `GraphQlRequest`, or replace the existing one. The code inside the scope block defines 
+how to modify the routing table of any `GraphQlRequest` messages that are emitted during processing
+of the original message that we are routing.
 
 Inside this scope block we have `clear` then `prepend { network graphQl }` which deletes the contents
 of the routing table entirely, then adds just one destination `network graphQl`, routing all emitted
@@ -1075,68 +1358,40 @@ adding global capture rules that `clear` the route.
 
 ## Clone
 
-The `clone` keyword can be used in a few places, and always means that you want to make a changed copy
-of a message. Messages are immutable, but you can make a new message that is mostly copied from an
-existing message, and has some fields with new values.
+Anywhere where a message reference is expected, you can follow the message reference with a scope block
+to create a mutated clone of the message. Messages are immutable, but you can make a new message that is 
+mostly copied from an existing message, and has some fields with new values.
 
-You can also create a copy of another message with the `...` spread operator, but this only copies the
-data fields, whereas `clone` also copies the context and route, and therefore is suitable for situations
-where you might mutate an object in other languages.
+You can also create a copy of another message's data with the `...` spread operator, but this only copies the
+data fields, whereas cloning also copies the context and route.
 
-These examples show some of the ways that you can use `clone` in a `process`:
-
-```npl
-process process1 {
-    accept Message1 {
-        emit clone {
-            field3 96
-        }
-        clear
-    }
-}
-```
-
-This example accepts a `Message1` type message and emits a clone of this message with value of `field3`
-changed to the value `96`. The `emit` is followed by a `clear` statement that deletes the routing information
+The example below accepts a `Message1` type message and emits a clone of this message with value of `field3`
+changed to the value `96`. The `emit` is followed by a route clear, that deletes the routing information
 from the original incomming `Message1` so that it is not routed any further.
 
 ```npl
 process process1 {
-    accept Message1 {
-        await { Message2 message2 }
-        emit clone message2 {
+    accept Message1 message1 {
+        emit message1 {
             field3 96
         }
+        route message1 { clear }
     }
 }
 ```
 
-This example starts processing a `Message1`, then waits for a `Message2` to be recieved, then emits a copy
-of `message2` with one of the fields changed.
+The example below starts processing a `Message1`, then waits for a `Message2` to be recieved, then emits a copy
+of `message2` with one of the fields copied from `message1`.
 
-You can also use a `clone` statement in a `pipe` `route` to duplicate the message being routed, and send the
-clone on a different route.
 
 ```npl
-pipe pipe1 {
-    route Message1 {
-        clone {
-            message {
-                field1 'new field 1 value'
-                field2 'new field 2 value'
-            }
-            prepend {
-                process process2
-            }
-        }
-        clear
+process process1 {
+    accept Message1 message1 {
+        await Message2 message2
+        emit message2 { field3 message1.field3 }
     }
 }
 ```
-
-This example defines a route for messages of type `Message1` by cloning the message with a couple of changed
-fields, adding `process2` to the front of the route, and clearing the route for the original message so that
-is does not propagate any further through the network.
 
 ## Await
 
@@ -1163,12 +1418,12 @@ For example:
 namespace app {
     network invoiceLogic {
         process taxCalculator {
-            accept Invoice {
+            accept Invoice invoice {
                 emit data.GraphQlRequest {
                     message { 
                         query "{ tenant(id: $tenantId)\n{ taxRate\n}\n}"
                         params { 
-                            tenantId message.tenantId
+                            tenantId invoice.tenantId
                         }
                     }
                 }
@@ -1177,10 +1432,10 @@ namespace app {
                     Error error
                 }
                 if response {
-                    clone {
+                    emit invoice {
                         taxRate response['tenant']['taxRate']
                     }
-                    clear
+                    route invoice { clear }
                 }
             }
         }
@@ -1242,23 +1497,23 @@ namespace App {
     }
 
     network math {
-        ingress egress mathQuestions { process doMath }
+        ingress egress mathQuestions process doMath
 
         process doMath {
-            accept MathQuestion {
-                if message.operation == Operation.add {
+            accept MathQuestion question {
+                if question.operation == Operation.add {
                     emit MathAnswer { 
                         message { answer question.a + question.b }
                     }
                 }
-                elseif message.operation == Operation.subtract {
+                elseif question.operation == Operation.subtract {
                     emit MathAnswer {
                         message { answer question.a - question.b }
                     }
                 }
                 else {
                     emit Exception { 
-                        message { text `Unknown math operation ${message.operation}`}
+                        message { text `Unknown math operation ${question.operation}`}
                     }
                 }
             }

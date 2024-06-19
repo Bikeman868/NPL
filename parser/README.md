@@ -2,12 +2,12 @@
 
 This is a shared library for parsing NPL source files. It is used by many development tools including:
 
-- The NPL compiler
-- Code formatters
-- Code linters
-- Static analysis tools
-- Monitoring tools
-- Runtime visualization of execution flow tools
+-   The NPL compiler
+-   Code formatters
+-   Code linters
+-   Static analysis tools
+-   Monitoring tools
+-   Runtime visualization of execution flow tools
 
 This library includes a very basic printer that will parse a the source file and pretty print the tokens. You can run it after compiling with `node dist <filename>.npl`. This repo contains a couple of sample NPL single source file applications that you can test with.
 
@@ -51,7 +51,16 @@ npm run build
 node dist HelloWorld.npl
 ```
 
-See package.json for other run commands.
+### Subsequent builds
+
+If you did not delete any source files, then you can just recompile the code with:
+
+```shell
+npm run compile
+node dist HelloWorld.npl
+```
+
+See `package.json` for other run commands.
 
 ### Unit tests
 

@@ -1,0 +1,215 @@
+/*
+    This sample program implements an event source. For those less familiar, event
+    sourcing is where you store input events as-is, and materialize the state at any
+    point in time by folding over the input events. To make materialization more
+    efficient when there are a large number of events, we keep snapshots of the
+    state from time to time. If new events come in with earlier timestamps, then
+    snapshots later then this are deleted because they are now invalid.
+
+    For this example the state is defined by a state transition graph, where input
+    messages cause state transitions.
+*/
+
+// Define the external interface messages
+namespace app.interface {
+    // External events that cause state transitions
+    message InputEvent {
+        date timestamp
+        string entityKey
+        string eventCode
+    }
+
+    // A request for the state of an entity at a specific point in time
+    message StateRequest {
+        string entityKey
+        date pointInTime
+    }
+
+    // The response to a request for the entity state
+    message StateResponse {
+        string entityKey
+        date timestamp
+        string code
+        string name
+    }
+}
+
+// Define the state transition graph
+namespace app.stateGraph {
+    message Transition {
+        string eventCode
+        string nextStateCode
+    }
+    message State {
+        string code
+        string name
+        Transition[] transitions
+    }
+    message Graph {
+        State[] states
+    }
+}
+
+// Define the event source
+namespace app.events {
+    message EventHistory {
+        string entityKey
+        date startTimestamp
+        date endTimestamp
+        InputEvent[] events
+    }
+    message Snapshot {
+        string entityKey
+        date timestamp
+        string stateCode
+    }
+}
+
+// Define the persistence layer interface
+namespace app.persistence {
+    message NotFound
+    message GetGraph
+    message GetEventHistory {
+        string entityKey
+        date startTimestamp
+        date endTimestamp
+    }
+    message GetLastSnapshot {
+        string entityKey
+        date timestamp
+    }
+    message PersistEvent {
+        inputEvent event
+    }
+    message PersistSnapshot {
+        snapshot snapshot
+    }
+    message DeleteSnapshots {
+        string entityKey
+        date timestamp
+    }
+}
+
+// Define the persistence network
+namespace app.persistence {
+    using npl.persistence
+    network data {
+        ingress egress default { process dataAccessLayer }
+
+        process dataAccessLayer {
+            accept GetGraph getGraph { 
+                emit Query {
+                    message {
+                        name 'getGraph' // For debug logging
+                        language 'SQL'
+                        version '92'
+                        query 'select code, name, transitions from graph'
+                    }
+                }
+                await QueryResult queryResult
+                /*
+                const stateTransitionGraph queryResult.rows.map(row => app.stateGraph.State { 
+                        message {
+                            code row['code']
+                            name row['name']
+                            transitions JSON.parse(row['transitions'])
+                        }
+                    }
+                )
+                */
+                emit app.stateGraph.Graph {
+                    message {
+                        states stateTransitionGraph
+                    }
+                }
+            }
+            accept GetEventHistory getEventHistory { 
+                // TODO: Database operations
+            }
+            accept GetLastSnapshot getLastSnapshot{ 
+                // TODO: Database operations
+            }
+            accept PersistEvent persistEvent { 
+                // TODO: Database operations
+            }
+            accept PersistSnapshot persistSnapshot { 
+                // TODO: Database operations
+            }
+            accept DeleteSnapshots deleteSnapshots { 
+                // TODO: Database operations
+            }
+        }
+    }
+}
+
+// Define the event sourcing network
+namespace app.events {
+    using app.interface
+    using app.persistence
+
+    network eventSource {
+        ingress egress default { process eventSource }
+
+        process eventSource {
+            accept InputEvent inputEvent {
+                emit PersistEvent {
+                    message {
+                        event inputEvent
+                    }
+                }
+                emit DeleteSnapshots {
+                    message {
+                        entityKey inputEvent.entityKey
+                        timestamp inputEvent.timestamp
+                    }
+                }
+            }
+            accept StateRequest stateRequest {
+                emit GetLastSnapshot {
+                    message {
+                        entityKey stateRequest.entityKey
+                        timestamp stateRequest.pointInTime
+                    }
+                }
+                await { 
+                    Snapshot snapshot
+                    NotFound notFound
+                }
+                /*
+                if snapshot {
+                    // TODO: Add event history since snapshot
+                    emit StateResponse {
+                        message {
+                            entityKey snapshot.entityKey
+                            timestamp snapshot.timestamp
+                            code snapshot.stateCode
+                            name ''
+                        }
+                    }
+                }
+                elseif notFound {
+                    // TODO: Get entire event history
+                    // TODO: Build state from event history
+                    // TODO: Create a new snapshot
+                }
+                */
+            }
+        }
+    }
+}
+
+// Define a state machine as a REST service
+namespace app {
+    application stateMachine {
+        connection npl.mysql.Database database {
+            config {
+                host 'localhost'
+                port 3306
+                user 'root'
+                password 'mysql'
+                database 'mysql'            
+            }
+            ingress egress app.persistence.data
+        }
+    }
+}

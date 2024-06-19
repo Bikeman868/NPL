@@ -54,12 +54,12 @@ namespace app {
 
     network Main {
         process InvoiceProcessor {
-            accept dto.Message1 {
+            accept dto.Message1 message1 {
                 await { Message3 message3 }
                 
                 emit Message2 {
                     message {
-                        ...message
+                        ...message1
                         taxPercent message3.taxRate * 100
                     }
                     context {
@@ -113,25 +113,25 @@ From this you can observe that:
 // The data namespace contains networks for reading and writing persistent stores
 // Start by defining messages and networks which are the interface to the data subsystem
 namespace data {
-    message GraphQlRequest {
-        string graphQl
+    message GraphQlQuery {
+        string query
     }
 
     message GraphQlResponse {
-        map<string, string> data
+        map<string, string>[] rows
     }
 
-    network GraphQl {
-        ingress egress default { process GraphQlQuery } 
+    network graphQl {
+        ingress egress default { process query } 
     }
 }
 
 // Define the processes within the data namespace
 // In this sample code the process does nothing
 namespace data {
-    network GraphQl {
-        process GraphQlQuery {
-            accept GraphQlRequest {
+    network graphQl {
+        process query {
+            accept GraphQlRequest request {
                 // TODO: Execute the GraphQL query
                 emit GraphQlResponse
             }
@@ -144,29 +144,29 @@ namespace app {
     // This is a placeholder for an invoice message which we will define later
     message Invoice
 
-    network InvoiceLogic {
+    network invoiceLogic {
         // The default entry point for this network is routed by the Main pipe
-        ingress egress default { pipe Main }
+        ingress egress default { pipe main }
 
-        // The DataAccess pipe modifies the message route to capture GraphQL 
-        // requests and route them to the GraphQl network
-        pipe DataAccess {
+        // The DataAccess pipe modifies the message route to capture GraphQlQuery messages 
+        // and route them to the graphQl network
+        pipe dataAccess {
             route * {
-                capture data.GraphQlRequest {
-                    prepend { network data.GraphQl }
+                capture GraphQlQuery {
+                    prepend { network data.graphQl }
                 }
             }
         }
 
-        pipe Main {
+        pipe main {
             route Invoice {
                 prepend { 
                     // Process invoices with the TaxCalculator process
-                    process TaxCalculator
+                    process taxCalculator
 
                     // Before calling TaxCalculator modify the message's route to capture
-                    // GraphQlRequest messages and route them to the GraphQl network
-                    pipe DataAccess
+                    // GraphQlQuery messages and route them to the graphQl network
+                    pipe dataAccess
                 }
             }
         }
@@ -175,14 +175,16 @@ namespace app {
 
 // Define processes for the main application
 namespace app {
-    network InvoiceLogic {
+    network invoiceLogic {
         process TaxCalculator {
-            accept Invoice {
-                emit data.GraphQlRequest {
-                    message { graphQl "some GraphQL query" }
+            accept Invoice invoice {
+                emit GraphQlQuery {
+                    message { 
+                        query "some GraphQL query"
+                    }
                 }
-                await { data.GraphQlResponse requestedData }
-                // Do something with requestedData
+                await GraphQlResponse queryResponse
+                // Do something with queryResponse
             }
         }
     }
@@ -198,19 +200,21 @@ squash the route for the original incomming message so that it is not processed 
 
 ```npl
 process Test {
-    accept Message1 {
-        emit clone {
+    accept Message1 message1 {
+        emit message1 {
             message {
-                field1 message.field1 + "_suffix"
+                field1 message1.field1 + "_suffix"
             }
             context {
                 message {
-                    ...message.context.message
+                    ...message1.context.message
                     isClone true
                 }
             }
         }
-        clear
+        route message1 {
+            clear
+        }
     }
 }
 ```
@@ -222,12 +226,7 @@ processing.
 
 Note that this code explicitly copies the message context of the message to demonstrate how you
 would do this, but this is not typical. If you do not include the `context` statement within the
-`clone` statment, the cloned message context will be an exact copy the original message context.
+cloned message, the context will be an exact copy the original message context.
 
-Writing `emit clone` on a line by itself with no scope block will simply emit another 
-message that is completely identical to the incomming message.
-
-Note that if we placed rhw `clear` before `clone` then we would have cleared the route on the
+Note that if we placed the `clear` before `emit` then we would have cleared the route on the
 incomming message before copying it, and the cloned message would also have no route going forward.
-
-This `clone` and `clear` syntax works in `accept` statements and `route` statements.

@@ -8,28 +8,25 @@ import { IContext } from '#interfaces/IContext.js';
 
 // Pass name of NPL source file on command line
 const sourceFileBytes = readFileSync(process.argv[2]);
-const sourceFileText = sourceFileBytes.toString(
-  'utf8',
-  0,
-  sourceFileBytes.length,
-);
+const sourceFileText = sourceFileBytes.toString('utf8', 0, sourceFileBytes.length);
 
 // The parser requires parsable text
 const buffer = new ParsableString(sourceFileText);
 const context = new Context(buffer);
-// context.debugLogging = (context: IContext) => context.position.line >= 16;
+context.debugLogging = (context: IContext) => false;
+context.traceLogging = (context: IContext) => false;
 
 // Tokenise the source file
 const parser = new Parser();
 const tokens = parser.parse(context);
 
 if (context.syntaxErrors.length > 0) {
-  const printer = new SyntaxErrorPrinter();
-  printer.includeConsoleColors = true;
-  printer.print(sourceFileText, context.syntaxErrors);
+    const printer = new SyntaxErrorPrinter();
+    printer.includeConsoleColors = true;
+    printer.print(sourceFileText, context.syntaxErrors);
 } else {
-  // Pretty print the code
-  const printer = new TokenPrinter(tokens);
-  printer.includeConsoleColors = true;
-  printer.print();
+    // Pretty print the code
+    const printer = new TokenPrinter(tokens);
+    printer.includeConsoleColors = true;
+    printer.print();
 }

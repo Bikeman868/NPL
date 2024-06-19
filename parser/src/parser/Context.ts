@@ -2,182 +2,139 @@ import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
 import { IContext } from '#interfaces/IContext.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
-import { IParserState } from '#interfaces/IParserState';
-import { StateName } from '#interfaces/StateName.js';
-import { ParserState } from './ParserState.js';
 
 export class Context implements IContext {
-  private _buffer: IParsable;
-  private _position: Position;
-  private _currentState: IParserState;
-  private _stateStack: IParserState[];
-  private _syntaxErrors: SyntaxError[];
-  private _isDryRun: boolean;
+    private _buffer: IParsable;
+    private _position: Position;
+    private _syntaxErrors: SyntaxError[];
+    private _isDryRun: boolean;
+    private _debugOutput: (line: String) => void;
+    private _statePath: string[] = [];
 
-  debugLogging: (context: IContext) => boolean = () => false;
+    debugLogging: (context: IContext) => boolean = () => false;
+    traceLogging: (context: IContext) => boolean = () => false;
 
-  constructor(buffer: IParsable, isDryRun?: boolean) {
-    this._buffer = buffer;
-    this._isDryRun = !!isDryRun;
-    this._position = buffer.getPosition();
-    this._currentState = new ParserState();
-    this._stateStack = [];
-    this._syntaxErrors = [];
-  }
-
-  get buffer() {
-    return this._buffer;
-  }
-
-  get isDryRun() {
-    return this._isDryRun;
-  }
-
-  set isDryRun(enabled: boolean) {
-    this._isDryRun = enabled;
-  }
-
-  get currentState(): IParserState {
-    return this._currentState;
-  }
-
-  get position(): Position {
-    return this._position;
-  }
-
-  get syntaxErrors(): SyntaxError[] {
-    return this._syntaxErrors;
-  }
-
-  /**
-   * Pushes the current state onto a stack, and changes the current state and sub-state
-   * If the sub-state is not specified then the sub-state will be set to 'start'
-   */
-  pushState(state: StateName, subState?: string): IParserState {
-    this.debug(
-      () =>
-        `${this.getDebugIndent()}${this._currentState.state}.${
-          this._currentState.subState
-        } => ${state}.${subState || 'start'}`,
-    );
-
-    if (!this._isDryRun) {
-      this._stateStack.push(new ParserState(this._currentState));
-      if (state) this._currentState.state = state;
-      this._currentState.subState = subState || 'start';
+    constructor(buffer: IParsable, isDryRun?: boolean, debugOutput?: (line: String) => void) {
+        this._buffer = buffer;
+        this._isDryRun = !!isDryRun;
+        this._position = buffer.getPosition();
+        this._syntaxErrors = [];
+        this._debugOutput = debugOutput || ((line: String) => console.log(line));
     }
 
-    return this._currentState;
-  }
-
-  /**
-   * Pushes the current state on the stack and changes the sub-state
-   */
-  pushSubState(subState: string): IParserState {
-    this.debug(
-      () =>
-        `${this.getDebugIndent()}${this._currentState.state}.${
-          this._currentState.subState
-        } => ${this._currentState.state}.${subState}`,
-    );
-
-    if (!this._isDryRun) {
-      this._stateStack.push(new ParserState(this._currentState));
-      this._currentState.subState = subState;
+    get buffer() {
+        return this._buffer;
     }
 
-    return this._currentState;
-  }
-
-  popState(): IParserState {
-    const oldState = this._currentState.state;
-    const oldSubState = this._currentState.subState;
-
-    if (!this._isDryRun) {
-      const popedState = this._stateStack.pop();
-      if (!popedState) throw new Error('More pops than pushes');
-      this._currentState = popedState;
+    get isDryRun() {
+        return this._isDryRun;
     }
 
-    this.debug(
-      () =>
-        `${this.getDebugIndent()}${this._currentState.state}.${
-          this._currentState.subState
-        } <= ${oldState}.${oldSubState}`,
-    );
-
-    return this._currentState;
-  }
-
-  setState(state?: StateName, subState?: string): IParserState {
-    this.debug(
-      () => `${this.getDebugIndent()}*.* --> ${state}.${subState || 'start'}`,
-    );
-
-    if (!this._isDryRun) {
-      if (state) this._currentState.state = state;
-      this._currentState.subState = subState || 'start';
-    }
-    return this._currentState;
-  }
-
-  setSubState(subState: string): IParserState {
-    this.debug(
-      () =>
-        `${this.getDebugIndent()}*.${
-          this._currentState.subState
-        } --> *.${subState}`,
-    );
-
-    if (!this._isDryRun) {
-      this._currentState.subState = subState;
+    set isDryRun(enabled: boolean) {
+        this._isDryRun = enabled;
     }
 
-    return this._currentState;
-  }
-
-  capturePosition() {
-    this._position = this._buffer.getPosition();
-  }
-
-  restorePosition() {
-    this._buffer.setPosition(this._position);
-  }
-
-  syntaxError(message: string): void {
-    this.debug(() => 'Syntax error "' + message + '"');
-
-    let state = '';
-    let stackDepth = '';
-    for (const s of this._stateStack) {
-      state += stackDepth + s.getDescription() + '\n';
-      stackDepth += '  ';
-    }
-    state += stackDepth + this._currentState.getDescription();
-
-    this._syntaxErrors.push({
-      state,
-      message,
-      ...this._position,
-    });
-  }
-
-  debug(messageFunc: () => any): void {
-    if (this.debugLogging(this)) {
-      const lineNumber = ('00' + this._position.line).slice(-3);
-      console.log(lineNumber + ' ' + messageFunc());
-    }
-  }
-
-  getDebugIndent(): string {
-    let indent = '';
-
-    if (this.debugLogging(this)) {
-      this._stateStack.forEach(() => {
-        indent += '  ';
-      });
+    get position(): Position {
+        return this._position;
     }
 
-    return indent;
-  }
+    get syntaxErrors(): SyntaxError[] {
+        return this._syntaxErrors;
+    }
+
+    get pathLength(): number {
+        return this._statePath.length;
+    }
+
+    get pathDescription(): string {
+        return 'npl.' + this._statePath.join('.');
+    }
+
+    pushPath(name: string | undefined): void {
+        if (name) this._statePath.push(name);
+    }
+
+    popPath(): string | undefined {
+        return this._statePath.pop();
+    }
+
+    getPathElement(index: number): string {
+        const name = this._statePath[index];
+        if (!name) throw Error(`Access to path element ${index} when path length is ${this._statePath.length}`);
+        return name;
+    }
+
+    clearPath(): void {
+        this._statePath = [];
+    }
+
+    capturePosition() {
+        this._position = this._buffer.getPosition();
+    }
+
+    restorePosition() {
+        this._buffer.setPosition(this._position);
+    }
+
+    syntaxError(message: string): void {
+        const state = 'npl.' + this._statePath.join('.');
+
+        this._syntaxErrors.push({
+            state,
+            message,
+            ...this._position,
+        });
+
+        this.debug(() => {
+            const bufferText = this._buffer.getRaw(this._position, 40).replace(/(?:\r\n|\r|\n)/g, '\\n');
+            return `Syntax error in ${state}. ${message} in "${bufferText}"`;
+        });
+    }
+
+    debug(messageFunc: () => any, indent?: string): void {
+        if (this.debugLogging(this) || this.traceLogging(this)) {
+            const message = messageFunc();
+            if (!message) return;
+
+            if (indent == undefined) indent = this.getDebugIndent();
+
+            const position = this.buffer.getPosition();
+            const lineNumber = ('000' + position.line).slice(-4);
+            const columnNumber = ('00' + position.column).slice(-3);
+            this._debugOutput(
+                lineNumber + ' ' + columnNumber + ' ' + indent + message + ' [' + this.pathDescription + ']',
+            );
+        }
+    }
+
+    trace(messageFunc: () => any, indent?: string): void {
+        if (this.traceLogging(this)) {
+            const message = messageFunc();
+            if (!message) return;
+
+            if (indent == undefined) indent = this.getTraceIndent();
+
+            const position = this.buffer.getPosition();
+            const lineNumber = ('000' + position.line).slice(-4);
+            const columnNumber = ('00' + position.column).slice(-3);
+
+            this._debugOutput(lineNumber + ' ' + columnNumber + ' ' + indent + message);
+        }
+    }
+
+    getDebugIndent(): string {
+        let indent = '';
+
+        if (this.debugLogging(this)) {
+            this._statePath.forEach(() => {
+                indent += '  ';
+            });
+        }
+
+        return indent;
+    }
+
+    getTraceIndent(): string {
+        return this.getDebugIndent() + ' - ';
+    }
 }

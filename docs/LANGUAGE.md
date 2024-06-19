@@ -37,16 +37,15 @@ If you are familar with OOP, you might find this [comparison with OOP](OOP_COMPA
 Sorry, but it's tradition. This is a hello world console app written in NPL.
 
 ```npl
-using npl.connection
+using npl.io
+using npl.scheduling
 
 namespace app {
     network hello {
-        ingress egress default {
-            process responder
-        }
+        ingress egress default { process responder }
         process responder {
             accept * {
-                emit console.Line { 
+                emit TextMessage { 
                     message { text 'Hello, world' }
                 }
             }
@@ -58,11 +57,13 @@ namespace app {
             config { 
                 count 1 
                 interval 0
-                message empty
             }
             ingress network hello
         }
         connection Console {
+            config {
+                mode ConsoleMode.lines
+            }
             egress network hello
         }
     }
@@ -101,7 +102,7 @@ separate statements, and if you have only one statement it can go all on one lin
 makes the code clean and easy to read as well as easy for the compiler to parse.
 
 NPL does use `.` to separate hierarchical names, and `{}` to denote scope, but otherwise
-tries to keep the syntax clean and simple.
+tries to keep symbols to a minimum.
 
 <a name="hello-world-namespace"></a>
 ## Namespace and using
@@ -128,12 +129,11 @@ source files.
 <a name="hello-world-message"></a>
 ## Message
 
-For this example we are using a `console.Line` message that is defined by the `console` 
-connection. This is not very typical. Most applications should define custom messages in
-the namespace of the application, and emit those, then provide a process that maps the
-fields of the application's message type onto the message type of the console. Doing it
-this way allows you to easily swap out the console for another connection type that uses a
-different message format.
+For this example we are using a `TextMessage` message that one of the built-in types. This is not 
+very typical. Most applications should define custom messages in the namespace of the application, 
+and emit those, then provide a process that maps the fields of the application's message type onto 
+the message type of the console. Doing it this way allows you to easily swap out the console for 
+another connection type that uses a different message format.
 
 <a name="hello-world-process"></a>
 ## Process
@@ -143,25 +143,27 @@ The process declaration:
 ```npl
 process responder {
     accept * {
-        emit console.Line { 
+        emit TextMessage { 
             message { text 'Hello, world' }
         }
     }
 }
 ```
 
-Defines a process called `responder` that will accept messages of any type. `process` is a reserved word,
-and is followed by the name of the process. Note that processes must be defined inside of a `network`.
+Defines a process called `responder` that will accept messages of any type (`*`). `process` is a 
+reserved word, and is followed by the name of the process. Note that processes must be defined
+inside of a `network`.
 
-The process definition is enclosed in `{}` and comprises a number of clauses that define the
+The process definition is enclosed in `{}` and comprises a number of statements that define the
 behavior of the process. Note that processes can not have internal state, only message processing
 logic. Conversely messages have state but no functionality. In NPL state travels with the message.
 
 The `accept` reserved word is followed by the name of a message type or `*` (which means that it will
-accept any type of message).
+accept any type of message) and can be followed by an identifier if you want to refer to the message
+in your code.
 
 In this case `accept * {}` defines the processing steps to perform when a message of any type is
-received, and  `emit console.Line { message { text 'Hello, world' } }` sends a `console.Line` type 
+received, and  `emit TextMessage { message { text 'Hello, world' } }` sends a `TextMessage` type 
 message with its `text` field set to the string literal "Hello, world".
 
 Note that the process does not know where the incomming message came from, or where the response that
@@ -175,20 +177,19 @@ The network declaration:
 
 ```npl
 network hello {
-    ingress egress default {
-        process responder
-    }
+    ingress egress default { process responder }
 }
 ```
 
 Defines a network of processes and pipes that perform some higher level processing function. This is somewhat
 equivalent to a module, package or assembly in other programming systems, except that they are not separately
-compiled, and it is common to have a large number of networks in an application. In NPL, higher level networks
-are composed of multiple lower level networks to give your application a deliberate hierarchical structure.
+compiled, and it is common to have a large number of networks in an NPL application. NPL extends the concept
+of Domain Driven Design into the application's internal structure, where networks are equivalent to domains,
+and solve exactly one problemm completely.
 
 In this example, the network is very simple. The network has one entry point that sends ingress (received) 
 messages to the `responder` process, and captures any emitted messages (egress) from the `responder` process
-and sends them back to the originator of the processed message.
+and sends them back out through the same network entry point.
 
 Networks often have multiple entry points that are named. You can also have a default unnamed entry point as
 demonstrated by this example.
@@ -203,7 +204,7 @@ with no name that is both ingress and egress.
 
 In this example the default entry point is wired to the `responder` process, which means that any messages
 received by the network will be forwarded to the `responder` and any messages that `responder` emits will
-be sent back to the message originator.
+be emitted from this network entry unless routed internally within the network.
 
 The network entry point can define multiple processes, in which case each message received will be delivered
 to each process, and the messages emitted by all of these processes will be returned via the entry point.
@@ -231,34 +232,38 @@ application helloWorld {
         ingress network hello
     }
     connection Console {
+        config {
+            mode ConsoleMode.lines
+        }
         egress network hello
     }
 }
 ```
 
 Defines an application called `helloWorld` that has two connections. Connections specify how your application
-communicates with things outside of your application.
+communicates with things outside of your application. You can have multiple instances of the same connection
+type with different configurations.
 
-The first connection is an `Emitter`, which resolves to `npl.connection.Emitter` via the `using` statement at
-the top of the source file. The emitter connection simply emits messages at regular intervals and it is built
-into the NPL runtime.
+The first connection is an `Emitter`, which resolves to `npl.scheduling.Emitter` via the `using` statement at
+the top of the source file. The emitter connection simply emits empty messages at regular intervals and it is
+built into the NPL runtime.
 
-In this example the emitter is configured to emit a single empty message after no delay. This connection is
+In this example the emitter is configured to emit a single message after no delay. This connection is
 defined as an ingress to the application, in other words the application receives messages from the emitter. 
 
 Application ingress and egress connections are always attached to the entry point of a network.
 
 The statement `ingress netwoek hello` sends messages recieved from this connection to the default (unnamed) 
-entry point of the `Hello` network. 
+entry point of the `hello` network. 
 
 Note that `empty` is a reserved word and is defined as `message empty {}`. Empty messages have context, can
-be routed like any other message, but they contain no information.
+be routed like any other message, but they contain no data.
 
 As previously discussed, the default entry point of the `hello` network will forward this empty message
-from the emitter to the `responder` process, which will then emit a `console.Line` message.
+from the emitter to the `responder` process, which will then emit a `TextMessage` message.
 
 The second `connection` is a `Console` connection, which is defined as an egress from the application. The
-name `Console` will be resolved to `npl.connection.Console` via the `using` statement.
+name `Console` will be resolved to `npl.io.Console` via the `using` statement.
 
 Defining this as an `egress` means that the application sends messages to the console connection. The
 source of the egress messages is the default entry point of the `hello` network. This will result in the 
@@ -422,7 +427,6 @@ reserved words:
 routed. The fields of the message can be read, but messages are immutable.
 * Routing commands like `append`, `prepend`, `remove` and `clear` to alter the path that the message will
 take through the network.
-* `clone` to make a copy of the message with a different route, context and field values.
 
 Routing is a big subject that is covered in detail elsewhere. In this example we are using `prepend` to add a new
 destination to the beginning of the route, changing where the message will go next, and `append` to add a new
@@ -558,18 +562,18 @@ In this scenario you can write:
 
 ```npl
 process invoiceCalculator {
-    accept Cart {
+    accept Cart cart {
         emit TaxRequest {
             message {
-                region message.region
-                country message.country
+                region cart.region
+                country cart.country
             }
         }
         await TaxResponse tax
         const subTotal = message.items.sum(item => item.price * item.quantity)
         emit Invoice {
             message {
-                ...message
+                ...cart
                 taxRate tax.rate
                 subTotal subTotal
                 total subTotal * (1 + tax.rate / 100)
@@ -590,11 +594,11 @@ to continue processing whichever the response is:
 
 ```npl
 process invoiceCalculator {
-    accept Cart {
+    accept Cart cart {
         emit TaxRequest {
             message {
-                region message.region
-                country message.country
+                region cart.region
+                country cart.country
             }
         }
         await { 
@@ -602,10 +606,10 @@ process invoiceCalculator {
             Exception ex
         }
         if tax {
-            const subTotal = message.items.sum(item => item.price * item.quantity)
+            const subTotal = cart.items.sum(item => item.price * item.quantity)
             emit Invoice {
                 message {
-                    ...message
+                    ...cart
                     taxRate   tax.rate
                     subTotal  subTotal
                     total     subTotal * (1 + tax.rate / 100)
@@ -721,26 +725,16 @@ This is an example pipe definition:
 
 ```npl
 pipe pipe1 {
-    route Message1 { prepend { process process1 } }
+    route Message1 { 
+        prepend { process process1 }
+    }
     route Message2 { 
         prepend { 
             process process1
             process process2
             pipe pipe2
         }
-        append  { pipe pipe2 }
-    }
-    route Message3 {
-        clone {
-            message {
-                field1 'new field 1 value'
-                field2 'new field 2 value'
-            }
-            prepend {
-                process process2
-            }
-        }
-        clear
+        append { pipe pipe2 }
     }
     route * {
         clear
@@ -753,19 +747,16 @@ This illustrates a few patterns and techniques as follows:
 
 * `Message1` routing simply adds a new destination to the front of the route. This is where the message will be sent next. Simple routing statements like this can be all on 1 line if you want.
 * `Message2` routing makes multiple routing changes. These must be separated by line breaks. The `prepend` statement also routes to multiple destinations, in this case the destintions must be separated by line breaks.
-* `Message3` routing makes a copy of the original message (including its route), where the copy has some modified field values. It also clears the route on the original message so that it will not be processed any further. This is as close as you can get to mutating a message.
 * `*` routing applies to any other type of message. In this case we clear the route to prevent any further processing of this message, then send the message to the `NotImplementedLogger` process. Note that the `prepend` statement must come after `clear` or the prepend would also be cleared.
 
 <a name="routing-route"></a>
 ## The `route` reserved word
 
-The `route` reserved word modifies the route associated with the message that is in context. For a `process`, this is the message that the process is currently processing. For a `pipe` this is the message that the pipe is routing.
+The `route` reserved word modifies the route associated with the message that is in context. For a `process`, the `route` reserved word must be followed by a message reference. For a `pipe` this is the message that the pipe is routing.
 
 There are also places where a new message context is created, for example when a process contains an `emit` statement. This statement creates a new message, and inside the message definition the `route` reserved word will modify the route of the newly created message.
 
 Newly created messages by default, are routed to the originator of the message that is currently in context, so it is uncommon to modify the route here. If processes emit messages with a custom route set by the process, this makes the process tightly coupled to the program structure, which makes it less flexible and less reusable.
-
-The `clone` reserved word makes a copy of the message in context, but can modify some of the fields and the message context. Inside the clone defintion, you can also use routing commands to alter the route of the clone.
 
 The `route` statement supports the following operations on the message route:
 
@@ -999,20 +990,20 @@ namespace App {
         ingress egress MathQuestions { process DoMath }
 
         process DoMath {
-            accept MathQuestion {
-                if message.operation == Operation.add {
+            accept MathQuestion question {
+                if question.operation == Operation.add {
                     emit MathAnswer { 
                         message { answer question.a + question.b }
                     }
                 }
-                elseif message.operation == Operation.subtract {
+                elseif question.operation == Operation.subtract {
                     emit MathAnswer {
                         message { answer question.a - question.b }
                     }
                 }
                 else {
                     emit Exception { 
-                        message { text `Unknown math operation ${message.operation}`}
+                        message { text `Unknown math operation ${question.operation}`}
                     }
                 }
             }

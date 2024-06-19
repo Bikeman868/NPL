@@ -1,37 +1,130 @@
-// This using statement lets us abbreviate `npl.connection.console` to just `console`
-using npl.connection
+/* 
+    This hello world application demonstrates some of the basic prinicples of NPL. Try 
+    modifying this app and see what happens
+*/
 
+using npl.scheduling // Allows us abbreviate `npl.scheduling.Emitter` to just `Emitter`
+
+// Define an application specific message that is used only within the application
+// and is fully decoupled from any console specific functionality, making the hello world
+// process fully generic and reusable
 namespace app {
-    /* This simple hello world application demonstrates some of the
-       basic prinicples of NPL. Try modifying this app and see what happens
-    */
-    application HelloWorld { // Only 1 application definition is allowed
-        connection emitter { // npl.connection.emitter periodically emits messages
-            config { 
-                count 1 // Emit 1 message and stop
-                interval 0 // Infinite delay between messages
-                message empty // Emit an empty message
-            }
-            ingress network Hello // Send recieved messages to the Hello network default entry point
-        }
-        connection console { // npl.connection.console lets you send text to the console output
-            config { mode console.lines } // Configure the console to output a line of text for each message
-            egress network Hello // Collect output from the default entry point on the Hello network
-        }
+    message TextMessage {
+        string text
     }
 }
 
-namespace app { // Namespace can be defined in multiple source files
-    network Hello { // This network responds to messages with 'Hello world'
-        ingress egress default { // Default entry point for incoming and outgoing messages
-            process Responder // All messages are handled by the 'Responder' process
-        }
-        process Responder {
-            accept * { // Accept all message types
-                emit console.text { // Produce a new message of type npl.connection.console.text
-                    message { text 'Hello, world' } // Set the message field values
+// The hello network responds to all ingress messages by emitting an app.TextMessage containing the text 'Hello, world'
+namespace app {
+    network hello {
+        ingress egress default process responder 
+
+        process responder {
+            // Accept all message types for processing
+            accept * acceptedMessage {
+                emit TextMessage {
+                    message { 
+                        text 'Hello, world'
+                    }
+                }
+            }
+            // This is how we can test this process
+            test 'Should emit hello world' {
+                emit empty
+                expect TextMessage {
+                    message { 
+                        text 'Hello, world'
+                    }
                 }
             }
         }
     }
-} 
+}
+
+// The consoleOutput network converts app.TextMessage mesages to npl.io.TextMessage messages that can be routed to the console output
+// Note that this network is purely functional and knows nothing about the hello network or how the application is wired up
+namespace app {
+    network consoleOutput {
+        // Route all messages in and out of this network through the converter process
+        ingress egress default process converter
+
+        process converter {
+            accept TextMessage textMessage {
+                emit npl.TextMessage {
+                    message { 
+                        text textMessage.text
+                    }
+                }
+            }
+
+            // This is how we can test this process
+            test 'Should convert app text messages to standard messages' {
+                emit app.TextMessage {
+                    message { 
+                        text 'Test message'
+                    }
+                }
+                expect npl.TextMessage {
+                    message { 
+                        text 'Test message'
+                    }
+                }
+            }
+        }
+    }
+}
+
+// The main network contains all of the routing for the application, and defines how the functional blocks of the application are wired up
+namespace app {
+    network main {
+        // Define a helloWorkd entry point that is handled by the helloWorld pipe
+        ingress egress helloWorld pipe helloWorld
+
+        // In a more complex application, this pipe defiinition should be in a separate source file
+        pipe helloWorld {
+            // Route all types of message
+            route * {
+                // Delete any route associated with the incomming message
+                clear
+
+                // Capture any TextMessage messages output during the processing of this message
+                // and send them to the default entry point on the consoleOutput network
+                capture TextMessage {
+                    prepend { network consoleOutput }
+                }
+
+                // Route the message to the hello network for processing
+                prepend {
+                    network hello
+                }
+            }
+        }
+    }
+}
+
+// Finally the application wires the main network to the outside world
+namespace app {
+    application helloWorld {
+        // npl.scheduling.Emitter periodically emits an empty message
+        connection Emitter emitter {
+            config { 
+                count 1 // Emit 1 message and stop
+                interval 0 // Infinite delay between messages
+            }
+
+            // Send messages from the Emitter to the helloWorld entry point on the main network
+            ingress main.helloWorld
+        }
+
+        // npl.io.Console lets you send text to the console output
+        connection npl.io.Console console {
+            config { 
+                // Configure the console to output a line of text for each message received
+                mode npl.io.ConsoleMode.lines
+            }
+
+            // Collect output from the main network's helloWorld entry point for the console connection
+            egress main.helloWorld
+        }
+    }
+}
