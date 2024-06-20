@@ -34,6 +34,7 @@ import {
     networkGraphBuilder,
     messageRouteGraphBuilder,
     assignmentExpressionGraphBuilder,
+    messageConstructorGraphBuilder,
 } from './index.js';
 
 import { defineDataTypeGraph } from './dataTypeGraph.js';
@@ -70,6 +71,7 @@ import { defineUsingGraph } from './usingGraph.js';
 import { defineVarGraph } from './varGraph.js';
 import { defineNetworkGraph } from './networkGraph.js';
 import { defineMessageRouteGraph } from './messageRouteGraph.js';
+import { defineMessageConstructorGraph } from './messageConstructorGraph.js';
 
 export function buildNplSyntaxGraph(): SyntaxGraph {
     defineApplicationConnectionGraph(applicationConnectionGraphBuilder);
@@ -86,6 +88,7 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineEnumGraph(enumGraphBuilder);
     defineEolGraph(eolGraphBuilder);
     defineExpectGraph(expectGraphBuilder);
+    defineMessageConstructorGraph(messageConstructorGraphBuilder);
     defineMessageContextGraph(messageContextGraphBuilder);
     defineMessageDefinitionGraph(messageDefinitionGraphBuilder);
     defineMessageInitGraph(messageInitGraphBuilder);

@@ -18,6 +18,7 @@ import {
 import {
     assignmentExpressionGraph,
     eolGraph,
+    messageConstructorGraph,
     parseEndFunctionCallSymbol,
     parseEndIndexerSymbol,
     parseEndListLiteralSymbol,
@@ -220,6 +221,7 @@ export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
         .subGraph('operator', binaryOperatorGraphBuilder.build(), 'second-term')
         .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
         .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('message-literal', messageConstructorGraph, 'operator')
     .graph.state('second-term')
         .subGraph('second-term', expressionTermGraphBuilder.build(), 'operator')
     .graph.build();
