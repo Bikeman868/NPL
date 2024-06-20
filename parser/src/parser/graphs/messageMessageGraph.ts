@@ -7,7 +7,7 @@ import {
     parseCloseScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, expressionGraph } from './index.js';
+import { eolGraph, assignmentExpressionGraph } from './index.js';
 
 /* Examples
 
@@ -35,9 +35,9 @@ export function defineMessageMessageGraph(builder: GraphBuilder) {
         .subGraph('blank-line', eolGraph, 'fields')
         .transition('message field name', parseIdentifier, skipSeparators, 'field-value')
     .graph.state('single-field')
-        .subGraph('single-expression', expressionGraph)
+        .subGraph('single-expression', assignmentExpressionGraph)
     .graph.state('field-value')
-        .subGraph('expression', expressionGraph, 'fields')
+        .subGraph('expression', assignmentExpressionGraph, 'fields')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

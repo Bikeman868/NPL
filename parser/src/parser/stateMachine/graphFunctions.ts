@@ -68,7 +68,8 @@ function tryStartGraph(context: IContext, syntaxGraph: SyntaxGraph, graphName: s
 
     for (const subGraphName of syntaxGraph.start.subGraphNames) {
         const subGraph = syntaxGraph.subGraphs.get(subGraphName);
-        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
+        if (!subGraph)
+            throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
 
         const subGraphResult = tryStartGraph(context, subGraph.graph, subGraphName);
 
@@ -163,7 +164,8 @@ function parseFromState(
     // See if any of the sub-graphs match the input stream
     for (const subGraphName of currentState.subGraphNames) {
         const subGraph = syntaxGraph.subGraphs.get(subGraphName);
-        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
+        if (!subGraph)
+            throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
 
         const subGraphResult = tryStartGraph(context, subGraph.graph, subGraphName);
 

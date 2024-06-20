@@ -38,6 +38,32 @@ export class GraphBuilder {
         return stateBuilder;
     }
 
+    private _checkIsGraphBuilt(graph: SyntaxGraph, visited: Set<SyntaxGraph>): void {
+        if (visited.has(graph)) return;
+        visited.add(graph);
+
+        if (!graph.start.subGraphNames || graph.start.subGraphNames.length == 0) {
+            if (!graph.start.transitions || graph.start.transitions.length == 0)
+                throw Error(`The ${graph.start.name} graph has no start sub-graphs or start transitions`);
+        }
+
+        for (let subGraph of graph.subGraphs) {
+            const subGraphTranstion = subGraph[1];
+            if (!subGraphTranstion || !subGraphTranstion.graph)
+                throw Error(`The ${subGraph[0]} sub-graph of the ${graph.start.name} graph is undefined`);
+            this._checkIsGraphBuilt(subGraphTranstion.graph, visited);
+        }
+    }
+
+    checkIsBuilt(): void {
+        const checkedGraphs = new Set<SyntaxGraph>();
+        try {
+            this._checkIsGraphBuilt(this._graph, checkedGraphs);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     get graph(): GraphBuilder {
         return this;
     }

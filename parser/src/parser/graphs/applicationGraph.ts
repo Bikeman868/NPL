@@ -7,12 +7,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { 
-    applicationConnectionGraph, 
-    configGraph,
-    eolGraph,
-    parseApplicationKeyword,
-} from './index.js';
+import { applicationConnectionGraph, configGraph, eolGraph, parseApplicationKeyword } from './index.js';
 
 // prettier-ignore
 /* Examples

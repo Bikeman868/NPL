@@ -16,7 +16,7 @@ const sourceFileBytes = readFileSync(process.argv[2]);
 const sourceFileText = sourceFileBytes.toString('utf8', 0, sourceFileBytes.length);
 
 // The syntax graph defines the syntax of the NPL language
-const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph()
+const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
 
 // The parser requires parsable text
 const buffer = new ParsableString(sourceFileText);

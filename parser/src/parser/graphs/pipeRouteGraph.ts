@@ -8,7 +8,13 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, parseAnyMessageTypeKeyword, parseEmptyKeyword, parseRouteKeyword, routingStatementGraph } from './index.js';
+import {
+    eolGraph,
+    parseAnyMessageTypeKeyword,
+    parseEmptyKeyword,
+    parseRouteKeyword,
+    routingStatementGraph,
+} from './index.js';
 
 /* Examples
 

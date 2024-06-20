@@ -15,13 +15,23 @@ import {
     parseString,
     skipSeparators,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, parseEndFunctionCallSymbol, parseEndIndexerSymbol, parseEndListLiteralSymbol, parseEndSubExpressionSymbol, parseStartFunctionCallSymbol, parseStartIndexerSymbol, parseStartListLiteralSymbol, parseStartSubExpressionSymbol } from './index.js';
+import {
+    assignmentExpressionGraph,
+    eolGraph,
+    parseEndFunctionCallSymbol,
+    parseEndIndexerSymbol,
+    parseEndListLiteralSymbol,
+    parseEndSubExpressionSymbol,
+    parseStartFunctionCallSymbol,
+    parseStartIndexerSymbol,
+    parseStartListLiteralSymbol,
+    parseStartSubExpressionSymbol,
+} from './index.js';
 
 const expressionTermGraphBuilder = new GraphBuilder('expression-term');
 const binaryOperatorGraphBuilder = new GraphBuilder('binary-operator');
 const unaryOperatorGraphBuilder = new GraphBuilder('unary-operator');
 const subExpressionGraphBuilder = new GraphBuilder('close-terminated-expression');
-const assignmentExpressionGraphBuilder = new GraphBuilder('eol-terminated-expression');
 const indexExpressionGraphBuilder = new GraphBuilder('array-index-expression');
 const functionCallGraphBuilder = new GraphBuilder('function-call');
 const literalListGraphBuilder = new GraphBuilder('literal-list');
@@ -103,7 +113,7 @@ literalListGraphBuilder
     .graph.state('elements')
         .transition(closeSquareBracket, parseEndListLiteralSymbol, skipSeparators)
         .subGraph('list-blank-line', eolGraph, 'elements')
-        .subGraph('list-element', assignmentExpressionGraphBuilder.build(), 'elements')
+        .subGraph('list-element', assignmentExpressionGraph, 'elements')
     .graph.build();
 
 // prettier-ignore
@@ -201,7 +211,7 @@ functionCallGraphBuilder
     }<EOL>
 
 */
-export function defineExpressionGraph(builder: GraphBuilder) {
+export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
         .subGraph('term', expressionTermGraphBuilder.build(), 'operator')

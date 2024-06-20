@@ -1,13 +1,7 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
-import {
-    buildKeywordParser,
-    skipSeparators,
-    parseOpenScope,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
+import { buildKeywordParser, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
 import { configFieldGraph, eolGraph } from './index.js';
-
 
 // prettier-ignore
 /* Examples

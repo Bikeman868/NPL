@@ -1,11 +1,8 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    buildKeywordParser,
-    parseQualifiedIdentifier,
-    skipSeparators,
-} from '../stateMachine/SyntaxParser.js';
-import { expressionGraph, parseSetKeyword } from './index.js';
+import { parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { assignmentExpressionGraph, parseSetKeyword } from './index.js';
 
+// prettier-ignore
 /* Examples
 
     set name 'String value'<EOL>
@@ -13,8 +10,6 @@ import { expressionGraph, parseSetKeyword } from './index.js';
     set nextId message.id + 1<EOL>
 
 */
-
-// prettier-ignore
 export function defineSetGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
@@ -22,6 +17,6 @@ export function defineSetGraph(builder: GraphBuilder) {
     .graph.state('name')
         .transition('const name', parseQualifiedIdentifier, skipSeparators, 'value')
     .graph.state('value')
-        .subGraph('expression', expressionGraph)
+        .subGraph('expression', assignmentExpressionGraph)
     .graph.build();
 }

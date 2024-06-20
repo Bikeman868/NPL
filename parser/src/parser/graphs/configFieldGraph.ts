@@ -1,10 +1,6 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
-import {
-    skipSeparators,
-    parseIdentifier,
-} from '../stateMachine/SyntaxParser.js';
-import { expressionGraph } from './index.js';
-
+import { skipSeparators, parseIdentifier } from '../stateMachine/SyntaxParser.js';
+import { assignmentExpressionGraph } from './index.js';
 
 // prettier-ignore
 /* Examples
@@ -17,6 +13,6 @@ export function defineConfigFieldGraph(builder: GraphBuilder) {
     .graph.start
         .transition('field name', parseIdentifier, skipSeparators, 'field-value')
     .graph.state('field-value')
-        .subGraph('default value', expressionGraph)
+        .subGraph('default value', assignmentExpressionGraph)
     .graph.build();
 }

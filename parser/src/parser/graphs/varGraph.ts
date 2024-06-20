@@ -1,6 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { buildKeywordParser, parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, expressionGraph, messageLiteralGraph, parseVarKeyword } from './index.js';
+import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { assignmentExpressionGraph, eolGraph, messageLiteralGraph, parseVarKeyword } from './index.js';
 
 // prettier-ignore
 /* Examples
@@ -19,6 +19,6 @@ export function defineVarGraph(builder: GraphBuilder) {
     .graph.state('value')
         .subGraph('no-value', eolGraph)
         .subGraph('message-literal', messageLiteralGraph)
-        .subGraph('initial value expression', expressionGraph)
+        .subGraph('initial value expression', assignmentExpressionGraph)
     .graph.build();
 }

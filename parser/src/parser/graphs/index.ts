@@ -1,6 +1,4 @@
-import {
-    buildKeywordParser, buildSymbolParser,
-} from '../stateMachine/SyntaxParser.js';
+import { buildKeywordParser, buildSymbolParser } from '../stateMachine/SyntaxParser.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { closeRoundBracket, closeSquareBracket, openRoundBracket, openSquareBracket } from '#interfaces/charsets.js';
 
@@ -46,6 +44,8 @@ export const parseEndFunctionCallSymbol = buildSymbolParser(closeRoundBracket, '
 
 export const applicationConnectionGraphBuilder = new GraphBuilder('connection');
 export const applicationGraphBuilder = new GraphBuilder('application');
+export const assignmentExpressionGraphBuilder = new GraphBuilder('assignment-expression');
+export const conditionalExpressionGraphBuilder = new GraphBuilder('conditional-expression');
 export const configGraphBuilder = new GraphBuilder('config');
 export const configFieldGraphBuilder = new GraphBuilder('config-field');
 export const constGraphBuilder = new GraphBuilder('const');
@@ -56,8 +56,6 @@ export const emitGraphBuilder = new GraphBuilder('emit');
 export const enumGraphBuilder = new GraphBuilder('enum');
 export const eolGraphBuilder = new GraphBuilder('eol');
 export const expectGraphBuilder = new GraphBuilder('expect');
-export const expressionGraphBuilder = new GraphBuilder('expression');
-export const conditionalExpressionGraphBuilder = new GraphBuilder('conditional-expression');
 export const messageContextGraphBuilder = new GraphBuilder('message-context');
 export const messageDefinitionGraphBuilder = new GraphBuilder('message-definition');
 export const messageInitGraphBuilder = new GraphBuilder('message-init');
@@ -81,6 +79,8 @@ export const varGraphBuilder = new GraphBuilder('var');
 
 export const applicationConnectionGraph = applicationConnectionGraphBuilder.build();
 export const applicationGraph = applicationGraphBuilder.build();
+export const assignmentExpressionGraph = assignmentExpressionGraphBuilder.build();
+export const conditionalExpressionGraph = conditionalExpressionGraphBuilder.build();
 export const configGraph = configGraphBuilder.build();
 export const configFieldGraph = configFieldGraphBuilder.build();
 export const constGraph = constGraphBuilder.build();
@@ -91,8 +91,6 @@ export const emitGraph = emitGraphBuilder.build();
 export const enumGraph = enumGraphBuilder.build();
 export const eolGraph = eolGraphBuilder.build();
 export const expectGraph = expectGraphBuilder.build();
-export const expressionGraph = expressionGraphBuilder.build();
-export const conditionalExpressionGraph = conditionalExpressionGraphBuilder.build();
 export const messageContextGraph = messageContextGraphBuilder.build();
 export const messageDefinitionGraph = messageDefinitionGraphBuilder.build();
 export const messageInitGraph = messageInitGraphBuilder.build();

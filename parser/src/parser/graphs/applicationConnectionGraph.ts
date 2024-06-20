@@ -8,12 +8,7 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { 
-    parseIngressKeyword,
-    parseEgressKeyword,
-    configGraph,
-    eolGraph,
-} from './index.js';
+import { parseIngressKeyword, parseEgressKeyword, configGraph, eolGraph } from './index.js';
 
 // prettier-ignore
 /* Examples

@@ -8,7 +8,22 @@ import {
     parseCloseScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { conditionalExpressionGraph, constGraph, emitGraph, eolGraph, parseAcceptKeyword, parseAnyMessageTypeKeyword, parseConditionalKeyword, parseEmptyKeyword, parseForKeyword, parseForOfInKeyword, processAwaitGraph, processRouteGraph, setGraph, varGraph } from './index.js';
+import {
+    conditionalExpressionGraph,
+    constGraph,
+    emitGraph,
+    eolGraph,
+    parseAcceptKeyword,
+    parseAnyMessageTypeKeyword,
+    parseConditionalKeyword,
+    parseEmptyKeyword,
+    parseForKeyword,
+    parseForOfInKeyword,
+    processAwaitGraph,
+    processRouteGraph,
+    setGraph,
+    varGraph,
+} from './index.js';
 
 const statementGraphBuilder: GraphBuilder = new GraphBuilder('process-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-scope-block');

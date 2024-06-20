@@ -6,7 +6,14 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph, parseEmptyKeyword, parseExpectKeyword } from './index.js';
+import {
+    eolGraph,
+    messageContextGraph,
+    messageMessageGraph,
+    messageRouteGraph,
+    parseEmptyKeyword,
+    parseExpectKeyword,
+} from './index.js';
 
 // prettier-ignore
 /* Examples

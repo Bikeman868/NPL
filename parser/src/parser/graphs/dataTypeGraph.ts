@@ -10,7 +10,6 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import { dataTypeGraph } from './index.js';
 
-
 // prettier-ignore
 /* Examples
 
@@ -23,7 +22,7 @@ import { dataTypeGraph } from './index.js';
     app.RequestMessage
 
 */
-export function buildDataTypeGraph(builder: GraphBuilder) {
+export function defineDataTypeGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
         .transition('"string", "number", "date", "boolean", "string[]", "number[]", "date[]", "boolean[]"', parseBasicType, skipSeparators)

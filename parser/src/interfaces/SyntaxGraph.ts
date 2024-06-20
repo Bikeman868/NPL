@@ -1,5 +1,5 @@
-import { State } from "#interfaces/State.js";
-import { SubGraphTransition } from "#interfaces/SubGraphTransition.js";
+import { State } from '#interfaces/State.js';
+import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
 
 /**
  * Represents a state transition graph comprising states, state transitions and sub-graphs
@@ -12,4 +12,3 @@ export type SyntaxGraph = {
     states: Map<string, State>;
     subGraphs: Map<string, SubGraphTransition>;
 };
-

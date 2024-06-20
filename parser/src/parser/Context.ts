@@ -16,11 +16,7 @@ export class Context implements IContext {
     debugLogging: (context: IContext) => boolean = () => false;
     traceLogging: (context: IContext) => boolean = () => false;
 
-    constructor(
-        buffer: IParsable,
-        syntaxGraph: SyntaxGraph,
-        isDryRun?: boolean, 
-        debugOutput?: (line: String) => void) {
+    constructor(buffer: IParsable, syntaxGraph: SyntaxGraph, isDryRun?: boolean, debugOutput?: (line: String) => void) {
         this._buffer = buffer;
         this._syntaxGraph = syntaxGraph;
         this._isDryRun = !!isDryRun;

@@ -6,12 +6,12 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { 
-    eolGraph, 
-    messageContextGraph, 
+import {
+    eolGraph,
+    messageContextGraph,
     messageMessageGraph,
-    messageRouteGraph, 
-    parseEmitKeyword, 
+    messageRouteGraph,
+    parseEmitKeyword,
     parseEmptyKeyword,
 } from './index.js';
 

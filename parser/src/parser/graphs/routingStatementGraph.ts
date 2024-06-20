@@ -7,9 +7,21 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { conditionalExpressionGraph, destinationGraph, eolGraph, parseAnyMessageTypeKeyword, parseCaptureKeyword, parseClearKeyword, parseConditionalKeyword, parseElseKeyword, parseEmptyKeyword, parseForKeyword, parseRouteEndKeyword } from './index.js';
+import {
+    conditionalExpressionGraph,
+    destinationGraph,
+    eolGraph,
+    parseAnyMessageTypeKeyword,
+    parseCaptureKeyword,
+    parseClearKeyword,
+    parseConditionalKeyword,
+    parseElseKeyword,
+    parseEmptyKeyword,
+    parseForKeyword,
+    parseRouteEndKeyword,
+    routingStatementGraph,
+} from './index.js';
 
-const statementGraphBuilder = new GraphBuilder('routing-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('route-scope-block');
 const captureGraphBuilder = new GraphBuilder('route-message-capture');
 
@@ -21,7 +33,7 @@ const captureGraphBuilder = new GraphBuilder('route-message-capture');
     capture empty {
         clear
         append process ns1.process1
-    }
+    }<EOL>
 
 */
 captureGraphBuilder
@@ -33,11 +45,11 @@ captureGraphBuilder
         .transition('the type of message to capture', parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
-        .subGraph('single-route', statementGraphBuilder.build())
+        .subGraph('single-route', routingStatementGraph)
     .graph.state('statements')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
-        .subGraph('multi-route', statementGraphBuilder.build(), 'statements')
+        .subGraph('multi-route', routingStatementGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
@@ -52,11 +64,11 @@ captureGraphBuilder
 */
 statemenScopeBlockGraphBuilder
     .graph.start
-        .subGraph('first-statement', statementGraphBuilder.build(), 'statements')
+        .subGraph('first-statement', routingStatementGraph, 'statements')
     .graph.state('statements')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
-        .subGraph('next-statement', statementGraphBuilder.build(), 'statements')
+        .subGraph('next-statement', routingStatementGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

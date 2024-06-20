@@ -1,9 +1,5 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    parseQualifiedIdentifier,
-    skipSeparators,
-    skipWhitespace,
-} from '../stateMachine/SyntaxParser.js';
+import { parseQualifiedIdentifier, skipSeparators, skipWhitespace } from '../stateMachine/SyntaxParser.js';
 import { parseUsingKeyword } from './index.js';
 
 // prettier-ignore
