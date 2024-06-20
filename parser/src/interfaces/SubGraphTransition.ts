@@ -1,4 +1,4 @@
-import { Graph } from './Graph.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 /**
  * Represents a possible transition to a new state via a sub-graph
@@ -7,7 +7,7 @@ export type SubGraphTransition = {
     /**
      * The sub-graph to use for parsing the input stream
      */
-    graph: Graph;
+    graph: SyntaxGraph;
     /**
      * The state to transition to when the sub-graph completes, or undefined to return from this graph
      */

@@ -1,5 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -38,7 +37,7 @@ const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 */
 
 // prettier-ignore
-export const namespaceGraph: Graph = new GraphBuilder('namespace')
+export const namespaceGraph = new GraphBuilder('namespace')
     .graph.start
         .transition('"namespace"', parseNamespace, skipSeparators, 'name')
     .graph.state('name')

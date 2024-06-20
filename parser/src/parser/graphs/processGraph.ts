@@ -1,5 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -39,7 +38,7 @@ const parseProcess = buildKeywordParser(['process'], 'Keyword');
 */
 
 // prettier-ignore
-export const processGraph: Graph = new GraphBuilder('process')
+export const processGraph = new GraphBuilder('process')
     .graph.start.
         transition('"process"', parseProcess, skipSeparators, 'name')
     .graph.state('name')

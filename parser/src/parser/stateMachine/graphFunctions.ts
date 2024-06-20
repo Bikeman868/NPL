@@ -1,21 +1,9 @@
 import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '../ParseResult.js';
-import { State } from './State.js';
-import { SubGraphTransition } from './SubGraphTransition.js';
+import { State } from '#interfaces/State.js';
 import { whitespace } from '#interfaces/charsets.js';
-import { StateTransition } from './StateTransition.js';
-
-/**
- * Represents a state transition graph comprising states, state transitions and sub-graphs
- * Sub-graphs are state transition graphs that are repeated in multiple places in the parent,
- * graph and avoid repetition. The same sub-graph can appear multiple times in a graph with
- * different transitions to/from other states.
- */
-export type Graph = {
-    start: State;
-    states: Map<string, State>;
-    subGraphs: Map<string, SubGraphTransition>;
-};
+import { StateTransition } from '#interfaces/StateTransition.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 enum GraphParsingOutcome {
     NotParsed,
@@ -36,14 +24,14 @@ type GraphParsingResult = {
  * If the input was not parsed, then the context path is not changed.
  * @param graphName is the name of this graph reference in the parent graph and is undefined if this it the root graph
  */
-function tryStartGraph(context: IContext, graph: Graph, graphName: string | undefined): GraphParsingResult {
+function tryStartGraph(context: IContext, syntaxGraph: SyntaxGraph, graphName: string | undefined): GraphParsingResult {
     context.trace(() => {
         // prettier-ignore
-        return `Testing ${graph.start.name}${graphName ? ':' + graphName : ''} graph`;
+        return `Testing ${syntaxGraph.start.name}${graphName ? ':' + graphName : ''} graph`;
     });
 
     // Check for transitions to an initial state
-    for (const transition of graph.start.transitions) {
+    for (const transition of syntaxGraph.start.transitions) {
         context.trace(() => {
             return `Testing '${transition.description}' transition`;
         });
@@ -72,15 +60,15 @@ function tryStartGraph(context: IContext, graph: Graph, graphName: string | unde
     }
 
     context.trace(() => {
-        return `No matching start transitions in '${graph.start.name}'}`;
+        return `No matching start transitions in '${syntaxGraph.start.name}'}`;
     });
 
     // Assumne that we will be starting with a sub-graph and pop this later if not
     context.pushPath(graphName);
 
-    for (const subGraphName of graph.start.subGraphNames) {
-        const subGraph = graph.subGraphs.get(subGraphName);
-        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${graph.start.name}" graph`);
+    for (const subGraphName of syntaxGraph.start.subGraphNames) {
+        const subGraph = syntaxGraph.subGraphs.get(subGraphName);
+        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
 
         const subGraphResult = tryStartGraph(context, subGraph.graph, subGraphName);
 
@@ -116,7 +104,7 @@ function tryStartGraph(context: IContext, graph: Graph, graphName: string | unde
     if (context.popPath() != graphName) throw Error(`Internal error: Popped sub-graph should have been "${graphName}"`);
 
     context.trace(() => {
-        return `No matching start sub-graphs in '${graph.start.name}'`;
+        return `No matching start sub-graphs in '${syntaxGraph.start.name}'`;
     });
     return { outcome: GraphParsingOutcome.NotParsed };
 }
@@ -129,7 +117,7 @@ function tryStartGraph(context: IContext, graph: Graph, graphName: string | unde
  */
 function parseFromState(
     context: IContext,
-    graph: Graph,
+    syntaxGraph: SyntaxGraph,
     currentState: State,
     graphName: string | undefined,
 ): GraphParsingResult {
@@ -174,8 +162,8 @@ function parseFromState(
 
     // See if any of the sub-graphs match the input stream
     for (const subGraphName of currentState.subGraphNames) {
-        const subGraph = graph.subGraphs.get(subGraphName);
-        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${graph.start.name}" graph`);
+        const subGraph = syntaxGraph.subGraphs.get(subGraphName);
+        if (!subGraph) throw Error(`Internal error: No "${subGraphName}" sub-graph in "${syntaxGraph.start.name}" graph`);
 
         const subGraphResult = tryStartGraph(context, subGraph.graph, subGraphName);
 
@@ -207,18 +195,18 @@ function parseFromState(
         }
     }
 
-    noValidTransitions(context, graph, currentState);
+    noValidTransitions(context, syntaxGraph, currentState);
     return { outcome: GraphParsingOutcome.NotParsed };
 }
 
 /**
  * Logs a syntax error when there are no paths forwards on the syntax graph
  */
-function noValidTransitions(context: IContext, graph: Graph, state: State): void {
+function noValidTransitions(context: IContext, syntaxGraph: SyntaxGraph, state: State): void {
     let options: string[] = listStateTransitions(state);
 
     for (const subGraphName of state.subGraphNames) {
-        const subGraph = graph.subGraphs.get(subGraphName);
+        const subGraph = syntaxGraph.subGraphs.get(subGraphName);
         if (subGraph) {
             options = options.concat(listGraphStartOptions(subGraph.graph));
         }
@@ -248,11 +236,11 @@ function skipWhitespaceAfterTransition(context: IContext, transition: StateTrans
     }
 }
 
-function listGraphStartOptions(graph: Graph): string[] {
-    let options = listStateTransitions(graph.start);
+function listGraphStartOptions(syntaxGraph: SyntaxGraph): string[] {
+    let options = listStateTransitions(syntaxGraph.start);
 
-    for (const subGraphName of graph.start.subGraphNames) {
-        const subGraph = graph.subGraphs.get(subGraphName);
+    for (const subGraphName of syntaxGraph.start.subGraphNames) {
+        const subGraph = syntaxGraph.subGraphs.get(subGraphName);
         if (subGraph) {
             options = options.concat(listGraphStartOptions(subGraph.graph));
         }
@@ -277,7 +265,7 @@ function listStateTransitions(state: State): string[] {
  */
 function parseGraphRecursive(
     context: IContext,
-    graph: Graph,
+    syntaxGraph: SyntaxGraph,
     pathIndex: number,
     graphName: string | undefined,
 ): GraphParsingResult {
@@ -285,14 +273,14 @@ function parseGraphRecursive(
     context.trace(() => name);
 
     if (pathIndex == context.pathLength - 1) {
-        const state = graph.states.get(name);
-        if (!state) throw Error(`Internal error: No "${name}" state in "${graph.start.name}" graph`);
+        const state = syntaxGraph.states.get(name);
+        if (!state) throw Error(`Internal error: No "${name}" state in "${syntaxGraph.start.name}" graph`);
 
-        return parseFromState(context, graph, state, graphName);
+        return parseFromState(context, syntaxGraph, state, graphName);
     } else {
         // Branches are sub-graphs
-        const subGraph = graph.subGraphs.get(name);
-        if (!subGraph) throw Error(`Internal error: No "${name}" sub-graph in "${graph.start.name}" graph`);
+        const subGraph = syntaxGraph.subGraphs.get(name);
+        if (!subGraph) throw Error(`Internal error: No "${name}" sub-graph in "${syntaxGraph.start.name}" graph`);
         const result = parseGraphRecursive(context, subGraph.graph, pathIndex + 1, name);
         switch (result.outcome) {
             case GraphParsingOutcome.SubGraphCompleted:
@@ -314,21 +302,21 @@ function parseGraphRecursive(
 /**
  * Parses an input stream, extracting the next token and updating the parsing context
  */
-export function parseNextToken(context: IContext, graph: Graph): ParseResult | undefined {
+export function parseNextToken(context: IContext): ParseResult | undefined {
     if (context.pathLength == 0) {
-        const graphParsingResult = tryStartGraph(context, graph, undefined);
-        if (graphParsingResult.outcome == GraphParsingOutcome.NotParsed) {
+        const result = tryStartGraph(context, context.syntaxGraph, undefined);
+        if (result.outcome == GraphParsingOutcome.NotParsed) {
             context.debug(() => 'Failed to parse root graph');
             context.buffer.skipAny(whitespace);
             if (!context.buffer.isEof()) {
-                noValidTransitions(context, graph, graph.start);
+                noValidTransitions(context, context.syntaxGraph, context.syntaxGraph.start);
             }
             return undefined;
         } else {
-            return graphParsingResult.parseResult!;
+            return result.parseResult!;
         }
     } else {
-        const graphParsingResult = parseGraphRecursive(context, graph, 0, undefined);
-        return graphParsingResult.parseResult;
+        const result = parseGraphRecursive(context, context.syntaxGraph, 0, undefined);
+        return result.parseResult;
     }
 }

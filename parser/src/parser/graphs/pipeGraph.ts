@@ -1,5 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -28,7 +27,7 @@ import { pipeRouteGraph } from './pipeRouteGraph.js';
 const parsePipe = buildKeywordParser(['pipe'], 'Keyword');
 
 // prettier-ignore
-export const pipeGraph: Graph = new GraphBuilder('pipe')
+export const pipeGraph = new GraphBuilder('pipe')
     .graph.start
         .transition('"pipe"', parsePipe, skipSeparators, 'name')
     .graph.state('name')

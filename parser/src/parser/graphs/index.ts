@@ -27,6 +27,7 @@ export const destinationGraphBuilder = new GraphBuilder('destination');
 export const destinationListGraphBuilder = new GraphBuilder('destination-list');
 export const emitGraphBuilder = new GraphBuilder('emit');
 export const enumGraphBuilder = new GraphBuilder('enum');
+export const eolGraphBuilder = new GraphBuilder('eol');
 
 
 export const applicationConnectionGraph = applicationConnectionGraphBuilder.build();
@@ -39,3 +40,4 @@ export const destinationGraph = destinationGraphBuilder.build();
 export const destinationListGraph = destinationListGraphBuilder.build();
 export const emitGraph = emitGraphBuilder.build();
 export const enumGraph = enumGraphBuilder.build();
+export const eolGraph = eolGraphBuilder.build();

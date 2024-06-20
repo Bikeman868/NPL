@@ -1,5 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -10,9 +9,8 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import { processGraph } from './processGraph.js';
 import { pipeGraph } from './pipeGraph.js';
-import { destinationListGraph } from './destinationListGraph.js';
 import { eolGraph } from './eolGraph.js';
-import { configGraph } from './index.js';
+import { configGraph, destinationListGraph } from './index.js';
 
 /* Examples
 
@@ -51,7 +49,7 @@ const parseEgress = buildKeywordParser(['egress'], 'Keyword');
 const parseDefault = buildKeywordParser(['default'], 'Keyword');
 
 // prettier-ignore
-const entrypointGraph: Graph = new GraphBuilder('network-entry')
+const entrypointGraph = new GraphBuilder('network-entry')
     .start
         .transition('ingress', parseIngress, skipSeparators, 'ingress')
         .transition('egress', parseEgress, skipSeparators, 'egress')
@@ -69,7 +67,7 @@ const entrypointGraph: Graph = new GraphBuilder('network-entry')
     .graph.build();
 
 // prettier-ignore
-export const networkGraph: Graph = new GraphBuilder('network')
+export const networkGraph = new GraphBuilder('network')
     .graph.start
         .transition('"network"', parseNetwork, skipSeparators, 'name')
     .graph.state('name')

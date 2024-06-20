@@ -1,10 +1,10 @@
-import { SyntaxParser, WhitespaceSkipper } from './SyntaxParser';
-import { Graph } from './Graph.js';
-import { State } from './State.js';
-import { SubGraphTransition } from './SubGraphTransition.js';
+import { SyntaxParser, WhitespaceSkipper } from './SyntaxParser.js';
+import { State } from '#interfaces/State.js';
+import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 export class GraphBuilder {
-    private _graph: Graph;
+    private _graph: SyntaxGraph;
 
     constructor(name: string) {
         this._graph = {
@@ -35,7 +35,7 @@ export class GraphBuilder {
         return new GraphStartBuilder(this);
     }
 
-    build(): Graph {
+    build(): SyntaxGraph {
         return this._graph;
     }
 
@@ -54,13 +54,13 @@ export class GraphBuilder {
         return this;
     }
 
-    startSubGraph(name: string, graph: Graph, nextStateName?: string): GraphBuilder {
+    startSubGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphBuilder {
         this.defineSubGraph(name, graph, nextStateName);
         this._graph.start.subGraphNames.push(name);
         return this;
     }
 
-    defineSubGraph(name: string, graph: Graph, nextStateName?: string) {
+    defineSubGraph(name: string, graph: SyntaxGraph, nextStateName?: string) {
         if (this._graph.subGraphs.get(name))
             throw Error(`There are two ${name} sub-graphs in the ${this._graph.start.name} graph`);
 
@@ -92,7 +92,7 @@ export class GraphStartBuilder {
         return this._graphBuilder;
     }
 
-    subGraph(name: string, graph: Graph, nextStateName?: string): GraphStartBuilder {
+    subGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphStartBuilder {
         this._graphBuilder.startSubGraph(name, graph, nextStateName);
         return this;
     }
@@ -134,7 +134,7 @@ export class GraphStateBuilder {
         return this._state;
     }
 
-    subGraph(name: string, graph: Graph, nextStateName?: string): GraphStateBuilder {
+    subGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphStateBuilder {
         this._graphBuilder.defineSubGraph(name, graph, nextStateName);
         this._state.subGraphNames.push(name);
         return this;

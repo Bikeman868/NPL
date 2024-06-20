@@ -5,6 +5,7 @@ import { ParsableString } from './ParsableString.js';
 import { IToken } from '#interfaces/IToken.js';
 import { TokenType } from '#interfaces/TokenType.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
+import { nplGraph } from './graphs/nplGraph.js';
 
 const helloWorld = `using npl.connection
 
@@ -47,7 +48,7 @@ namespace App {
 
 function parse(sourceCode: string): IToken[] {
     const buffer = new ParsableString(sourceCode);
-    const context = new Context(buffer, false);
+    const context = new Context(buffer, nplGraph, false);
     const parser = new Parser();
     const tokens = parser.parse(context);
     return tokens;
@@ -55,7 +56,7 @@ function parse(sourceCode: string): IToken[] {
 
 function syntaxCheck(sourceCode: string): SyntaxError[] {
     const buffer = new ParsableString(sourceCode);
-    const context = new Context(buffer, false);
+    const context = new Context(buffer, nplGraph, false);
     const parser = new Parser();
     parser.parse(context);
     return context.syntaxErrors;

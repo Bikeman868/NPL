@@ -1,5 +1,4 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { Graph } from '../stateMachine/Graph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -19,7 +18,7 @@ const parseMessage = buildKeywordParser(['message'], 'Keyword');
     boolean  flag
 */
 // prettier-ignore
-const messageFieldGraph: Graph = new GraphBuilder('message-field')
+const messageFieldGraph = new GraphBuilder('message-field')
     .graph.start
         .subGraph('type', dataTypeGraph, 'identifier')
     .graph.state('identifier')
@@ -45,7 +44,7 @@ const messageFieldGraph: Graph = new GraphBuilder('message-field')
 */
 
 // prettier-ignore
-export const messageDefinitionGraph: Graph = new GraphBuilder('message-type')
+export const messageDefinitionGraph = new GraphBuilder('message-type')
     .graph.start
         .transition('"message"', parseMessage, skipSeparators, 'name')
     .graph.state('name')
@@ -56,7 +55,7 @@ export const messageDefinitionGraph: Graph = new GraphBuilder('message-type')
         .subGraph('single-field', messageFieldGraph, 'end')
     .graph.state('fields')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
-        .subGraph('blank-line', eolGraph, "fields")
+        .subGraph('blank-line', eolGraph, 'fields')
         .subGraph('field', messageFieldGraph, 'field-end')
     .graph.state('field-end')
         .subGraph('field-end', eolGraph, 'fields')

@@ -1,6 +1,7 @@
 import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 /**
  * The parser is completely stateless. All parsing state is contained
@@ -13,6 +14,7 @@ export interface IContext {
     readonly isDryRun: boolean;
     readonly pathLength: number;
     readonly pathDescription: string;
+    readonly syntaxGraph: SyntaxGraph;
 
     pushPath(name: string | undefined): void;
     popPath(): string | undefined;

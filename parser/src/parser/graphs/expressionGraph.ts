@@ -6,7 +6,7 @@ import {
     openSquareBracket,
     closeSquareBracket,
 } from '#interfaces/charsets.js';
-import { Graph } from 'parser/stateMachine/Graph.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildSymbolParser,
@@ -211,7 +211,7 @@ functionCallGraphBuilder
     }<EOL>
 
 */
-export const expressionGraph: Graph = assignmentExpressionGraphBuilder
+export const expressionGraph = assignmentExpressionGraphBuilder
     .graph.start
         .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
     .graph.state('operator')
@@ -233,7 +233,7 @@ export const expressionGraph: Graph = assignmentExpressionGraphBuilder
     (1 + 2) * (5 + 6) {
 
 */
-export const conditionalExpressionGraph: Graph = conditionalExpressionGraphBuilder
+export const conditionalExpressionGraph = conditionalExpressionGraphBuilder
     .graph.start
         .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
     .graph.state('operator')
