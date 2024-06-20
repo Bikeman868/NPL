@@ -2,24 +2,18 @@ import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
-    buildEolParser,
     buildCloseScopeParser,
-    buildIdentifierParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-
-const parseAwait = buildKeywordParser(['await'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-const parseAll = buildKeywordParser(['*'], 'Keyword');
+import { eolGraph, parseAnyMessageTypeKeyword, parseAwaitKeyword, parseEmptyKeyword } from './index.js';
 
 // prettier-ignore
 const messageTypeGraph = new GraphBuilder('await-message-type')
-    .graph.startTransition('"empty"', parseEmpty, skipSeparators)
-    .graph.startTransition('"*"', parseAll, skipSeparators)
+    .graph.startTransition('"empty"', parseEmptyKeyword, skipSeparators)
+    .graph.startTransition('"*"', parseAnyMessageTypeKeyword, skipSeparators)
     .graph.startTransition('identifier or message type', parseQualifiedIdentifier, skipSeparators)
     .graph.build();
 
@@ -37,9 +31,10 @@ const messageTypeGraph = new GraphBuilder('await-message-type')
 */
 
 // prettier-ignore
-export const processAwaitGraph = new GraphBuilder('await')
+export function defineProcessAwaitGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"await"', parseAwait, skipSeparators, 'message-type')
+        .transition('"await"', parseAwaitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'multiple-message-types')
         .subGraph('single-message-type', messageTypeGraph, 'single-identifier')
@@ -58,3 +53,4 @@ export const processAwaitGraph = new GraphBuilder('await')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

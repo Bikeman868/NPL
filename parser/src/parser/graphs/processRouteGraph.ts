@@ -7,8 +7,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { routingStatementGraph } from './routingStatementGraph.js';
-import { eolGraph } from './eolGraph.js';
+import { eolGraph, routingStatementGraph } from './index.js';
 
 /** Examples
 
@@ -31,7 +30,8 @@ import { eolGraph } from './eolGraph.js';
 const parseRoute = buildKeywordParser(['route'], 'Keyword');
 
 // prettier-ignore
-export const processRouteGraph = new GraphBuilder('process-route')
+export function defineProcessRouteGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"route"', parseRoute, skipSeparators, 'identifier')
     .graph.state('identifier')
@@ -47,3 +47,4 @@ export const processRouteGraph = new GraphBuilder('process-route')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

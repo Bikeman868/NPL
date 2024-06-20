@@ -8,8 +8,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { routingStatementGraph } from './routingStatementGraph.js';
-import { eolGraph } from './eolGraph.js';
+import { eolGraph, parseAnyMessageTypeKeyword, parseEmptyKeyword, parseRouteKeyword, routingStatementGraph } from './index.js';
 
 /* Examples
 
@@ -30,17 +29,14 @@ import { eolGraph } from './eolGraph.js';
     }<EOL>
 */
 
-const parseRoute = buildKeywordParser(['route'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-const parseAnyType = buildSymbolParser('*', 'Keyword');
-
 // prettier-ignore
-export const pipeRouteGraph = new GraphBuilder('pipe-route')
+export function definePipeRouteGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"route"', parseRoute, skipSeparators, 'message-type')
+        .transition('"route"', parseRouteKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmpty, skipSeparators, 'identifier')
-        .transition('"*"', parseAnyType, skipSeparators, 'identifier')
+        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'identifier')
+        .transition('"*"', parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
         .transition('the type of message to route', parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
@@ -52,3 +48,4 @@ export const pipeRouteGraph = new GraphBuilder('pipe-route')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

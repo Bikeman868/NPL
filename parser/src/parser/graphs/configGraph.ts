@@ -1,12 +1,12 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
     skipSeparators,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { configFieldGraph, configGraphBuilder } from './index.js';
+import { configFieldGraph, eolGraph } from './index.js';
 
 
 // prettier-ignore
@@ -19,7 +19,8 @@ import { configFieldGraph, configGraphBuilder } from './index.js';
         protocol 'http'
     }<EOL>
 */
-configGraphBuilder
+export function defineConfigGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"config"', buildKeywordParser(['config'], 'Keyword'), skipSeparators, 'definition')
     .graph.state('definition')
@@ -33,3 +34,4 @@ configGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

@@ -7,8 +7,7 @@ import {
     parseCloseScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { expressionGraph } from './expressionGraph.js';
+import { eolGraph, expressionGraph } from './index.js';
 
 /* Examples
 
@@ -24,7 +23,8 @@ import { expressionGraph } from './expressionGraph.js';
 const parseMessage = buildKeywordParser(['message'], 'Keyword');
 
 // prettier-ignore
-export const messageMessageGraph = new GraphBuilder('message-message')
+export function defineMessageMessageGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"message"', parseMessage, skipSeparators, 'definition')
     .graph.state('definition')
@@ -41,3 +41,4 @@ export const messageMessageGraph = new GraphBuilder('message-message')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

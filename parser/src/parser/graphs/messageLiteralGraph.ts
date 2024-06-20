@@ -1,12 +1,9 @@
 // prettier-ignore
 
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
-import { messageMessageGraph } from './messageMessageGraph.js';
-import { messageContextGraph } from './messageContextGraph.js';
-import { messageRouteGraph } from './messageRouteGraph.js';
+import { closeCurlyBracket } from '#interfaces/charsets.js';
 import { buildSymbolParser, parseStartMessageLiteral, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
+import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph } from './index.js';
 
 const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral');
 
@@ -26,7 +23,8 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
     }<EOL>
 
 */
-export const messageLiteralGraph = new GraphBuilder('message-literal')
+export function defineMessageLiteralGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('message type', parseStartMessageLiteral, skipSeparators, 'message')
     .graph.state('message')
@@ -38,3 +36,4 @@ export const messageLiteralGraph = new GraphBuilder('message-literal')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

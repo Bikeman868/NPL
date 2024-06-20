@@ -7,10 +7,7 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { processGraph } from './processGraph.js';
-import { pipeGraph } from './pipeGraph.js';
-import { eolGraph } from './eolGraph.js';
-import { configGraph, destinationListGraph } from './index.js';
+import { configGraph, destinationListGraph, eolGraph, pipeGraph, processGraph } from './index.js';
 
 /* Examples
 
@@ -67,7 +64,8 @@ const entrypointGraph = new GraphBuilder('network-entry')
     .graph.build();
 
 // prettier-ignore
-export const networkGraph = new GraphBuilder('network')
+export function defineNetworkGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"network"', parseNetwork, skipSeparators, 'name')
     .graph.state('name')
@@ -90,3 +88,4 @@ export const networkGraph = new GraphBuilder('network')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

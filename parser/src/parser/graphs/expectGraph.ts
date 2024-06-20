@@ -1,17 +1,14 @@
 import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { messageMessageGraph } from './messageMessageGraph.js';
-import { messageContextGraph } from './messageContextGraph.js';
-import { messageRouteGraph } from './messageRouteGraph.js';
+import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph, parseEmptyKeyword, parseExpectKeyword } from './index.js';
 
+// prettier-ignore
 /* Examples
     expect empty<EOL>
 
@@ -56,16 +53,12 @@ import { messageRouteGraph } from './messageRouteGraph.js';
         }
     }<EOL>
 */
-
-const parseExpect = buildKeywordParser(['expect'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-
-// prettier-ignore
-export const expectGraph = new GraphBuilder('expect')
+export function defineExpectGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"expect"', parseExpect, skipSeparators, 'message-type')
+        .transition('"expect"', parseExpectKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmpty, skipSeparators, 'definition')
+        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'definition')
         .transition('message or message type', parseQualifiedIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'constructor')
@@ -82,3 +75,4 @@ export const expectGraph = new GraphBuilder('expect')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

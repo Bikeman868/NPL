@@ -3,10 +3,12 @@ import { parseNextToken } from './graphFunctions';
 import { ParsableString } from '../ParsableString';
 import { Context } from '../Context';
 import { IContext } from '#interfaces/IContext';
-import { nplGraph } from '../graphs/nplGraph';
 import { ParseResult } from '../ParseResult';
 import { TokenType } from '#interfaces/TokenType';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph';
+import { buildNplSyntaxGraph } from '#parser/graphs/buildNplSyntaxGraph';
+
+const nplGraph = buildNplSyntaxGraph();
 
 function buildContext(sourceCode: string, graph: SyntaxGraph): IContext {
     const buffer = new ParsableString(sourceCode);

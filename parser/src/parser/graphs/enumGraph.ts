@@ -1,12 +1,12 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import {
     parseIdentifier,
     skipSeparators,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { enumGraphBuilder, parseEnumKeyword } from './index.js';
+import { eolGraph, parseEnumKeyword } from './index.js';
 
 // prettier-ignore
 /* Examples
@@ -22,7 +22,8 @@ import { enumGraphBuilder, parseEnumKeyword } from './index.js';
     }<EOL>
 
 */
-enumGraphBuilder
+export function defineEnumGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"enum"', parseEnumKeyword, skipSeparators, 'name')
     .graph.state('name')
@@ -43,3 +44,4 @@ enumGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

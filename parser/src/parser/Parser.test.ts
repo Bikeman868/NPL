@@ -5,7 +5,7 @@ import { ParsableString } from './ParsableString.js';
 import { IToken } from '#interfaces/IToken.js';
 import { TokenType } from '#interfaces/TokenType.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
-import { nplGraph } from './graphs/nplGraph.js';
+import { buildNplSyntaxGraph } from './graphs/buildNplSyntaxGraph.js';
 
 const helloWorld = `using npl.connection
 
@@ -45,6 +45,8 @@ namespace App {
         }
     }
 }`;
+
+const nplGraph = buildNplSyntaxGraph();
 
 function parse(sourceCode: string): IToken[] {
     const buffer = new ParsableString(sourceCode);

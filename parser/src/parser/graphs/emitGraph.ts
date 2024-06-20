@@ -1,17 +1,19 @@
 import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { messageMessageGraph } from './messageMessageGraph.js';
-import { messageContextGraph } from './messageContextGraph.js';
-import { messageRouteGraph } from './messageRouteGraph.js';
-import { emitGraphBuilder, parseEmitKeyword, parseEmptyKeyword } from './index.js';
+import { 
+    eolGraph, 
+    messageContextGraph, 
+    messageMessageGraph,
+    messageRouteGraph, 
+    parseEmitKeyword, 
+    parseEmptyKeyword,
+} from './index.js';
 
 // prettier-ignore
 /* Examples
@@ -58,7 +60,8 @@ import { emitGraphBuilder, parseEmitKeyword, parseEmptyKeyword } from './index.j
         }
     }<EOL>
 */
-emitGraphBuilder
+export function defineEmitGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"emit"', parseEmitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
@@ -79,3 +82,4 @@ emitGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

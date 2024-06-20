@@ -18,6 +18,17 @@ export class GraphBuilder {
         };
     }
 
+    clear(): GraphBuilder {
+        this._graph.start = {
+            name: this._graph.start.name,
+            subGraphNames: [],
+            transitions: [],
+        };
+        this._graph.states = new Map<string, State>();
+        this._graph.subGraphs = new Map<string, SubGraphTransition>([]);
+        return this;
+    }
+
     state(name: string): GraphStateBuilder {
         if (this._graph.states.get(name))
             throw Error(`There are two ${name} states in the ${this._graph.start.name} graph`);

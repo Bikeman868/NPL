@@ -1,7 +1,8 @@
 import {
-    buildKeywordParser,
+    buildKeywordParser, buildSymbolParser,
 } from '../stateMachine/SyntaxParser.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
+import { closeRoundBracket, closeSquareBracket, openRoundBracket, openSquareBracket } from '#interfaces/charsets.js';
 
 /* 
     This source file defines all of the syntax graphs used by the parser
@@ -9,13 +10,39 @@ import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
     in cases where the syntax is recursively nested
 */
 
-export const parseIngressKeyword = buildKeywordParser(['ingress'], 'Keyword');
-export const parseEgressKeyword = buildKeywordParser(['egress'], 'Keyword');
+export const parseAnyMessageTypeKeyword = buildSymbolParser('*', 'Keyword');
+export const parseAcceptKeyword = buildKeywordParser(['accept'], 'Keyword');
+export const parseApplicationKeyword = buildKeywordParser(['application'], 'Keyword');
+export const parseAwaitKeyword = buildKeywordParser(['await'], 'Keyword');
+export const parseCaptureKeyword = buildKeywordParser(['capture'], 'Keyword');
+export const parseClearKeyword = buildKeywordParser(['clear'], 'Keyword');
+export const parseConditionalKeyword = buildKeywordParser(['if', 'elseif', 'while'], 'Keyword');
 export const parseConstKeyword = buildKeywordParser(['const'], 'Keyword');
+export const parseDestinationKeyword = buildKeywordParser(['network', 'process', 'pipe'], 'Keyword');
+export const parseEgressKeyword = buildKeywordParser(['egress'], 'Keyword');
+export const parseElseKeyword = buildKeywordParser(['else'], 'Keyword');
 export const parseEmitKeyword = buildKeywordParser(['emit'], 'Keyword');
 export const parseEmptyKeyword = buildKeywordParser(['empty'], 'Keyword');
 export const parseEnumKeyword = buildKeywordParser(['enum'], 'Keyword');
+export const parseExpectKeyword = buildKeywordParser(['expect'], 'Keyword');
+export const parseForKeyword = buildKeywordParser(['for'], 'Keyword');
+export const parseForOfInKeyword = buildKeywordParser(['of', 'in'], 'Keyword');
+export const parseIngressKeyword = buildKeywordParser(['ingress'], 'Keyword');
+export const parsePipeKeyword = buildKeywordParser(['pipe'], 'Keyword');
+export const parseRouteKeyword = buildKeywordParser(['route'], 'Keyword');
+export const parseRouteEndKeyword = buildKeywordParser(['append', 'prepend'], 'Keyword');
+export const parseSetKeyword = buildKeywordParser(['set'], 'Keyword');
+export const parseUsingKeyword = buildKeywordParser(['using'], 'Keyword');
+export const parseVarKeyword = buildKeywordParser(['var'], 'Keyword');
 
+export const parseStartSubExpressionSymbol = buildSymbolParser(openRoundBracket, 'StartSubExpression');
+export const parseEndSubExpressionSymbol = buildSymbolParser(closeRoundBracket, 'EndSubExpression');
+export const parseStartListLiteralSymbol = buildSymbolParser(openSquareBracket, 'StartListLiteral');
+export const parseEndListLiteralSymbol = buildSymbolParser(closeSquareBracket, 'EndListLiteral');
+export const parseStartIndexerSymbol = buildSymbolParser(openSquareBracket, 'StartIndexer');
+export const parseEndIndexerSymbol = buildSymbolParser(closeSquareBracket, 'EndIndexer');
+export const parseStartFunctionCallSymbol = buildSymbolParser(openRoundBracket, 'StartCallParams');
+export const parseEndFunctionCallSymbol = buildSymbolParser(closeRoundBracket, 'EndCallParams');
 
 export const applicationConnectionGraphBuilder = new GraphBuilder('connection');
 export const applicationGraphBuilder = new GraphBuilder('application');
@@ -28,7 +55,29 @@ export const destinationListGraphBuilder = new GraphBuilder('destination-list');
 export const emitGraphBuilder = new GraphBuilder('emit');
 export const enumGraphBuilder = new GraphBuilder('enum');
 export const eolGraphBuilder = new GraphBuilder('eol');
-
+export const expectGraphBuilder = new GraphBuilder('expect');
+export const expressionGraphBuilder = new GraphBuilder('expression');
+export const conditionalExpressionGraphBuilder = new GraphBuilder('conditional-expression');
+export const messageContextGraphBuilder = new GraphBuilder('message-context');
+export const messageDefinitionGraphBuilder = new GraphBuilder('message-definition');
+export const messageInitGraphBuilder = new GraphBuilder('message-init');
+export const messageLiteralGraphBuilder = new GraphBuilder('message-literal');
+export const messageMessageGraphBuilder = new GraphBuilder('message-message');
+export const messageRouteGraphBuilder = new GraphBuilder('message-route');
+export const namespaceGraphBuilder = new GraphBuilder('namespace');
+export const networkGraphBuilder = new GraphBuilder('network');
+export const nplGraphBuilder = new GraphBuilder('npl');
+export const pipeGraphBuilder = new GraphBuilder('pipe');
+export const pipeRouteGraphBuilder = new GraphBuilder('pipe-route');
+export const processAcceptGraphBuilder = new GraphBuilder('process-accept');
+export const processAwaitGraphBuilder = new GraphBuilder('process-await');
+export const processGraphBuilder = new GraphBuilder('process');
+export const processRouteGraphBuilder = new GraphBuilder('process-route');
+export const routingStatementGraphBuilder = new GraphBuilder('routing-statement');
+export const setGraphBuilder = new GraphBuilder('set');
+export const testGraphBuilder = new GraphBuilder('test');
+export const usingGraphBuilder = new GraphBuilder('using');
+export const varGraphBuilder = new GraphBuilder('var');
 
 export const applicationConnectionGraph = applicationConnectionGraphBuilder.build();
 export const applicationGraph = applicationGraphBuilder.build();
@@ -41,3 +90,26 @@ export const destinationListGraph = destinationListGraphBuilder.build();
 export const emitGraph = emitGraphBuilder.build();
 export const enumGraph = enumGraphBuilder.build();
 export const eolGraph = eolGraphBuilder.build();
+export const expectGraph = expectGraphBuilder.build();
+export const expressionGraph = expressionGraphBuilder.build();
+export const conditionalExpressionGraph = conditionalExpressionGraphBuilder.build();
+export const messageContextGraph = messageContextGraphBuilder.build();
+export const messageDefinitionGraph = messageDefinitionGraphBuilder.build();
+export const messageInitGraph = messageInitGraphBuilder.build();
+export const messageLiteralGraph = messageLiteralGraphBuilder.build();
+export const messageMessageGraph = messageMessageGraphBuilder.build();
+export const messageRouteGraph = messageRouteGraphBuilder.build();
+export const namespaceGraph = namespaceGraphBuilder.build();
+export const networkGraph = networkGraphBuilder.build();
+export const nplGraph = nplGraphBuilder.build();
+export const pipeGraph = pipeGraphBuilder.build();
+export const pipeRouteGraph = pipeRouteGraphBuilder.build();
+export const processAcceptGraph = processAcceptGraphBuilder.build();
+export const processAwaitGraph = processAwaitGraphBuilder.build();
+export const processGraph = processGraphBuilder.build();
+export const processRouteGraph = processRouteGraphBuilder.build();
+export const routingStatementGraph = routingStatementGraphBuilder.build();
+export const setGraph = setGraphBuilder.build();
+export const testGraph = testGraphBuilder.build();
+export const usingGraph = usingGraphBuilder.build();
+export const varGraph = varGraphBuilder.build();

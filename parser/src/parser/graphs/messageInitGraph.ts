@@ -1,8 +1,7 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { skipSeparators, parseIdentifier, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { expressionGraph } from './expressionGraph.js';
+import { eolGraph, expressionGraph } from './index.js';
 
 /* Examples
 
@@ -15,7 +14,8 @@ import { expressionGraph } from './expressionGraph.js';
 */
 
 // prettier-ignore
-export const messageInitGraph = new GraphBuilder('message-init')
+export function defineMessageInitGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('field name', parseIdentifier, skipSeparators, 'single-value')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'fields')
@@ -30,3 +30,4 @@ export const messageInitGraph = new GraphBuilder('message-init')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

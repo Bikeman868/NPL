@@ -1,7 +1,7 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseCloseScope, parseOpenScope, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { destinationGraph, destinationListGraphBuilder } from './index.js';
+import { destinationGraph, eolGraph } from './index.js';
 
 /* Examples
     process process1<EOL>
@@ -15,8 +15,9 @@ import { destinationGraph, destinationListGraphBuilder } from './index.js';
 
 */
 // prettier-ignore
-destinationListGraphBuilder
-    .start
+export function defineDestinationListGraph(builder: GraphBuilder) {
+    builder.clear()
+    .graph.start
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'scoped')
         .subGraph('single', destinationGraph, 'end')
     .graph.state('scoped')
@@ -33,3 +34,4 @@ destinationListGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

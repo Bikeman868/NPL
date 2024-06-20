@@ -1,15 +1,15 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     parseIdentifier,
     skipSeparators,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { pipeRouteGraph } from './pipeRouteGraph.js';
+import { eolGraph, parsePipeKeyword, pipeRouteGraph } from './index.js';
 
+
+// prettier-ignore
 /* Examples
 
     pipe myPipe<EOL>
@@ -23,13 +23,10 @@ import { pipeRouteGraph } from './pipeRouteGraph.js';
     }<EOL>
 
 */
-
-const parsePipe = buildKeywordParser(['pipe'], 'Keyword');
-
-// prettier-ignore
-export const pipeGraph = new GraphBuilder('pipe')
+export function definePipeGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"pipe"', parsePipe, skipSeparators, 'name')
+        .transition('"pipe"', parsePipeKeyword, skipSeparators, 'name')
     .graph.state('name')
         .transition('pipe name', parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
@@ -42,3 +39,4 @@ export const pipeGraph = new GraphBuilder('pipe')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

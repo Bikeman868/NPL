@@ -1,4 +1,5 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
     parseOpenScope,
@@ -7,12 +8,11 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
 import { 
-    applicationConnectionGraphBuilder,
     parseIngressKeyword,
     parseEgressKeyword,
     configGraph,
+    eolGraph,
 } from './index.js';
 
 // prettier-ignore
@@ -28,7 +28,8 @@ import {
     }<EOL>
 
 */
-applicationConnectionGraphBuilder
+export function defineApplicationConnectionGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"connection"', buildKeywordParser(['connection'], 'Keyword'), skipSeparators, 'type')
     .graph.state('type')
@@ -55,3 +56,4 @@ applicationConnectionGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

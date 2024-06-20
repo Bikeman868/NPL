@@ -1,20 +1,13 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     buildCloseScopeParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { conditionalExpressionGraph } from './expressionGraph.js';
-import { destinationGraph } from './index.js';
-
-const parseCapture = buildKeywordParser(['capture'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-const parseAll = buildKeywordParser(['*'], 'Keyword');
+import { conditionalExpressionGraph, destinationGraph, eolGraph, parseAnyMessageTypeKeyword, parseCaptureKeyword, parseClearKeyword, parseConditionalKeyword, parseElseKeyword, parseEmptyKeyword, parseForKeyword, parseRouteEndKeyword } from './index.js';
 
 const statementGraphBuilder = new GraphBuilder('routing-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('route-scope-block');
@@ -33,10 +26,10 @@ const captureGraphBuilder = new GraphBuilder('route-message-capture');
 */
 captureGraphBuilder
     .graph.start
-        .transition('"capture"', parseCapture, skipSeparators, 'message-type')
+        .transition('"capture"', parseCaptureKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmpty, skipSeparators, 'identifier')
-        .transition('"*"', parseAll, skipSeparators, 'identifier')
+        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'identifier')
+        .transition('"*"', parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
         .transition('the type of message to capture', parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
@@ -94,13 +87,14 @@ statemenScopeBlockGraphBuilder
     }<EOL>
 
 */
-statementGraphBuilder
+export function defineRoutingStatementGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"clear"', buildKeywordParser(['clear'], 'Keyword'), skipSeparators, 'end')
-        .transition('"append", "prepend"', buildKeywordParser(['append', 'prepend'], 'Keyword'), skipSeparators, 'route')
-        .transition('"if", "elseif", "while"', buildKeywordParser(['if', 'elseif', 'while'], 'Keyword'), skipSeparators, 'conditional')
-        .transition('"else"', buildKeywordParser(['else'], 'Keyword'), skipSeparators, 'else')
-        .transition('"for"', buildKeywordParser(['for'], 'Keyword'), skipSeparators, 'for')
+        .transition('"clear"', parseClearKeyword, skipSeparators, 'end')
+        .transition('"append", "prepend"', parseRouteEndKeyword, skipSeparators, 'route')
+        .transition('"if", "elseif", "while"', parseConditionalKeyword, skipSeparators, 'conditional')
+        .transition('"else"', parseElseKeyword, skipSeparators, 'else')
+        .transition('"for"', parseForKeyword, skipSeparators, 'for')
         .subGraph('"capture"', captureGraphBuilder.build())
     .graph.state('route')
         .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'destinations')
@@ -122,5 +116,4 @@ statementGraphBuilder
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
-
-export const routingStatementGraph = statementGraphBuilder.build();
+}

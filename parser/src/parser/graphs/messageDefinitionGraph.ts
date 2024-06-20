@@ -7,8 +7,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { dataTypeGraph } from './index.js';
+import { dataTypeGraph, eolGraph } from './index.js';
 
 const parseMessage = buildKeywordParser(['message'], 'Keyword');
 
@@ -44,7 +43,8 @@ const messageFieldGraph = new GraphBuilder('message-field')
 */
 
 // prettier-ignore
-export const messageDefinitionGraph = new GraphBuilder('message-type')
+export function defineMessageDefinitionGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"message"', parseMessage, skipSeparators, 'name')
     .graph.state('name')
@@ -62,3 +62,4 @@ export const messageDefinitionGraph = new GraphBuilder('message-type')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

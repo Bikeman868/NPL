@@ -7,11 +7,7 @@ import {
     parseQualifiedIdentifier,
     parseOpenScope,
 } from '../stateMachine/SyntaxParser.js';
-import { usingGraph } from './usingGraph.js';
-import { messageDefinitionGraph } from './messageDefinitionGraph.js';
-import { networkGraph } from './networkGraph.js';
-import { eolGraph } from './eolGraph.js';
-import { applicationGraph, enumGraph } from './index.js';
+import { applicationGraph, enumGraph, eolGraph, messageDefinitionGraph, networkGraph, usingGraph } from './index.js';
 
 const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 
@@ -37,7 +33,8 @@ const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 */
 
 // prettier-ignore
-export const namespaceGraph = new GraphBuilder('namespace')
+export function defineNamespaceGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"namespace"', parseNamespace, skipSeparators, 'name')
     .graph.state('name')
@@ -61,3 +58,4 @@ export const namespaceGraph = new GraphBuilder('namespace')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

@@ -7,9 +7,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { processAcceptGraph } from './processAcceptGraph.js';
-import { testGraph } from './testGraph.js';
+import { eolGraph, processAcceptGraph, testGraph } from './index.js';
 
 const parseProcess = buildKeywordParser(['process'], 'Keyword');
 
@@ -38,9 +36,10 @@ const parseProcess = buildKeywordParser(['process'], 'Keyword');
 */
 
 // prettier-ignore
-export const processGraph = new GraphBuilder('process')
-    .graph.start.
-        transition('"process"', parseProcess, skipSeparators, 'name')
+export function defineProcessGraph(builder: GraphBuilder) {
+    builder.clear()
+    .graph.start
+        .transition('"process"', parseProcess, skipSeparators, 'name')
     .graph.state('name')
         .transition('process name', parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
@@ -54,3 +53,4 @@ export const processGraph = new GraphBuilder('process')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

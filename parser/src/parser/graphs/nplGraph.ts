@@ -1,8 +1,7 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { usingGraph } from './usingGraph.js';
-import { namespaceGraph } from './namespaceGraph.js';
-import { eolGraph } from './eolGraph.js';
+import { eolGraph, namespaceGraph, usingGraph } from './index.js';
 
+// prettier-ignore
 /* Examples
 
     <EOL><EOL>
@@ -14,11 +13,11 @@ import { eolGraph } from './eolGraph.js';
     }<EOL>
 
 */
-
-// prettier-ignore
-export const nplGraph = new GraphBuilder('npl')
+export function defineNplGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .subGraph('eol', eolGraph)
         .subGraph('using', usingGraph)
         .subGraph('namespace', namespaceGraph)
     .graph.build();
+}

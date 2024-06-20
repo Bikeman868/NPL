@@ -7,9 +7,7 @@ import {
     parseString,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { expectGraph } from './expectGraph.js';
-import { emitGraph } from './index.js';
+import { emitGraph, eolGraph, expectGraph } from './index.js';
 
 const parseTest = buildKeywordParser(['test'], 'Keyword');
 
@@ -30,7 +28,8 @@ const parseTest = buildKeywordParser(['test'], 'Keyword');
 */
 
 // prettier-ignore
-export const testGraph = new GraphBuilder('unit-test')
+export function defineTestGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"test"', parseTest, skipSeparators, 'description')
     .graph.state('description')
@@ -46,3 +45,4 @@ export const testGraph = new GraphBuilder('unit-test')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

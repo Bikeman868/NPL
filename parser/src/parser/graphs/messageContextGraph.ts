@@ -1,8 +1,7 @@
 import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildKeywordParser, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph } from './eolGraph.js';
-import { messageInitGraph } from './messageInitGraph.js';
+import { eolGraph, messageInitGraph } from './index.js';
 
 const parseContextKeyword = buildKeywordParser(['context'], 'Keyword');
 const parseContextType = buildKeywordParser(['origin', 'message', 'network'], 'Keyword');
@@ -31,7 +30,8 @@ const parseContextType = buildKeywordParser(['origin', 'message', 'network'], 'K
         }
     }<EOL>
 */
-export const messageContextGraph = new GraphBuilder('message-context')
+export function defineMessageContextGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"context"', parseContextKeyword, skipSeparators, 'definition')
     .graph.state('definition')
@@ -48,3 +48,4 @@ export const messageContextGraph = new GraphBuilder('message-context')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}

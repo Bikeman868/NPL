@@ -1,22 +1,24 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     parseQualifiedIdentifier,
     skipSeparators,
     skipWhitespace,
 } from '../stateMachine/SyntaxParser.js';
+import { parseUsingKeyword } from './index.js';
 
+// prettier-ignore
 /* Examples
 
     using namespace1<EOL>
 
     using namespace1.namespace2<EOL>
-*/
 
-// prettier-ignore
-export const usingGraph = new GraphBuilder('using')
+*/
+export function defineUsingGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"using"', buildKeywordParser(['using'], 'Keyword'), skipSeparators, 'namespace')
+        .transition('"using"', parseUsingKeyword, skipSeparators, 'namespace')
     .graph.state('namespace')
         .transition('namespace name', parseQualifiedIdentifier, skipWhitespace)
     .graph.build();
+}

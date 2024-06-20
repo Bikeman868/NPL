@@ -2,24 +2,13 @@ import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
-    buildSymbolParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseCloseScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { processAwaitGraph } from './processAwaitGraph.js';
-import { varGraph } from './varGraph.js';
-import { eolGraph } from './eolGraph.js';
-import { processRouteGraph } from './processRouteGraph.js';
-import { conditionalExpressionGraph } from './expressionGraph.js';
-import { setGraph } from './setGraph.js';
-import { constGraph, emitGraph } from './index.js';
-
-const parseAccept = buildKeywordParser(['accept'], 'Keyword');
-const parseEmpty = buildKeywordParser(['empty'], 'Keyword');
-const parseAny = buildSymbolParser('*', 'Keyword');
+import { conditionalExpressionGraph, constGraph, emitGraph, eolGraph, parseAcceptKeyword, parseAnyMessageTypeKeyword, parseConditionalKeyword, parseEmptyKeyword, parseForKeyword, parseForOfInKeyword, processAwaitGraph, processRouteGraph, setGraph, varGraph } from './index.js';
 
 const statementGraphBuilder: GraphBuilder = new GraphBuilder('process-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-scope-block');
@@ -36,8 +25,8 @@ const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-s
 */
 statementGraphBuilder
     .graph.start
-        .transition('"if", "elseif", "while"', buildKeywordParser(['if', 'elseif', 'while'], 'Keyword'), skipSeparators, 'conditional')
-        .transition('"for"', buildKeywordParser(['for'], 'Keyword'), skipSeparators, 'for-loop')
+        .transition('"if", "elseif", "while"', parseConditionalKeyword, skipSeparators, 'conditional')
+        .transition('"for"', parseForKeyword, skipSeparators, 'for-loop')
         .subGraph('emit', emitGraph)
         .subGraph('await', processAwaitGraph)
         .subGraph('const', constGraph)
@@ -53,7 +42,7 @@ statementGraphBuilder
     .graph.state('for-loop')
         .transition('identifier', parseIdentifier, skipSeparators, 'loop-type')
     .graph.state('loop-type')
-        .transition('"of", "in"', buildKeywordParser(['of', 'in'], 'Keyword'), skipSeparators, 'conditional')
+        .transition('"of", "in"', parseForOfInKeyword, skipSeparators, 'conditional')
     .graph.build();
 
 // prettier-ignore
@@ -102,12 +91,13 @@ statemenScopeBlockGraphBuilder
         await SomeMessage
     }<EOL>
 */
-export const processAcceptGraph = new GraphBuilder('accept')
+export function defineProcessAcceptGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition('"accept"', parseAccept, skipSeparators, 'message-type')
+        .transition('"accept"', parseAcceptKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmpty, skipSeparators, 'identifier')
-        .transition('"*"', parseAny, skipSeparators, 'identifier')
+        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'identifier')
+        .transition('"*"', parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
         .transition('the type of message to accept', parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition('message identifier', parseIdentifier, skipSeparators, 'has-identifier')
@@ -120,3 +110,4 @@ export const processAcceptGraph = new GraphBuilder('accept')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('scope-block', statemenScopeBlockGraphBuilder.build())
     .graph.build();
+}

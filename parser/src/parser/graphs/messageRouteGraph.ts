@@ -1,8 +1,7 @@
 import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildKeywordParser, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { routingStatementGraph } from './routingStatementGraph.js';
-import { eolGraph } from './eolGraph.js';
+import { eolGraph, routingStatementGraph } from './index.js';
 
 /* Examples
     route clear<EOL>
@@ -20,7 +19,8 @@ import { eolGraph } from './eolGraph.js';
 const parseRoute = buildKeywordParser(['route'], 'Keyword');
 
 // prettier-ignore
-export const messageRouteGraph = new GraphBuilder('route')
+export function defineMessageRouteGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition('"route"', parseRoute, skipSeparators, 'route')
     .graph.state('route')
@@ -33,3 +33,4 @@ export const messageRouteGraph = new GraphBuilder('route')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();
+}
