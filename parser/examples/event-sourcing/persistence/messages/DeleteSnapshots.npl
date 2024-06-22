@@ -1,0 +1,8 @@
+// When the persistence network receives this message, it will delete any snapshots
+// at the specified timestamp or newer
+namespace app.persistence {
+    message DeleteSnapshots {
+        string entityKey
+        date timestamp
+    }
+}

@@ -149,6 +149,12 @@ namespace namespace1 {
         process process1 {
             accept namespace.MyMessage
             accept namespace.MyMessage myMessage
+            accept namespace.MyMessage {}
+            accept namespace.MyMessage myMessage {}
+            accept namespace.MyMessage {
+            }
+            accept namespace.MyMessage myMessage {
+            }
             accept empty name {
                 emit name
             }
@@ -156,6 +162,20 @@ namespace namespace1 {
                 const myValue 10
                 emit empty
                 var variable myValue + 1
+            }
+        }
+    }
+}
+
+// === Process config ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            config oneConfig 'value'
+            config {
+                config1 1
+                config2 2
             }
         }
     }
@@ -277,6 +297,57 @@ namespace namespace1 {
         }
     }
 }
+
+// === Pipes ===
+
+namespace namespace1 {
+    network network1 {
+        pipe pipe1
+        pipe pipe1 {}
+        pipe pipe1 {
+        }
+        pipe pipe1 {
+            config {
+                enabled true
+            }
+        }
+        pipe pipe1 {
+            route MyMessage {
+                clear
+                append process process1
+                append pipe pipe1
+                append network network1
+                append network network1.entryPoint1
+                append { process process1 }
+                append { 
+                    process process1 
+                    process process2
+                    pipe pipe1
+                }
+                prepend pipe pipe1
+                capture Error {
+                    clear
+                    append network logger.errors
+                }
+            }
+        }
+    }
+}
+
+// === Pipe config ===
+
+namespace namespace1 {
+    network network1 {
+        pipe pipe1 {
+            config oneConfig 'value'
+            config {
+                config1 1
+                config2 2
+            }
+        }
+    }
+}
+
 
 // === Enums ===
 
@@ -414,12 +485,18 @@ namespace namespace1 {
     }
 }
 
-// === SApplication ===
+// === Application ===
 
 namespace namespace1 {
     application app
     application app {}
     application app {
+    }
+    application app {
+        config {
+            config1 1
+            config2 2
+        }
     }
     application app {
         connection npl.io.Console console {

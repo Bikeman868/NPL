@@ -1,0 +1,8 @@
+// When the persistence network receives this message, it will respond
+// with the newest snapshot that is older than the timestamp
+namespace app.persistence {
+    message GetLastSnapshot {
+        string entityKey
+        date timestamp
+    }
+}

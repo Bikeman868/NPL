@@ -1,0 +1,5 @@
+// This message is returned by the persistence network when the query did not
+// match any records in the database
+namespace app.persistence {
+    message NotFound
+}

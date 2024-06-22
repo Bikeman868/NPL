@@ -1,0 +1,5 @@
+// The app.endpoints.http network processes http requests and produces http responses
+namespace app.endpoints {
+    network http {
+    }
+}

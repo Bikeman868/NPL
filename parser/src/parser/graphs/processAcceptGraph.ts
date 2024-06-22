@@ -73,6 +73,8 @@ statementGraphBuilder
 */
 statemenScopeBlockGraphBuilder
     .graph.start
+        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .subGraph('blank-first-line', eolGraph, 'statements')
         .subGraph('first-statement', statementGraphBuilder.build(), 'statements')
     .graph.state('statements')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
@@ -87,7 +89,17 @@ statemenScopeBlockGraphBuilder
  
     accept MessageType<EOL>
 
+    accept MessageType {}<EOL>
+
+    accept MessageType {
+    }<EOL>
+
     accept MessageType messageType<EOL>
+
+    accept MessageType messageType {}<EOL>
+
+    accept MessageType messageType {
+    }<EOL>
 
     accept empty {
         emit MyMessage message count 1

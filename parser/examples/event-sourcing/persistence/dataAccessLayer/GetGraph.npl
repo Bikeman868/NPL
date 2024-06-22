@@ -1,0 +1,43 @@
+// GetGraph messages are processed by reading records from the database
+// and emitting a Graph message containing the state transition graph
+namespace app.persistence {
+    network database {
+        process dataAccessLayer {
+            accept GetGraph getGraph { 
+                emit npl.persistence.Query {
+                    message {
+                        name 'getGraph' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'select 
+                                 code, name, transitions
+                               from graph'
+                    }
+                }
+                
+                await npl.persistence.QueryResult queryResult
+
+                var states []
+                
+                for row of queryResult.rows {
+                    set states [
+                        ...states
+                        app.stateGraph.State { 
+                            message {
+                                code row['code']
+                                name row['name']
+                                transitions JSON.parse(row['transitions'])
+                            }
+                        }
+                    ]
+                }
+                
+                emit app.stateGraph.Graph {
+                    message {
+                        states states
+                    }
+                }
+            }
+        }
+    }
+}

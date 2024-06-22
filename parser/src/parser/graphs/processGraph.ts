@@ -7,7 +7,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, processAcceptGraph, testGraph } from './index.js';
+import { configGraph, eolGraph, processAcceptGraph, testGraph } from './index.js';
 
 const parseProcess = buildKeywordParser(['process'], 'Keyword');
 
@@ -50,6 +50,7 @@ export function defineProcessGraph(builder: GraphBuilder) {
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('accept', processAcceptGraph, 'statements')
         .subGraph('test', testGraph, 'statements')
+        .subGraph('config', configGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

@@ -1,0 +1,43 @@
+// StateRequest messages are processed by retrieving events and snapshots from the
+// database, and computing the current state by starting from the newest shapshot
+// and applying any newer events. If more than a few events are applied, then a new 
+// snapshot is created
+namespace app.events {
+    using app.interface
+    using app.persistence
+
+    network eventSource {
+        process eventSource {
+            accept StateRequest stateRequest {
+                emit GetLastSnapshot {
+                    message {
+                        entityKey stateRequest.entityKey
+                        timestamp stateRequest.pointInTime
+                    }
+                }
+                await { 
+                    Snapshot snapshot
+                    NotFound notFound
+                }
+                /*
+                if snapshot {
+                    // TODO: Add event history since snapshot
+                    emit StateResponse {
+                        message {
+                            entityKey snapshot.entityKey
+                            timestamp snapshot.timestamp
+                            code snapshot.stateCode
+                            name ''
+                        }
+                    }
+                }
+                elseif notFound {
+                    // TODO: Get entire event history
+                    // TODO: Build state from event history
+                    // TODO: Create a new snapshot
+                }
+                */
+            }
+        }
+    }
+}

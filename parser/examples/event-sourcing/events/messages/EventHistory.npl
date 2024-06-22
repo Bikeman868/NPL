@@ -1,0 +1,10 @@
+// The EventHistory message containss the events received for an entity
+// during a time period, in timestamp order
+namespace app.events {
+    message EventHistory {
+        string entityKey
+        date startTimestamp
+        date endTimestamp
+        InputEvent[] events
+    }
+}

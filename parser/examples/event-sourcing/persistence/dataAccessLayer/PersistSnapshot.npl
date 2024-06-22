@@ -1,0 +1,10 @@
+namespace app.persistence {
+    using npl.persistence
+    network database {
+        process dataAccessLayer {
+            accept PersistSnapshot persistSnapshot { 
+                // TODO: Database operations
+            }
+        }
+    }
+}

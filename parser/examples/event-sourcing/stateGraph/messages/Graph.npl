@@ -1,0 +1,7 @@
+// The Graph message contains a state transition graph represented as states
+// and possible state transitions
+namespace app.stateGraph {
+    message Graph {
+        State[] states
+    }
+}
