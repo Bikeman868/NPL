@@ -22,7 +22,8 @@ function allFilesRecursive(filePath: string, files: string[]) {
         for (let filename of fs.readdirSync(filePath))
             allFilesRecursive(filePath + path.sep + filename, files);
     } else {
-        files.push(filePath);
+        if (filePath.endsWith('.npl'))
+            files.push(filePath);
     }
 }
 

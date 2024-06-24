@@ -15,28 +15,51 @@ namespace app.events {
                         timestamp stateRequest.pointInTime
                     }
                 }
+                
+                emit GetGraph
+
                 await { 
                     Snapshot snapshot
                     NotFound notFound
                 }
-                /*
+
+                await Graph graph
+
+                var stateCode graph.startingStateCode
+                var timestamp Date.now()
+                
                 if snapshot {
-                    // TODO: Add event history since snapshot
-                    emit StateResponse {
-                        message {
-                            entityKey snapshot.entityKey
-                            timestamp snapshot.timestamp
-                            code snapshot.stateCode
-                            name ''
-                        }
+                    set stateCode snapshot.stateCode
+                    set timestamp snapshot.timestamp
+                }
+
+                emit GetEventHistory {
+                    message {
+                        entityKey stateRequest.entityKey
+                        startTimestamp timestamp
+                        endTimestamp stateRequest.pointInTime
                     }
                 }
-                elseif notFound {
-                    // TODO: Get entire event history
+
+                await EventHistory eventHistory
+
+                for event of eventHistory.events {
                     // TODO: Build state from event history
+                }
+
+                if eventHistory.events.length() > 5 {
                     // TODO: Create a new snapshot
                 }
-                */
+
+                const stateName graph.states[stateCode].stateName
+                emit StateResponse {
+                    message {
+                        entityKey stateRequest.entityKey
+                        timestamp timestamp
+                        stateCode stateCode
+                        stateName stateName
+                    }
+                }
             }
         }
     }

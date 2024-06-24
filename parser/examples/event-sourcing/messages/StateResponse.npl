@@ -3,7 +3,7 @@ namespace app.interface {
     message StateResponse {
         string entityKey
         date timestamp
-        string code
-        string name
+        string stateCode
+        string stateName
     }
 }

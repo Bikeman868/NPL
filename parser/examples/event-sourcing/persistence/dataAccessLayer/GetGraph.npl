@@ -3,37 +3,38 @@
 namespace app.persistence {
     network database {
         process dataAccessLayer {
-            accept GetGraph getGraph { 
+            config {
+                startingStateCode 'A'
+            }
+            accept GetGraph getGraph {
                 emit npl.persistence.Query {
                     message {
                         name 'getGraph' // For debug logging
                         language 'SQL'
                         version 'MySQL'
                         query 'select 
-                                 code, name, transitions
+                                 stateCode, stateNname, transitions
                                from graph'
                     }
                 }
                 
                 await npl.persistence.QueryResult queryResult
 
-                var states []
+                var states map<string State>
                 
                 for row of queryResult.rows {
-                    set states [
-                        ...states
-                        app.stateGraph.State { 
+                    set states[row['stateCode']] app.stateGraph.State { 
                             message {
-                                code row['code']
-                                name row['name']
+                                stateCode row['stateCode']
+                                stateNname row['stateNname']
                                 transitions JSON.parse(row['transitions'])
                             }
                         }
-                    ]
                 }
                 
                 emit app.stateGraph.Graph {
                     message {
+                        startingStateCode config.startingStateCode
                         states states
                     }
                 }

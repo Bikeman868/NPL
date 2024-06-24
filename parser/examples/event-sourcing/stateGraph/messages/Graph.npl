@@ -2,6 +2,7 @@
 // and possible state transitions
 namespace app.stateGraph {
     message Graph {
-        State[] states
+        string startingStateCode
+        map<string State> states
     }
 }

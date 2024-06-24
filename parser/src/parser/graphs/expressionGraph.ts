@@ -89,6 +89,10 @@ binaryOperatorGraphBuilder
         .transition('||', buildSymbolParser('||', 'Operator'), skipSeparators)
         .transition('&', buildSymbolParser('&', 'Operator'), skipSeparators)
         .transition('|', buildSymbolParser('|', 'Operator'), skipSeparators)
+        .transition('>=', buildSymbolParser('>=', 'Operator'), skipSeparators)
+        .transition('<=', buildSymbolParser('<=', 'Operator'), skipSeparators)
+        .transition('>', buildSymbolParser('>', 'Operator'), skipSeparators)
+        .transition('<', buildSymbolParser('<', 'Operator'), skipSeparators)
     .graph.build();
 
 // prettier-ignore
