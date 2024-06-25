@@ -65,6 +65,7 @@ captureGraphBuilder
 statemenScopeBlockGraphBuilder
     .graph.start
         .subGraph('first-statement', routingStatementGraph, 'statements')
+        .subGraph('blank-first-line', eolGraph, 'statements')
     .graph.state('statements')
         .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
@@ -118,11 +119,12 @@ export function defineRoutingStatementGraph(builder: GraphBuilder) {
     .graph.state('conditional')
         .subGraph('expression', conditionalExpressionGraph, 'conditional-eol')
     .graph.state('conditional-eol')
-        .subGraph('conditional-eol', eolGraph, 'conditional-statement')
-    .graph.state('conditional-statement')
+        .subGraph('conditional-eol', eolGraph, 'statements')
+    .graph.state('statements')
         .subGraph('statements', statemenScopeBlockGraphBuilder.build())
     .graph.state('else')
-        .subGraph('else', eolGraph) // TODO:
+        .transition('openCurlyBracket', parseOpenScope, skipSeparators, 'statements')
+        .subGraph('else-single-statement', routingStatementGraph)
     .graph.state('for')
         .subGraph('for', eolGraph) // TODO:
     .graph.state('end')

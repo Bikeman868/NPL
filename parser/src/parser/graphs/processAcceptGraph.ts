@@ -16,6 +16,7 @@ import {
     parseAcceptKeyword,
     parseAnyMessageTypeKeyword,
     parseConditionalKeyword,
+    parseElseKeyword,
     parseEmptyKeyword,
     parseForKeyword,
     parseForOfInKeyword,
@@ -42,6 +43,8 @@ statementGraphBuilder
     .graph.start
         .transition('"if", "elseif", "while"', parseConditionalKeyword, skipSeparators, 'conditional')
         .transition('"for"', parseForKeyword, skipSeparators, 'for-loop')
+        .transition('"else"', parseElseKeyword, skipSeparators, 'else')
+        .subGraph('blank-line', eolGraph)
         .subGraph('emit', emitGraph)
         .subGraph('await', processAwaitGraph)
         .subGraph('const', constGraph)
@@ -51,13 +54,16 @@ statementGraphBuilder
     .graph.state('conditional')
         .subGraph('expression', conditionalExpressionGraph, 'conditional-eol')
     .graph.state('conditional-eol')
-        .subGraph('conditional-eol', eolGraph, 'conditional-statement')
-    .graph.state('conditional-statement')
+        .subGraph('conditional-eol', eolGraph, 'statement-block')
+    .graph.state('statement-block')
         .subGraph('statements', statemenScopeBlockGraphBuilder.build())
     .graph.state('for-loop')
         .transition('identifier', parseIdentifier, skipSeparators, 'loop-type')
     .graph.state('loop-type')
         .transition('"of", "in"', parseForOfInKeyword, skipSeparators, 'conditional')
+    .graph.state('else')
+        .transition('openCurlyBracket', parseOpenScope, skipSeparators, 'statement-block')
+        .subGraph('else-single-statement', statementGraphBuilder.build())
     .graph.build();
 
 // prettier-ignore

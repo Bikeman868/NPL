@@ -5,11 +5,13 @@ import {
     comma,
     openSquareBracket,
     closeSquareBracket,
+    closeCurlyBracket,
 } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildSymbolParser,
     parseBoolean,
+    parseIdentifier,
     parseNumber,
     parseQualifiedIdentifier,
     parseString,
@@ -19,13 +21,16 @@ import {
     assignmentExpressionGraph,
     eolGraph,
     messageConstructorGraph,
+    messageLiteralGraph,
     parseEndFunctionCallSymbol,
     parseEndIndexerSymbol,
     parseEndListLiteralSymbol,
+    parseEndMapLiteralSymbol,
     parseEndSubExpressionSymbol,
     parseStartFunctionCallSymbol,
     parseStartIndexerSymbol,
     parseStartListLiteralSymbol,
+    parseStartMapLiteralSymbol,
     parseStartSubExpressionSymbol,
 } from './index.js';
 
@@ -36,6 +41,7 @@ const subExpressionGraphBuilder = new GraphBuilder('close-terminated-expression'
 const indexExpressionGraphBuilder = new GraphBuilder('array-index-expression');
 const functionCallGraphBuilder = new GraphBuilder('function-call');
 const literalListGraphBuilder = new GraphBuilder('literal-list');
+const literalMapGraphBuilder = new GraphBuilder('literal-map');
 
 // prettier-ignore
 /* Examples:
@@ -50,9 +56,16 @@ const literalListGraphBuilder = new GraphBuilder('literal-list');
 
     namespace1.LogOption.debug
 
+    !namespace1.LogOption.debug
+
     true
 
     (<expression>)
+
+    {
+        key1 value1
+        key2 value2
+    }
 
 */
 expressionTermGraphBuilder
@@ -63,6 +76,7 @@ expressionTermGraphBuilder
         .transition('date literal', parseString, skipSeparators)
         .transition('identifier', parseQualifiedIdentifier, skipSeparators)
         .subGraph('literal-list', literalListGraphBuilder.build())
+        .subGraph('literal-map', literalMapGraphBuilder.build())
         .subGraph('sub-expression', subExpressionGraphBuilder.build())
         .subGraph('unary', unaryOperatorGraphBuilder.build(), 'unary')
     .graph.state('unary')
@@ -72,6 +86,7 @@ expressionTermGraphBuilder
         .transition('date literal', parseString, skipSeparators)
         .transition('identifier', parseQualifiedIdentifier, skipSeparators)
         .subGraph('unary-literal-list', literalListGraphBuilder.build())
+        .subGraph('unary-literal-map', literalMapGraphBuilder.build())
         .subGraph('unary-sub-expression', subExpressionGraphBuilder.build())
         .subGraph('double-unary', unaryOperatorGraphBuilder.build(), 'unary')
 .graph.build();
@@ -93,6 +108,7 @@ binaryOperatorGraphBuilder
         .transition('<=', buildSymbolParser('<=', 'Operator'), skipSeparators)
         .transition('>', buildSymbolParser('>', 'Operator'), skipSeparators)
         .transition('<', buildSymbolParser('<', 'Operator'), skipSeparators)
+        .transition('.', buildSymbolParser('.', 'Operator'), skipSeparators)
     .graph.build();
 
 // prettier-ignore
@@ -119,6 +135,28 @@ literalListGraphBuilder
         .transition(closeSquareBracket, parseEndListLiteralSymbol, skipSeparators)
         .subGraph('list-blank-line', eolGraph, 'elements')
         .subGraph('list-element', assignmentExpressionGraph, 'elements')
+    .graph.build();
+
+// prettier-ignore
+/* Examples 
+
+    {
+        'key1' 1
+        'key2' 2
+    }
+
+    {}
+
+*/
+literalMapGraphBuilder
+    .graph.start
+        .transition(openCurlyBracket, parseStartMapLiteralSymbol, skipSeparators, 'entries')
+    .graph.state('entries')
+        .transition(closeCurlyBracket, parseEndMapLiteralSymbol, skipSeparators)
+        .transition('key', parseIdentifier, skipSeparators, 'value')
+        .subGraph('blank-line', eolGraph, 'entries')
+    .graph.state('value')
+        .subGraph('value', assignmentExpressionGraph, 'entries')
     .graph.build();
 
 // prettier-ignore

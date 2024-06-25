@@ -27,4 +27,7 @@ export type TokenType =
     | 'StartMessageLiteral'
     | 'EndMessageLiteral'
     | 'StartCallParams'
-    | 'EndCallParams';
+    | 'EndCallParams'
+    | 'StartMapLiteral'
+    | 'EndMapLiteral'
+    ;

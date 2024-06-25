@@ -1,6 +1,6 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, messageLiteralGraph, parseConstKeyword } from './index.js';
+import { assignmentExpressionGraph, mapLiteralGraph, messageLiteralGraph, parseConstKeyword } from './index.js';
 
 // prettier-ignore
 /* Examples

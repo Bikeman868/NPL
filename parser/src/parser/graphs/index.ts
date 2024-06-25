@@ -1,6 +1,6 @@
 import { buildKeywordParser, buildSymbolParser } from '../stateMachine/SyntaxParser.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { closeRoundBracket, closeSquareBracket, openRoundBracket, openSquareBracket } from '#interfaces/charsets.js';
+import { closeCurlyBracket, closeRoundBracket, closeSquareBracket, openCurlyBracket, openRoundBracket, openSquareBracket } from '#interfaces/charsets.js';
 
 /* 
     This source file defines all of the syntax graphs used by the parser
@@ -41,6 +41,8 @@ export const parseStartIndexerSymbol = buildSymbolParser(openSquareBracket, 'Sta
 export const parseEndIndexerSymbol = buildSymbolParser(closeSquareBracket, 'EndIndexer');
 export const parseStartFunctionCallSymbol = buildSymbolParser(openRoundBracket, 'StartCallParams');
 export const parseEndFunctionCallSymbol = buildSymbolParser(closeRoundBracket, 'EndCallParams');
+export const parseStartMapLiteralSymbol = buildSymbolParser(openCurlyBracket, 'StartMapLiteral');
+export const parseEndMapLiteralSymbol = buildSymbolParser(closeCurlyBracket, 'EndMapLiteral');
 
 export const applicationConnectionGraphBuilder = new GraphBuilder('connection');
 export const applicationGraphBuilder = new GraphBuilder('application');
@@ -56,6 +58,7 @@ export const emitGraphBuilder = new GraphBuilder('emit');
 export const enumGraphBuilder = new GraphBuilder('enum');
 export const eolGraphBuilder = new GraphBuilder('eol');
 export const expectGraphBuilder = new GraphBuilder('expect');
+export const mapLiteralGraphBuilder = new GraphBuilder('map-literal');
 export const messageConstructorGraphBuilder = new GraphBuilder('message-constructor');
 export const messageContextGraphBuilder = new GraphBuilder('message-context');
 export const messageDefinitionGraphBuilder = new GraphBuilder('message-definition');
@@ -92,6 +95,7 @@ export const emitGraph = emitGraphBuilder.build();
 export const enumGraph = enumGraphBuilder.build();
 export const eolGraph = eolGraphBuilder.build();
 export const expectGraph = expectGraphBuilder.build();
+export const mapLiteralGraph = mapLiteralGraphBuilder.build();
 export const messageConstructorGraph = messageConstructorGraphBuilder.build();
 export const messageContextGraph = messageContextGraphBuilder.build();
 export const messageDefinitionGraph = messageDefinitionGraphBuilder.build();

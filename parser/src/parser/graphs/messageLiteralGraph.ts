@@ -18,7 +18,10 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
         message {
             field1 field1Value
             field2 field2Value
-            field3 field3Value
+            field3 {
+                key1 value1
+                key2 value2
+            }
         }
     }<EOL>
 

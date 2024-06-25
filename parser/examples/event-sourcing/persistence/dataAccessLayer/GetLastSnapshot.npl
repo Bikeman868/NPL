@@ -31,9 +31,11 @@ namespace app.persistence {
                 const row queryResult.rows[0]
                 if row {
                     emit app.events.Snapshot {
-                        entityKey row['entityKey']
-                        timestamp row['timestamp']
-                        stateCode row['stateCode']
+                        message {
+                            entityKey row['entityKey']
+                            timestamp row['timestamp']
+                            stateCode row['stateCode']
+                        }
                     }
                 }
                 else {

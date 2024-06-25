@@ -1,6 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, eolGraph, messageLiteralGraph, parseVarKeyword } from './index.js';
+import { assignmentExpressionGraph, dataTypeGraph, eolGraph, messageLiteralGraph, parseVarKeyword } from './index.js';
 
 // prettier-ignore
 /* Examples
@@ -8,6 +8,15 @@ import { assignmentExpressionGraph, eolGraph, messageLiteralGraph, parseVarKeywo
     var name 'String value'<EOL>
 
     var nextId message.id + 1<EOL>
+
+    var name string<EOL>
+
+    var newMap map<string MyMessageType><EOL>
+
+    var myMap {
+        "key1" 1
+        'key1' 2
+    }<EOL>
 
 */
 export function defineVarGraph(builder: GraphBuilder) {
@@ -18,7 +27,9 @@ export function defineVarGraph(builder: GraphBuilder) {
         .transition('var name', parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('no-value', eolGraph)
-        .subGraph('message-literal', messageLiteralGraph)
+        .subGraph('data-type', dataTypeGraph, 'end')
         .subGraph('initial value expression', assignmentExpressionGraph)
+    .graph.state('end')
+        .subGraph('end', eolGraph)
     .graph.build();
 }
