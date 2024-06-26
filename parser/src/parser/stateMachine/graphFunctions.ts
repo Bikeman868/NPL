@@ -36,7 +36,7 @@ function tryStartGraph(context: IContext, syntaxGraph: SyntaxGraph, graphName: s
             return `Testing '${transition.description}' transition`;
         });
 
-        const parseResult = transition.parser(context);
+        const parseResult = transition.parser.parseFunction(context);
 
         if (parseResult) {
             context.debug(() => {
@@ -136,7 +136,7 @@ function parseFromState(
             return `Testing '${transition.description}' transition`;
         });
 
-        const parseResult = transition.parser(context);
+        const parseResult = transition.parser.parseFunction(context);
         if (parseResult) {
             context.debug(() => {
                 return `Found ${parseResult.tokenType} in '${transition.description}' transition`;

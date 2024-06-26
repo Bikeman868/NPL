@@ -15,7 +15,7 @@ export function defineSetGraph(builder: GraphBuilder) {
     .graph.start
         .transition('"set"', parseSetKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('const name', parseQualifiedIdentifier, skipSeparators, 'value')
+        .transition('var name', parseQualifiedIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('expression', assignmentExpressionGraph)
     .graph.build();

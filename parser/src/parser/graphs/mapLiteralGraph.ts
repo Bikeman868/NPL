@@ -1,20 +1,9 @@
 // prettier-ignore
 
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { 
-    closeCurlyBracket, 
-    openCurlyBracket,
-} from '#interfaces/charsets.js';
-import { 
-    parseIdentifier, 
-    skipSeparators,
-} from '../stateMachine/SyntaxParser.js';
-import { 
-    assignmentExpressionGraph, 
-    eolGraph, 
-    parseEndMapLiteralSymbol, 
-    parseStartMapLiteralSymbol,
-} from './index.js';
+import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { assignmentExpressionGraph, eolGraph, parseEndMapLiteralSymbol, parseStartMapLiteralSymbol } from './index.js';
 
 // prettier-ignore
 /* Examples

@@ -19,17 +19,15 @@ const fileNames = [source];
 
 function allFilesRecursive(filePath: string, files: string[]) {
     if (fs.statSync(filePath).isDirectory()) {
-        for (let filename of fs.readdirSync(filePath))
-            allFilesRecursive(filePath + path.sep + filename, files);
+        for (let filename of fs.readdirSync(filePath)) allFilesRecursive(filePath + path.sep + filename, files);
     } else {
-        if (filePath.endsWith('.npl'))
-            files.push(filePath);
+        if (filePath.endsWith('.npl')) files.push(filePath);
     }
 }
 
 if (fs.statSync(source).isDirectory()) {
     fileNames.splice(0);
-    allFilesRecursive(source, fileNames)
+    allFilesRecursive(source, fileNames);
 }
 
 // The syntax graph defines the syntax of the NPL language

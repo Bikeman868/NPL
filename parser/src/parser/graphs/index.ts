@@ -1,6 +1,13 @@
 import { buildKeywordParser, buildSymbolParser } from '../stateMachine/SyntaxParser.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { closeCurlyBracket, closeRoundBracket, closeSquareBracket, openCurlyBracket, openRoundBracket, openSquareBracket } from '#interfaces/charsets.js';
+import {
+    closeCurlyBracket,
+    closeRoundBracket,
+    closeSquareBracket,
+    openCurlyBracket,
+    openRoundBracket,
+    openSquareBracket,
+} from '#interfaces/charsets.js';
 
 /* 
     This source file defines all of the syntax graphs used by the parser

@@ -21,7 +21,6 @@ import {
     assignmentExpressionGraph,
     eolGraph,
     messageConstructorGraph,
-    messageLiteralGraph,
     parseEndFunctionCallSymbol,
     parseEndIndexerSymbol,
     parseEndListLiteralSymbol,

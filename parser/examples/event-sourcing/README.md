@@ -6,7 +6,7 @@ This sample program implements an event sourced state machine.
 
 For those less familiar, even sourcing is where you store input events as-is,
 and materialize the state at any point in time by folding over the input events.
-To make materialization more efficient when there are a large number of events, 
+To make materialization more efficient when there are a large number of events,
 we keep snapshots of the state from time to time. If new events come in with
 earlier timestamps, then snapshots later then this are deleted because they are
 now invalid.
@@ -25,6 +25,7 @@ time, the results will reflect the updated state transition graph.
 ## Running the application locally
 
 To get this running locally, you need to:
+
 1. Install npl
 2. Install MySQL
 3. Run a SQL script to create the database tables
@@ -33,8 +34,9 @@ To get this running locally, you need to:
 6. Use curl commands to verify the application is working as expected
 
 Notes:
-* Insteal of using MySQL, it's easy to change the database to postgres, SQL Server, Oracle, Google BigTable or whatever, just by changing the application.yaml file.
-* Instead of updating the credentials in application.npl, you can put credentials in environment variables, and reference those in the `config` sections by enclosing the environment variable name in `%` symbols within a string.
+
+-   Insteal of using MySQL, it's easy to change the database to postgres, SQL Server, Oracle, Google BigTable or whatever, just by changing the application.yaml file.
+-   Instead of updating the credentials in application.npl, you can put credentials in environment variables, and reference those in the `config` sections by enclosing the environment variable name in `%` symbols within a string.
 
 ## Installing npl
 
@@ -44,22 +46,22 @@ TBD
 
 Note that :
 
-* You might need to adjust this script if you are using another database. The 
-following script is designed for MySQL, but as close to Ansi SQL as possible.
-* I defined a trivial state transition graph for illustration purposes, but
-you can make this graph as complicates as you like. Since the application 
-periodically reloads the state transition graph into memory, any changes you
-make whilst the application is running will take a little while to be in effect.
+-   You might need to adjust this script if you are using another database. The
+    following script is designed for MySQL, but as close to Ansi SQL as possible.
+-   I defined a trivial state transition graph for illustration purposes, but
+    you can make this graph as complicates as you like. Since the application
+    periodically reloads the state transition graph into memory, any changes you
+    make whilst the application is running will take a little while to be in effect.
 
 ```sql
 create table snapshots (
-    entityKey varchar(255) not null primary key, 
-    timestamp timestamp not null, 
+    entityKey varchar(255) not null primary key,
+    timestamp timestamp not null,
     stateCode varchar(50) not null
 );
 
 create table events (
-    entityKey varchar(255) not null primary key, 
+    entityKey varchar(255) not null primary key,
     timestamp timestamp not null,
     eventCode varchar(50) not null
 );
@@ -70,22 +72,23 @@ create table graph (
     transitions text not null
 );
 
-insert into graph 
+insert into graph
     (stateCode, stateName, transitions)
 values
     ("A", "State A", '[{"eventCode":"1", "nextStateCode":"B"}, {"eventCode":"2", "nextStateCode":"C"}]');
 
-insert into graph 
+insert into graph
     (stateCode, stateName, transitions)
 values
     ("B", "State B", '[{"eventCode":"1", "nextStateCode":"A"}, {"eventCode":"2", "nextStateCode":"C"}]');
 
-insert into graph 
+insert into graph
     (stateCode, stateName, transitions)
 values
     ("C", "State C", '[{"eventCode":"3", "nextStateCode":"A"}]');
 
 ```
+
 ## Testing with curl
 
 TBD
