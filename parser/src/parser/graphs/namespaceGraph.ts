@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseQualifiedIdentifier,
     parseOpenScope,
 } from '../stateMachine/SyntaxParser.js';
-import { applicationGraph, enumGraph, eolGraph, messageDefinitionGraph, networkGraph, usingGraph } from './index.js';
+import { applicationGraph, enumGraph, eolGraph, messageDefinitionGraph, networkGraph, usingGraph } from '../index.js';
 
 const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 
@@ -36,11 +35,11 @@ const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 export function defineNamespaceGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"namespace"', parseNamespace, skipSeparators, 'name')
+        .transition(parseNamespace, skipSeparators, 'name')
     .graph.state('name')
-        .transition('namespace identifier', parseQualifiedIdentifier, skipSeparators, 'definition')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statement')
+        .transition(parseOpenScope, skipSeparators, 'statement')
         .subGraph('empty-definition', eolGraph)
         .subGraph('single-using', usingGraph)
         .subGraph('single-message', messageDefinitionGraph)
@@ -48,7 +47,7 @@ export function defineNamespaceGraph(builder: GraphBuilder) {
         .subGraph('single-enum', enumGraph)
         .subGraph('single-application', applicationGraph)
     .graph.state('statement')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statement')
         .subGraph('using', usingGraph, 'statement')
         .subGraph('message', messageDefinitionGraph, 'statement')

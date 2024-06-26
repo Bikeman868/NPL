@@ -5,7 +5,7 @@ import { ParsableString } from './ParsableString.js';
 import { IToken } from '#interfaces/IToken.js';
 import { TokenType } from '#interfaces/TokenType.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
-import { buildNplSyntaxGraph } from './graphs/buildNplSyntaxGraph.js';
+import { buildNplSyntaxGraph } from './buildNplSyntaxGraph.js';
 
 const helloWorld = `using npl.connection
 

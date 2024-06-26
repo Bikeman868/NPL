@@ -1,8 +1,5 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
-    buildSymbolParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
@@ -14,7 +11,7 @@ import {
     parseEmptyKeyword,
     parseRouteKeyword,
     routingStatementGraph,
-} from './index.js';
+} from '../index.js';
 
 /* Examples
 
@@ -39,16 +36,16 @@ import {
 export function definePipeRouteGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"route"', parseRouteKeyword, skipSeparators, 'message-type')
+        .transition(parseRouteKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'identifier')
-        .transition('"*"', parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
-        .transition('the type of message to route', parseQualifiedIdentifier, skipSeparators, 'identifier')
+        .transition(parseEmptyKeyword, skipSeparators, 'identifier')
+        .transition(parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('empty-definition', eolGraph)
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('routing statement', routingStatementGraph, 'statements')
     .graph.state('end')

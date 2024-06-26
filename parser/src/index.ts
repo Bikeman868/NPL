@@ -8,7 +8,7 @@ import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 import { Parser } from '#parser/Parser.js';
 import { Context } from '#parser/Context.js';
 import { ParsableString } from '#parser/ParsableString.js';
-import { buildNplSyntaxGraph } from '#parser/graphs/buildNplSyntaxGraph.js';
+import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph.js';
 
 import { TokenPrinter } from './printer/TokenPrinter.js';
 import { SyntaxErrorPrinter } from './printer/SyntaxErrorPrinter.js';

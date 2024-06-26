@@ -7,7 +7,7 @@ import {
     parseString,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { emitGraph, eolGraph, expectGraph } from './index.js';
+import { emitGraph, eolGraph, expectGraph } from '../index.js';
 
 const parseTest = buildKeywordParser(['test'], 'Keyword');
 
@@ -31,14 +31,14 @@ const parseTest = buildKeywordParser(['test'], 'Keyword');
 export function defineTestGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"test"', parseTest, skipSeparators, 'description')
+        .transition(parseTest, skipSeparators, 'description')
     .graph.state('description')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
-        .transition('string literal', parseString, skipSeparators, 'definition')
+        .transition(parseOpenScope, skipSeparators, 'statements')
+        .transition(parseString, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('emit', emitGraph, 'statements')
         .subGraph('expect', expectGraph, 'statements')

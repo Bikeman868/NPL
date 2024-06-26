@@ -1,7 +1,6 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseIdentifier, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, parseEnumKeyword } from './index.js';
+import { eolGraph, parseEnumKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -20,21 +19,21 @@ import { eolGraph, parseEnumKeyword } from './index.js';
 export function defineEnumGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"enum"', parseEnumKeyword, skipSeparators, 'name')
+        .transition(parseEnumKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('enum identifier', parseIdentifier, skipSeparators, 'definition')
+        .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'scoped-value')
+        .transition(parseOpenScope, skipSeparators, 'scoped-value')
         .subGraph('empty-definition', eolGraph)
-        .transition('enum value', parseIdentifier, skipSeparators, 'single-line-values')
+        .transition(parseIdentifier, skipSeparators, 'single-line-values')
     .graph.state('scoped-value')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('scoped-eol', eolGraph, 'scoped-value')
-        .transition('enum value', parseIdentifier, skipSeparators, 'scoped-eol')
+        .transition(parseIdentifier, skipSeparators, 'scoped-eol')
     .graph.state('scoped-eol')
         .subGraph('scoped-value-eol', eolGraph, 'scoped-value')
     .graph.state('single-line-values')
-        .transition('enum value', parseIdentifier, skipSeparators, 'single-line-values')
+        .transition(parseIdentifier, skipSeparators, 'single-line-values')
         .subGraph('single-line-eol', eolGraph)
     .graph.state('end')
         .subGraph('end', eolGraph)

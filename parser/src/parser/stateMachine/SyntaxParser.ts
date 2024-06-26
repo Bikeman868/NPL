@@ -223,7 +223,7 @@ export const parseEolComment = buildEolCommentParser();
 export function buildBasicTypeParser(): SyntaxParser {
     const types = ['string', 'number', 'date', 'boolean'];
     return {
-        description: '"string", "number", "date" or "boolean"',
+        description: '"string", "number", "date", "boolean", "string[]", "number[]", "date[]" or "boolean[]"',
         parseFunction: (context: IContext) => {
             const startPosition = context.buffer.getPosition();
             let text = context.buffer.extractAny(keyword);

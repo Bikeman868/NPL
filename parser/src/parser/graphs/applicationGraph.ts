@@ -1,13 +1,7 @@
 import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
-import {
-    buildKeywordParser,
-    skipSeparators,
-    parseIdentifier,
-    parseOpenScope,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
-import { applicationConnectionGraph, configGraph, eolGraph, parseApplicationKeyword } from './index.js';
+import { skipSeparators, parseIdentifier, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
+import { applicationConnectionGraph, configGraph, eolGraph, parseApplicationKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -27,14 +21,14 @@ import { applicationConnectionGraph, configGraph, eolGraph, parseApplicationKeyw
 export function defineApplicationGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"application"', parseApplicationKeyword, skipSeparators, 'name')
+        .transition(parseApplicationKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('application name', parseIdentifier, skipSeparators, 'definition')
+        .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('empty-definition', eolGraph)
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('config', configGraph, 'statements')
         .subGraph('connection', applicationConnectionGraph, 'statements')

@@ -1,20 +1,18 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
-    buildCloseScopeParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
     parseIdentifier,
+    parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, parseAnyMessageTypeKeyword, parseAwaitKeyword, parseEmptyKeyword } from './index.js';
+import { eolGraph, parseAnyMessageTypeKeyword, parseAwaitKeyword, parseEmptyKeyword } from '../index.js';
 
 // prettier-ignore
 const messageTypeGraph = new GraphBuilder('await-message-type')
-    .graph.startTransition('"empty"', parseEmptyKeyword, skipSeparators)
-    .graph.startTransition('"*"', parseAnyMessageTypeKeyword, skipSeparators)
-    .graph.startTransition('identifier or message type', parseQualifiedIdentifier, skipSeparators)
+    .graph.startTransition(parseEmptyKeyword, skipSeparators)
+    .graph.startTransition(parseAnyMessageTypeKeyword, skipSeparators)
+    .graph.startTransition(parseQualifiedIdentifier, skipSeparators)
     .graph.build();
 
 /* Examples
@@ -34,19 +32,19 @@ const messageTypeGraph = new GraphBuilder('await-message-type')
 export function defineProcessAwaitGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"await"', parseAwaitKeyword, skipSeparators, 'message-type')
+        .transition(parseAwaitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'multiple-message-types')
+        .transition(parseOpenScope, skipSeparators, 'multiple-message-types')
         .subGraph('single-message-type', messageTypeGraph, 'single-identifier')
     .graph.state('single-identifier')
         .subGraph('single-no-identifier', eolGraph)
-        .transition('single-identifier', parseIdentifier, skipSeparators, 'end')
+        .transition(parseIdentifier, skipSeparators, 'end')
     .graph.state('multiple-message-types')
-        .transition(closeCurlyBracket, buildCloseScopeParser())
+        .transition(parseCloseScope)
         .subGraph('blank-line', eolGraph, 'multiple-message-types')
         .subGraph('multiple-message-type', messageTypeGraph, 'multiple-identifier')
     .graph.state('multiple-identifier')
-        .transition('multiple-identifier', parseIdentifier, skipSeparators, 'multiple-end')
+        .transition(parseIdentifier, skipSeparators, 'multiple-end')
         .subGraph('multiple-no-identifier', eolGraph, 'multiple-message-types')
     .graph.state('multiple-end')
         .subGraph('multiple-end', eolGraph, 'multiple-message-types')

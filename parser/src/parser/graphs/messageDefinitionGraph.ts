@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { dataTypeGraph, eolGraph } from './index.js';
+import { dataTypeGraph, eolGraph } from '../index.js';
 
 const parseMessage = buildKeywordParser(['message'], 'Keyword');
 
@@ -21,7 +20,7 @@ const messageFieldGraph = new GraphBuilder('message-field')
     .graph.start
         .subGraph('type', dataTypeGraph, 'identifier')
     .graph.state('identifier')
-        .transition('message field name', parseIdentifier, skipSeparators)
+        .transition(parseIdentifier, skipSeparators)
     .graph.build();
 
 /* Examples
@@ -46,15 +45,15 @@ const messageFieldGraph = new GraphBuilder('message-field')
 export function defineMessageDefinitionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"message"', parseMessage, skipSeparators, 'name')
+        .transition(parseMessage, skipSeparators, 'name')
     .graph.state('name')
-        .transition('message identifier', parseIdentifier, skipSeparators, 'definition')
+        .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'fields')
+        .transition(parseOpenScope, skipSeparators, 'fields')
         .subGraph('empty-definition', eolGraph)
         .subGraph('single-field', messageFieldGraph, 'end')
     .graph.state('fields')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'fields')
         .subGraph('field', messageFieldGraph, 'field-end')
     .graph.state('field-end')

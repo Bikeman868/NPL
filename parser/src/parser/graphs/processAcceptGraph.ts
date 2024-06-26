@@ -1,7 +1,5 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     skipSeparators,
     parseQualifiedIdentifier,
     parseOpenScope,
@@ -24,7 +22,7 @@ import {
     processRouteGraph,
     setGraph,
     varGraph,
-} from './index.js';
+} from '../index.js';
 
 const statementGraphBuilder: GraphBuilder = new GraphBuilder('process-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-scope-block');
@@ -41,9 +39,9 @@ const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-s
 */
 statementGraphBuilder
     .graph.start
-        .transition('"if", "elseif", "while"', parseConditionalKeyword, skipSeparators, 'conditional')
-        .transition('"for"', parseForKeyword, skipSeparators, 'for-loop')
-        .transition('"else"', parseElseKeyword, skipSeparators, 'else')
+        .transition(parseConditionalKeyword, skipSeparators, 'conditional')
+        .transition(parseForKeyword, skipSeparators, 'for-loop')
+        .transition(parseElseKeyword, skipSeparators, 'else')
         .subGraph('blank-line', eolGraph)
         .subGraph('emit', emitGraph)
         .subGraph('await', processAwaitGraph)
@@ -58,11 +56,11 @@ statementGraphBuilder
     .graph.state('statement-block')
         .subGraph('statements', statemenScopeBlockGraphBuilder.build())
     .graph.state('for-loop')
-        .transition('identifier', parseIdentifier, skipSeparators, 'loop-type')
+        .transition(parseIdentifier, skipSeparators, 'loop-type')
     .graph.state('loop-type')
-        .transition('"of", "in"', parseForOfInKeyword, skipSeparators, 'conditional')
+        .transition(parseForOfInKeyword, skipSeparators, 'conditional')
     .graph.state('else')
-        .transition('openCurlyBracket', parseOpenScope, skipSeparators, 'statement-block')
+        .transition(parseOpenScope, skipSeparators, 'statement-block')
         .subGraph('else-single-statement', statementGraphBuilder.build())
     .graph.build();
 
@@ -79,11 +77,11 @@ statementGraphBuilder
 */
 statemenScopeBlockGraphBuilder
     .graph.start
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-first-line', eolGraph, 'statements')
         .subGraph('first-statement', statementGraphBuilder.build(), 'statements')
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('next-statement', statementGraphBuilder.build(), 'statements')
     .graph.state('end')
@@ -127,17 +125,17 @@ statemenScopeBlockGraphBuilder
 export function defineProcessAcceptGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"accept"', parseAcceptKeyword, skipSeparators, 'message-type')
+        .transition(parseAcceptKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'identifier')
-        .transition('"*"', parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
-        .transition('the type of message to accept', parseQualifiedIdentifier, skipSeparators, 'identifier')
+        .transition(parseEmptyKeyword, skipSeparators, 'identifier')
+        .transition(parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
-        .transition('message identifier', parseIdentifier, skipSeparators, 'has-identifier')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseIdentifier, skipSeparators, 'has-identifier')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('placeholder-definition', eolGraph)
     .graph.state('has-identifier')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('identified-placeholder', eolGraph)
     .graph.state('statements')
         .subGraph('blank-line', eolGraph, 'statements')

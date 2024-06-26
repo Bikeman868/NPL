@@ -1,4 +1,3 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseCloseScope,
     parseIdentifier,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, assignmentExpressionGraph } from './index.js';
+import { eolGraph, assignmentExpressionGraph } from '../index.js';
 
 /* Examples
 
@@ -26,14 +25,14 @@ const parseMessage = buildKeywordParser(['message'], 'Keyword');
 export function defineMessageMessageGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"message"', parseMessage, skipSeparators, 'definition')
+        .transition(parseMessage, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'fields')
-        .transition('message field name', parseIdentifier, skipSeparators, 'single-field')
+        .transition(parseOpenScope, skipSeparators, 'fields')
+        .transition(parseIdentifier, skipSeparators, 'single-field')
     .graph.state('fields')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'fields')
-        .transition('message field name', parseIdentifier, skipSeparators, 'field-value')
+        .transition(parseIdentifier, skipSeparators, 'field-value')
     .graph.state('single-field')
         .subGraph('single-expression', assignmentExpressionGraph)
     .graph.state('field-value')

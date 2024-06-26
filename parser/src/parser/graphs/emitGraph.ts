@@ -1,4 +1,3 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     skipSeparators,
@@ -13,7 +12,7 @@ import {
     messageRouteGraph,
     parseEmitKeyword,
     parseEmptyKeyword,
-} from './index.js';
+} from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -63,18 +62,18 @@ import {
 export function defineEmitGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"emit"', parseEmitKeyword, skipSeparators, 'message-type')
+        .transition(parseEmitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition('"empty"', parseEmptyKeyword, skipSeparators, 'definition')
-        .transition('message or message type', parseQualifiedIdentifier, skipSeparators, 'definition')
+        .transition(parseEmptyKeyword, skipSeparators, 'definition')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'constructor')
+        .transition(parseOpenScope, skipSeparators, 'constructor')
         .subGraph('empty-definition', eolGraph)
         .subGraph('single-message-message', messageMessageGraph)
         .subGraph('single-message-context', messageContextGraph)
         .subGraph('single-message-route', messageRouteGraph)
     .graph.state('constructor')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'constructor')
         .subGraph('message-message', messageMessageGraph, 'constructor')
         .subGraph('message-context', messageContextGraph, 'constructor')

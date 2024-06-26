@@ -76,14 +76,8 @@ export class GraphBuilder {
         return this._graph;
     }
 
-    startTransition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphBuilder {
+    startTransition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphBuilder {
         this._graph.start.transitions.push({
-            description,
             nextStateName,
             parser,
             whitespaceSkipper,
@@ -115,13 +109,8 @@ export class GraphStartBuilder {
         this._graphBuilder = graphBuilder;
     }
 
-    transition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphStartBuilder {
-        this._graphBuilder.startTransition(description, parser, whitespaceSkipper, nextStateName);
+    transition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphStartBuilder {
+        this._graphBuilder.startTransition(parser, whitespaceSkipper, nextStateName);
         return this;
     }
 
@@ -148,14 +137,8 @@ export class GraphStateBuilder {
         };
     }
 
-    transition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphStateBuilder {
+    transition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphStateBuilder {
         this._state.transitions.push({
-            description,
             parser,
             whitespaceSkipper,
             nextStateName,

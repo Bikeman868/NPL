@@ -1,5 +1,5 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { eolGraph, namespaceGraph, usingGraph } from './index.js';
+import { eolGraph, namespaceGraph, usingGraph } from '../index.js';
 
 // prettier-ignore
 /* Examples

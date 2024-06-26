@@ -1,6 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, dataTypeGraph, eolGraph, messageLiteralGraph, parseVarKeyword } from './index.js';
+import { assignmentExpressionGraph, dataTypeGraph, eolGraph, parseVarKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -22,9 +22,9 @@ import { assignmentExpressionGraph, dataTypeGraph, eolGraph, messageLiteralGraph
 export function defineVarGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"var"', parseVarKeyword, skipSeparators, 'name')
+        .transition(parseVarKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('var name', parseIdentifier, skipSeparators, 'value')
+        .transition(parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('no-value', eolGraph)
         .subGraph('data-type', dataTypeGraph, 'end')

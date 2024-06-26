@@ -1,6 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseQualifiedIdentifier, skipSeparators, skipWhitespace } from '../stateMachine/SyntaxParser.js';
-import { parseUsingKeyword } from './index.js';
+import { parseUsingKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -13,8 +13,8 @@ import { parseUsingKeyword } from './index.js';
 export function defineUsingGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"using"', parseUsingKeyword, skipSeparators, 'namespace')
+        .transition(parseUsingKeyword, skipSeparators, 'namespace')
     .graph.state('namespace')
-        .transition('namespace name', parseQualifiedIdentifier, skipWhitespace)
+        .transition(parseQualifiedIdentifier, skipWhitespace)
     .graph.build();
 }

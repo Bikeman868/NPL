@@ -1,7 +1,6 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildKeywordParser, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, messageInitGraph } from './index.js';
+import { eolGraph, messageInitGraph } from '../index.js';
 
 const parseContextKeyword = buildKeywordParser(['context'], 'Keyword');
 const parseContextType = buildKeywordParser(['origin', 'message', 'network'], 'Keyword');
@@ -33,16 +32,16 @@ const parseContextType = buildKeywordParser(['origin', 'message', 'network'], 'K
 export function defineMessageContextGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"context"', parseContextKeyword, skipSeparators, 'definition')
+        .transition(parseContextKeyword, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'scope-block')
-        .transition('"origin", "network", "message"', parseContextType, skipSeparators, 'single-context')
+        .transition(parseOpenScope, skipSeparators, 'scope-block')
+        .transition(parseContextType, skipSeparators, 'single-context')
     .graph.state('single-context')
         .subGraph('single-context', messageInitGraph)
     .graph.state('scope-block')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'scope-block')
-        .transition('"origin", "network", "message"', parseContextType, skipSeparators, 'context')
+        .transition(parseContextType, skipSeparators, 'context')
     .graph.state('context')
         .subGraph('context', messageInitGraph, "scope-block")
     .graph.state('end')

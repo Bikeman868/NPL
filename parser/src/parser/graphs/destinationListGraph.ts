@@ -1,7 +1,6 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseCloseScope, parseOpenScope, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { destinationGraph, eolGraph } from './index.js';
+import { destinationGraph, eolGraph } from '../index.js';
 
 /* Examples
     process process1<EOL>
@@ -18,15 +17,15 @@ import { destinationGraph, eolGraph } from './index.js';
 export function defineDestinationListGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'scoped')
+        .transition(parseOpenScope, skipSeparators, 'scoped')
         .subGraph('single', destinationGraph, 'end')
     .graph.state('scoped')
         .subGraph('scoped-single', destinationGraph, 'scoped-single')
         .subGraph('destination-list', eolGraph, 'list')
     .graph.state('scoped-single')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
     .graph.state('list')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'list')
         .subGraph('destination', destinationGraph, 'destination-eol')
     .graph.state('destination-eol')

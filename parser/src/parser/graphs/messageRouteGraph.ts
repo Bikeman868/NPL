@@ -1,7 +1,6 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildKeywordParser, skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, routingStatementGraph } from './index.js';
+import { eolGraph, routingStatementGraph } from '../index.js';
 
 /* Examples
     route clear<EOL>
@@ -22,12 +21,12 @@ const parseRoute = buildKeywordParser(['route'], 'Keyword');
 export function defineMessageRouteGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"route"', parseRoute, skipSeparators, 'route')
+        .transition(parseRoute, skipSeparators, 'route')
     .graph.state('route')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('single-statement', routingStatementGraph)
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('destination', routingStatementGraph, 'statements')
     .graph.state('end')

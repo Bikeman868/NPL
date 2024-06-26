@@ -1,6 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, parseSetKeyword } from './index.js';
+import { assignmentExpressionGraph, parseSetKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -13,9 +13,9 @@ import { assignmentExpressionGraph, parseSetKeyword } from './index.js';
 export function defineSetGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"set"', parseSetKeyword, skipSeparators, 'name')
+        .transition(parseSetKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('var name', parseQualifiedIdentifier, skipSeparators, 'value')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('expression', assignmentExpressionGraph)
     .graph.build();

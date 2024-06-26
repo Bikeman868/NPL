@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph, eolGraph, processAcceptGraph, testGraph } from './index.js';
+import { configGraph, eolGraph, processAcceptGraph, testGraph } from '../index.js';
 
 const parseProcess = buildKeywordParser(['process'], 'Keyword');
 
@@ -39,14 +38,14 @@ const parseProcess = buildKeywordParser(['process'], 'Keyword');
 export function defineProcessGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"process"', parseProcess, skipSeparators, 'name')
+        .transition(parseProcess, skipSeparators, 'name')
     .graph.state('name')
-        .transition('process name', parseIdentifier, skipSeparators, 'definition')
+        .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('empty-definition', eolGraph)
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('accept', processAcceptGraph, 'statements')
         .subGraph('test', testGraph, 'statements')

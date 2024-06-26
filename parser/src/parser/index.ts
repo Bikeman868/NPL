@@ -1,5 +1,5 @@
-import { buildKeywordParser, buildSymbolParser } from '../stateMachine/SyntaxParser.js';
-import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
+import { buildKeywordParser, buildSymbolParser } from './stateMachine/SyntaxParser.js';
+import { GraphBuilder } from './stateMachine/GraphBuilder.js';
 import {
     closeCurlyBracket,
     closeRoundBracket,

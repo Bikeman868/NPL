@@ -1,7 +1,6 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseCloseScope, parseOpenScope, skipSeparators } from '#parser/stateMachine/SyntaxParser.js';
-import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph } from './index.js';
+import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -34,9 +33,9 @@ import { eolGraph, messageContextGraph, messageMessageGraph, messageRouteGraph }
 export function defineMessageConstructorGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'definition')
+        .transition(parseOpenScope, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators)
+        .transition(parseCloseScope, skipSeparators)
         .subGraph('blank-line', eolGraph, 'definition')
         .subGraph('message-message', messageMessageGraph, 'definition')
         .subGraph('message-context', messageContextGraph, 'definition')

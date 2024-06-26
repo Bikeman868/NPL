@@ -1,4 +1,3 @@
-import { openCurlyBracket, closeCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, routingStatementGraph } from './index.js';
+import { eolGraph, routingStatementGraph } from '../index.js';
 
 /** Examples
 
@@ -33,15 +32,15 @@ const parseRoute = buildKeywordParser(['route'], 'Keyword');
 export function defineProcessRouteGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"route"', parseRoute, skipSeparators, 'identifier')
+        .transition(parseRoute, skipSeparators, 'identifier')
     .graph.state('identifier')
-        .transition('message identifier', parseQualifiedIdentifier, skipSeparators, 'definition')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statements')
+        .transition(parseOpenScope, skipSeparators, 'statements')
         .subGraph('single-statement', routingStatementGraph)
         .subGraph('empty-definition', eolGraph)
     .graph.state('statements')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
         .subGraph('statement', routingStatementGraph, 'statements')
     .graph.state('end')

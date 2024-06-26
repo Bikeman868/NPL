@@ -6,7 +6,7 @@ import { IContext } from '#interfaces/IContext';
 import { ParseResult } from '../ParseResult';
 import { TokenType } from '#interfaces/TokenType';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph';
-import { buildNplSyntaxGraph } from '#parser/graphs/buildNplSyntaxGraph';
+import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph';
 
 const nplGraph = buildNplSyntaxGraph();
 

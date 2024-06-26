@@ -1,7 +1,6 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { skipSeparators, parseIdentifier, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, assignmentExpressionGraph } from './index.js';
+import { eolGraph, assignmentExpressionGraph } from '../index.js';
 
 /* Examples
 
@@ -17,14 +16,14 @@ import { eolGraph, assignmentExpressionGraph } from './index.js';
 export function defineMessageInitGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('field name', parseIdentifier, skipSeparators, 'single-value')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'fields')
+        .transition(parseIdentifier, skipSeparators, 'single-value')
+        .transition(parseOpenScope, skipSeparators, 'fields')
     .graph.state('single-value')
         .subGraph('single-value', assignmentExpressionGraph)
     .graph.state('fields')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'fields')
-        .transition('field name', parseIdentifier, skipSeparators, 'value')
+        .transition(parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('value', assignmentExpressionGraph, 'fields')
     .graph.state('end')

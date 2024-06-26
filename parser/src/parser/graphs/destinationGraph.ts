@@ -1,6 +1,6 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { parseDestinationKeyword } from './index.js';
+import { parseDestinationKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -15,8 +15,8 @@ import { parseDestinationKeyword } from './index.js';
 export function defineDestinationGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"network", "process", "pipe"', parseDestinationKeyword, skipSeparators, 'name')
+        .transition(parseDestinationKeyword, skipSeparators, 'name')
     .graph.state('name')
-        .transition('name', parseQualifiedIdentifier, skipSeparators)
+        .transition(parseQualifiedIdentifier, skipSeparators)
     .graph.build();
 }

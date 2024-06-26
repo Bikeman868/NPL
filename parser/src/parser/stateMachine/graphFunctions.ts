@@ -33,14 +33,14 @@ function tryStartGraph(context: IContext, syntaxGraph: SyntaxGraph, graphName: s
     // Check for transitions to an initial state
     for (const transition of syntaxGraph.start.transitions) {
         context.trace(() => {
-            return `Testing '${transition.description}' transition`;
+            return `Testing '${transition.parser.description}' transition`;
         });
 
         const parseResult = transition.parser.parseFunction(context);
 
         if (parseResult) {
             context.debug(() => {
-                return `Found  ${parseResult.tokenType} in '${transition.description}' transition`;
+                return `Found  ${parseResult.tokenType} in '${transition.parser.description}' transition`;
             });
 
             skipWhitespaceAfterTransition(context, transition);
@@ -133,13 +133,13 @@ function parseFromState(
     // See if any state transitions match the input stream
     for (const transition of currentState.transitions) {
         context.trace(() => {
-            return `Testing '${transition.description}' transition`;
+            return `Testing '${transition.parser.description}' transition`;
         });
 
         const parseResult = transition.parser.parseFunction(context);
         if (parseResult) {
             context.debug(() => {
-                return `Found ${parseResult.tokenType} in '${transition.description}' transition`;
+                return `Found ${parseResult.tokenType} in '${transition.parser.description}' transition`;
             });
 
             skipWhitespaceAfterTransition(context, transition);
@@ -233,7 +233,7 @@ function skipWhitespaceAfterTransition(context: IContext, transition: StateTrans
                 .replace(/\n/g, 'n')
                 .replace(/\r/g, 'r')
                 .replace(/\t/g, 't');
-            return `Skipped ${length} '${spaces}' after '${transition.description}' transition`;
+            return `Skipped ${length} '${spaces}' after '${transition.parser.description}' transition`;
         });
     }
 }
@@ -255,7 +255,7 @@ function listStateTransitions(state: State): string[] {
     const options = [];
 
     for (const transition of state.transitions) {
-        options.push(transition.description);
+        options.push(transition.parser.description);
     }
 
     return options;

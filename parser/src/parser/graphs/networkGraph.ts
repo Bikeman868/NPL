@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildKeywordParser,
@@ -7,7 +6,7 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph, destinationListGraph, eolGraph, pipeGraph, processGraph } from './index.js';
+import { configGraph, destinationListGraph, eolGraph, pipeGraph, processGraph } from '../index.js';
 
 /* Examples
 
@@ -48,36 +47,36 @@ const parseDefault = buildKeywordParser(['default'], 'Keyword');
 // prettier-ignore
 const entrypointGraph = new GraphBuilder('network-entry')
     .start
-        .transition('ingress', parseIngress, skipSeparators, 'ingress')
-        .transition('egress', parseEgress, skipSeparators, 'egress')
+        .transition(parseIngress, skipSeparators, 'ingress')
+        .transition(parseEgress, skipSeparators, 'egress')
     .graph.state('ingress')
-        .transition('egress', parseEgress, skipSeparators, 'name')
-        .transition('default', parseDefault, skipSeparators)
-        .transition('entry point name', parseIdentifier, skipSeparators)
+        .transition(parseEgress, skipSeparators, 'name')
+        .transition(parseDefault, skipSeparators)
+        .transition(parseIdentifier, skipSeparators)
     .graph.state('egress')
-        .transition('ingress', parseIngress, skipSeparators, 'name')
-        .transition('default', parseDefault, skipSeparators)
-        .transition('entry point name', parseIdentifier, skipSeparators)
+        .transition(parseIngress, skipSeparators, 'name')
+        .transition(parseDefault, skipSeparators)
+        .transition(parseIdentifier, skipSeparators)
     .graph.state('name')
-        .transition('default', parseDefault, skipSeparators)
-        .transition('entry point name', parseIdentifier, skipSeparators)
+        .transition(parseDefault, skipSeparators)
+        .transition(parseIdentifier, skipSeparators)
     .graph.build();
 
 // prettier-ignore
 export function defineNetworkGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition('"network"', parseNetwork, skipSeparators, 'name')
+        .transition(parseNetwork, skipSeparators, 'name')
     .graph.state('name')
-        .transition('network name', parseIdentifier, skipSeparators, 'definition')
+        .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')
-        .transition(openCurlyBracket, parseOpenScope, skipSeparators, 'statement-block')
+        .transition(parseOpenScope, skipSeparators, 'statement-block')
         .subGraph('empty-definition', eolGraph)
         .subGraph('single-line', entrypointGraph, 'single-entrypoint')
     .graph.state('single-entrypoint')
         .subGraph('destination-list', destinationListGraph, 'end')
     .graph.state('statement-block')
-        .transition(closeCurlyBracket, parseCloseScope, skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-statement-line', eolGraph, 'statement-block')
         .subGraph('network-entrypoint', entrypointGraph, 'entrypoint-statement')
         .subGraph('process', processGraph, 'statement-block')
