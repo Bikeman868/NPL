@@ -63,18 +63,7 @@ import { defineMessageDefinitionGraph } from './graphs/messageDefinitionGraph.js
 import { defineMessageInitGraph } from './graphs/messageInitGraph.js';
 import { defineMessageLiteralGraph } from './graphs/messageLiteralGraph.js';
 import { defineMessageMessageGraph } from './graphs/messageMessageGraph.js';
-import {
-    defineConditionalExpressionGraph,
-    defineAssignmentExpressionGraph,
-    defineBinaryOperatorGraph,
-    defineExpressionTermGraph,
-    defineFunctionCallGraph,
-    defineLiteralMapGraph,
-    defineLiteralListGraph,
-    defineIndexExpressionGraph,
-    defineSubExpressionGraph,
-    defineUnaryOperatorGraph,
-} from './graphs/expressionGraph.js';
+import { defineAssignmentExpressionGraph } from './graphs/assignmentExpressionGraph.js';
 import { defineNamespaceGraph } from './graphs/namespaceGraph.js';
 import { defineNplGraph } from './graphs/nplGraph.js';
 import { definePipeGraph } from './graphs/pipeGraph.js';
@@ -91,6 +80,15 @@ import { defineVarGraph } from './graphs/varGraph.js';
 import { defineNetworkGraph } from './graphs/networkGraph.js';
 import { defineMessageRouteGraph } from './graphs/messageRouteGraph.js';
 import { defineMessageConstructorGraph } from './graphs/messageConstructorGraph.js';
+import { defineBinaryOperatorGraph } from './graphs/binaryOperatorGraph.js';
+import { defineConditionalExpressionGraph } from './graphs/conditionalExpressionGraph.js';
+import { defineExpressionTermGraph } from './graphs/expressionTermGraph.js';
+import { defineFunctionCallGraph } from './graphs/functionCallGraph.js';
+import { defineIndexExpressionGraph } from './graphs/indexExpressionGraph.js';
+import { defineLiteralListGraph } from './graphs/literalListGraph.js';
+import { defineLiteralMapGraph } from './graphs/literalMapGraph.js';
+import { defineSubExpressionGraph } from './graphs/subExpressionGraph.js';
+import { defineUnaryOperatorGraph } from './graphs/unaryOperatorGraph.js';
 
 export function buildNplSyntaxGraph(): SyntaxGraph {
     defineApplicationConnectionGraph(applicationConnectionGraphBuilder);
