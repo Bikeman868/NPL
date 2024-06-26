@@ -11,7 +11,15 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import {
     assignmentExpressionGraph,
+    binaryOperatorGraph,
     eolGraph,
+    expressionTermGraph,
+    functionCallGraph,
+    indexExpressionGraph,
+    literalListGraph,
+    literalListGraphBuilder,
+    literalMapGraph,
+    literalMapGraphBuilder,
     messageConstructorGraph,
     parseEndFunctionCallSymbol,
     parseEndIndexerSymbol,
@@ -23,16 +31,11 @@ import {
     parseStartListLiteralSymbol,
     parseStartMapLiteralSymbol,
     parseStartSubExpressionSymbol,
+    subExpressionGraph,
+    subExpressionGraphBuilder,
+    unaryOperatorGraph,
+    unaryOperatorGraphBuilder,
 } from '../index.js';
-
-const expressionTermGraphBuilder = new GraphBuilder('expression-term');
-const binaryOperatorGraphBuilder = new GraphBuilder('binary-operator');
-const unaryOperatorGraphBuilder = new GraphBuilder('unary-operator');
-const subExpressionGraphBuilder = new GraphBuilder('close-terminated-expression');
-const indexExpressionGraphBuilder = new GraphBuilder('array-index-expression');
-const functionCallGraphBuilder = new GraphBuilder('function-call');
-const literalListGraphBuilder = new GraphBuilder('literal-list');
-const literalMapGraphBuilder = new GraphBuilder('literal-map');
 
 // prettier-ignore
 /* Examples:
@@ -59,17 +62,18 @@ const literalMapGraphBuilder = new GraphBuilder('literal-map');
     }
 
 */
-expressionTermGraphBuilder
+export function defineExpressionTermGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(parseString, skipSeparators)
         .transition(parseNumber, skipSeparators)
         .transition(parseBoolean, skipSeparators)
         .transition(parseString, skipSeparators)
         .transition(parseQualifiedIdentifier, skipSeparators)
-        .subGraph('literal-list', literalListGraphBuilder.build())
-        .subGraph('literal-map', literalMapGraphBuilder.build())
-        .subGraph('sub-expression', subExpressionGraphBuilder.build())
-        .subGraph('unary', unaryOperatorGraphBuilder.build(), 'unary')
+        .subGraph('literal-list', literalListGraph)
+        .subGraph('literal-map', literalMapGraph)
+        .subGraph('sub-expression', subExpressionGraph)
+        .subGraph('unary', unaryOperatorGraph, 'unary')
     .graph.state('unary')
         .transition(parseString, skipSeparators)
         .transition(parseNumber, skipSeparators)
@@ -80,10 +84,12 @@ expressionTermGraphBuilder
         .subGraph('unary-literal-map', literalMapGraphBuilder.build())
         .subGraph('unary-sub-expression', subExpressionGraphBuilder.build())
         .subGraph('double-unary', unaryOperatorGraphBuilder.build(), 'unary')
-.graph.build();
+    .graph.build();
+}
 
 // prettier-ignore
-binaryOperatorGraphBuilder
+export function defineBinaryOperatorGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(buildSymbolParser('==', 'Operator'), skipSeparators)
         .transition(buildSymbolParser('!=', 'Operator'), skipSeparators)
@@ -101,13 +107,16 @@ binaryOperatorGraphBuilder
         .transition(buildSymbolParser('<', 'Operator'), skipSeparators)
         .transition(buildSymbolParser('.', 'Operator'), skipSeparators)
     .graph.build();
+}
 
 // prettier-ignore
-unaryOperatorGraphBuilder
+export function defineUnaryOperatorGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(buildSymbolParser('!', 'Operator'), skipSeparators)
         .transition(buildSymbolParser('...', 'Operator'), skipSeparators)
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples 
@@ -119,14 +128,16 @@ unaryOperatorGraphBuilder
     []
 
 */
-literalListGraphBuilder
+export function defineLiteralListGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
-        .transition(parseStartListLiteralSymbol, skipSeparators, 'elements')
+        .transition(parseStartMapLiteralSymbol, skipSeparators, 'elements')
     .graph.state('elements')
-        .transition(parseEndListLiteralSymbol, skipSeparators)
+        .transition(parseEndMapLiteralSymbol, skipSeparators)
         .subGraph('list-blank-line', eolGraph, 'elements')
         .subGraph('list-element', assignmentExpressionGraph, 'elements')
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples 
@@ -139,7 +150,8 @@ literalListGraphBuilder
     {}
 
 */
-literalMapGraphBuilder
+export function defineLiteralMapGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(parseStartMapLiteralSymbol, skipSeparators, 'entries')
     .graph.state('entries')
@@ -149,6 +161,7 @@ literalMapGraphBuilder
     .graph.state('value')
         .subGraph('value', assignmentExpressionGraph, 'entries')
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples 
@@ -158,20 +171,22 @@ literalMapGraphBuilder
     (myArray[10])
 
 */
-subExpressionGraphBuilder
+export function defineSubExpressionGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(parseStartSubExpressionSymbol, skipSeparators, 'term')
     .graph.state('term')
         .transition(parseEndSubExpressionSymbol, skipSeparators)
-        .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .transition(parseEndSubExpressionSymbol, skipSeparators)
-        .subGraph('operator', binaryOperatorGraphBuilder.build(), 'second-term')
-        .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
-        .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('operator', binaryOperatorGraph, 'second-term')
+        .subGraph('indexer', indexExpressionGraph, 'operator')
+        .subGraph('function-call', functionCallGraph, 'operator')
     .graph.state('second-term')
-        .subGraph('second-term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('second-term', expressionTermGraph, 'operator')
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples
@@ -183,17 +198,19 @@ subExpressionGraphBuilder
     [list[3]]
 
 */
-indexExpressionGraphBuilder
+export function defineIndexExpressionGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(parseStartIndexerSymbol, skipSeparators, 'index-expression')
     .graph.state('index-expression')
-        .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .transition(parseEndIndexerSymbol, skipSeparators)
-        .subGraph('operator', binaryOperatorGraphBuilder.build(), 'index-expression')
-        .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
-        .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('operator', binaryOperatorGraph, 'index-expression')
+        .subGraph('indexer', indexExpressionGraph, 'operator')
+        .subGraph('function-call', functionCallGraph, 'operator')
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples
@@ -203,19 +220,21 @@ indexExpressionGraphBuilder
     (list[3], myString.indexOf(' '), 99)
 
 */
-functionCallGraphBuilder
+export function defineFunctionCallGraph(builder: GraphBuilder) {
+    builder.clear()
     .graph.start
         .transition(parseStartFunctionCallSymbol, skipSeparators, 'parameter')
     .graph.state('parameter')
         .transition(parseEndFunctionCallSymbol, skipSeparators)
-        .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .transition(parseEndFunctionCallSymbol, skipSeparators)
         .transition(buildSymbolParser(comma, 'ListSeparator'), skipSeparators, 'parameter')
-        .subGraph('operator', binaryOperatorGraphBuilder.build(), 'parameter')
-        .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
-        .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('operator', binaryOperatorGraph, 'parameter')
+        .subGraph('indexer', indexExpressionGraph, 'operator')
+        .subGraph('function-call', functionCallGraph, 'operator')
     .graph.build();
+}
 
 // prettier-ignore
 /* Examples
@@ -248,15 +267,15 @@ functionCallGraphBuilder
 export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .subGraph('end', eolGraph)
-        .subGraph('operator', binaryOperatorGraphBuilder.build(), 'second-term')
-        .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
-        .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('operator', binaryOperatorGraph, 'second-term')
+        .subGraph('indexer', indexExpressionGraph, 'operator')
+        .subGraph('function-call', functionCallGraph, 'operator')
         .subGraph('message-literal', messageConstructorGraph, 'operator')
     .graph.state('second-term')
-        .subGraph('second-term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('second-term', expressionTermGraph, 'operator')
     .graph.build();
 }
 
@@ -273,13 +292,13 @@ export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
 export function defineConditionalExpressionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .subGraph('term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .transition(buildSymbolParser(openCurlyBracket, 'StartScope'), skipSeparators)
-        .subGraph('operator', binaryOperatorGraphBuilder.build(), 'second-term')
-        .subGraph('indexer', indexExpressionGraphBuilder.build(), 'operator')
-        .subGraph('function-call', functionCallGraphBuilder.build(), 'operator')
+        .subGraph('operator', binaryOperatorGraph, 'second-term')
+        .subGraph('indexer', indexExpressionGraph, 'operator')
+        .subGraph('function-call', functionCallGraph, 'operator')
     .graph.state('second-term')
-        .subGraph('second-term', expressionTermGraphBuilder.build(), 'operator')
+        .subGraph('second-term', expressionTermGraph, 'operator')
     .graph.build();
 }

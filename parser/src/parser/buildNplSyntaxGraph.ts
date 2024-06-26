@@ -35,6 +35,14 @@ import {
     messageRouteGraphBuilder,
     assignmentExpressionGraphBuilder,
     messageConstructorGraphBuilder,
+    binaryOperatorGraphBuilder,
+    expressionTermGraphBuilder,
+    functionCallGraphBuilder,
+    indexExpressionGraphBuilder,
+    literalListGraphBuilder,
+    literalMapGraphBuilder,
+    subExpressionGraphBuilder,
+    unaryOperatorGraphBuilder,
 } from './index.js';
 
 import { defineDataTypeGraph } from './graphs/dataTypeGraph.js';
@@ -55,7 +63,18 @@ import { defineMessageDefinitionGraph } from './graphs/messageDefinitionGraph.js
 import { defineMessageInitGraph } from './graphs/messageInitGraph.js';
 import { defineMessageLiteralGraph } from './graphs/messageLiteralGraph.js';
 import { defineMessageMessageGraph } from './graphs/messageMessageGraph.js';
-import { defineConditionalExpressionGraph, defineAssignmentExpressionGraph } from './graphs/expressionGraph.js';
+import {
+    defineConditionalExpressionGraph,
+    defineAssignmentExpressionGraph,
+    defineBinaryOperatorGraph,
+    defineExpressionTermGraph,
+    defineFunctionCallGraph,
+    defineLiteralMapGraph,
+    defineLiteralListGraph,
+    defineIndexExpressionGraph,
+    defineSubExpressionGraph,
+    defineUnaryOperatorGraph,
+} from './graphs/expressionGraph.js';
 import { defineNamespaceGraph } from './graphs/namespaceGraph.js';
 import { defineNplGraph } from './graphs/nplGraph.js';
 import { definePipeGraph } from './graphs/pipeGraph.js';
@@ -77,6 +96,7 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineApplicationConnectionGraph(applicationConnectionGraphBuilder);
     defineApplicationGraph(applicationGraphBuilder);
     defineAssignmentExpressionGraph(assignmentExpressionGraphBuilder);
+    defineBinaryOperatorGraph(binaryOperatorGraphBuilder);
     defineConditionalExpressionGraph(conditionalExpressionGraphBuilder);
     defineConfigFieldGraph(configFieldGraphBuilder);
     defineConfigGraph(configGraphBuilder);
@@ -88,6 +108,11 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineEnumGraph(enumGraphBuilder);
     defineEolGraph(eolGraphBuilder);
     defineExpectGraph(expectGraphBuilder);
+    defineExpressionTermGraph(expressionTermGraphBuilder);
+    defineFunctionCallGraph(functionCallGraphBuilder);
+    defineIndexExpressionGraph(indexExpressionGraphBuilder);
+    defineLiteralListGraph(literalListGraphBuilder);
+    defineLiteralMapGraph(literalMapGraphBuilder);
     defineMessageConstructorGraph(messageConstructorGraphBuilder);
     defineMessageContextGraph(messageContextGraphBuilder);
     defineMessageDefinitionGraph(messageDefinitionGraphBuilder);
@@ -106,7 +131,9 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineProcessRouteGraph(processRouteGraphBuilder);
     defineRoutingStatementGraph(routingStatementGraphBuilder);
     defineSetGraph(setGraphBuilder);
+    defineSubExpressionGraph(subExpressionGraphBuilder);
     defineTestGraph(testGraphBuilder);
+    defineUnaryOperatorGraph(unaryOperatorGraphBuilder);
     defineUsingGraph(usingGraphBuilder);
     defineVarGraph(varGraphBuilder);
 
