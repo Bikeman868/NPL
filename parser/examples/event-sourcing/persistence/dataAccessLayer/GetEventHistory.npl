@@ -10,7 +10,7 @@ namespace app.persistence {
                         name 'getEventHistory' // For debug logging
                         language 'SQL'
                         version 'MySQL'
-                        query `select
+                        query 'select
                                  entityKey, timestamp, eventCode 
                               from events 
                               where 
@@ -18,7 +18,7 @@ namespace app.persistence {
                               and 
                                 timestamp >= @startTimestamp
                               and
-                                timestamp < @endTimestamp`
+                                timestamp < @endTimestamp'
                         parameters {
                             entityKey getEventHistory.entityKey
                             startTimestamp getEventHistory.startTimestamp

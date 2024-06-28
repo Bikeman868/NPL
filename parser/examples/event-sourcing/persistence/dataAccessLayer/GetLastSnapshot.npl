@@ -10,7 +10,7 @@ namespace app.persistence {
                         name 'getGraph' // For debug logging
                         language 'SQL'
                         version 'MySQL'
-                        query `select 
+                        query 'select 
                                  entityKey, timestamp, stateCode 
                                from snapshots 
                                where
@@ -18,7 +18,7 @@ namespace app.persistence {
                                and 
                                  timestamp >= @timestamp
                                order by timestamp desc
-                               limit 1`
+                               limit 1'
                         parameters {
                             entityKey getLastSnapshot.entityKey
                             timestamp getLastSnapshot.timestamp

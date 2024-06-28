@@ -1,6 +1,6 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { parseIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, messageLiteralGraph, parseConstKeyword } from '../index.js';
+import { assignmentExpressionGraph, literalMessageGraph, parseConstKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -21,7 +21,7 @@ export function defineConstGraph(builder: GraphBuilder) {
     .graph.state('name')
         .transition(parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
-        .subGraph('message-literal', messageLiteralGraph)
+        .subGraph('message-literal', literalMessageGraph)
         .subGraph('const-value', assignmentExpressionGraph)
     .graph.build();
 }

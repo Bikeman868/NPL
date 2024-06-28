@@ -11,7 +11,7 @@ import {
     enumGraphBuilder,
     eolGraphBuilder,
     messageMessageGraphBuilder,
-    messageLiteralGraphBuilder,
+    literalMessageGraphBuilder,
     messageInitGraphBuilder,
     messageDefinitionGraphBuilder,
     messageContextGraphBuilder,
@@ -34,7 +34,6 @@ import {
     networkGraphBuilder,
     messageRouteGraphBuilder,
     assignmentExpressionGraphBuilder,
-    messageConstructorGraphBuilder,
     binaryOperatorGraphBuilder,
     expressionTermGraphBuilder,
     functionCallGraphBuilder,
@@ -61,7 +60,7 @@ import { defineExpectGraph } from './graphs/expectGraph.js';
 import { defineMessageContextGraph } from './graphs/messageContextGraph.js';
 import { defineMessageDefinitionGraph } from './graphs/messageDefinitionGraph.js';
 import { defineMessageInitGraph } from './graphs/messageInitGraph.js';
-import { defineMessageLiteralGraph } from './graphs/messageLiteralGraph.js';
+import { defineLiteralMessageGraph } from './graphs/literalMessageGraph.js';
 import { defineMessageMessageGraph } from './graphs/messageMessageGraph.js';
 import { defineAssignmentExpressionGraph } from './graphs/assignmentExpressionGraph.js';
 import { defineNamespaceGraph } from './graphs/namespaceGraph.js';
@@ -79,7 +78,6 @@ import { defineUsingGraph } from './graphs/usingGraph.js';
 import { defineVarGraph } from './graphs/varGraph.js';
 import { defineNetworkGraph } from './graphs/networkGraph.js';
 import { defineMessageRouteGraph } from './graphs/messageRouteGraph.js';
-import { defineMessageConstructorGraph } from './graphs/messageConstructorGraph.js';
 import { defineBinaryOperatorGraph } from './graphs/binaryOperatorGraph.js';
 import { defineConditionalExpressionGraph } from './graphs/conditionalExpressionGraph.js';
 import { defineExpressionTermGraph } from './graphs/expressionTermGraph.js';
@@ -111,11 +109,10 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineIndexExpressionGraph(indexExpressionGraphBuilder);
     defineLiteralListGraph(literalListGraphBuilder);
     defineLiteralMapGraph(literalMapGraphBuilder);
-    defineMessageConstructorGraph(messageConstructorGraphBuilder);
     defineMessageContextGraph(messageContextGraphBuilder);
     defineMessageDefinitionGraph(messageDefinitionGraphBuilder);
     defineMessageInitGraph(messageInitGraphBuilder);
-    defineMessageLiteralGraph(messageLiteralGraphBuilder);
+    defineLiteralMessageGraph(literalMessageGraphBuilder);
     defineMessageMessageGraph(messageMessageGraphBuilder);
     defineMessageRouteGraph(messageRouteGraphBuilder);
     defineNamespaceGraph(namespaceGraphBuilder);

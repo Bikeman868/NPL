@@ -9,7 +9,7 @@ namespace app.persistence {
                         name 'deleteSnapshots' // For debug logging
                         language 'SQL'
                         version 'MySQL'
-                        query `delete
+                        query 'delete
                                from snapshots 
                                where
                                  entityKey = @entityKey

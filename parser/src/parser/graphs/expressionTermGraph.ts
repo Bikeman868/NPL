@@ -1,6 +1,7 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     parseBoolean,
+    parseDate,
     parseNumber,
     parseQualifiedIdentifier,
     parseString,
@@ -8,13 +9,9 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import {
     literalListGraph,
-    literalListGraphBuilder,
     literalMapGraph,
-    literalMapGraphBuilder,
     subExpressionGraph,
-    subExpressionGraphBuilder,
     unaryOperatorGraph,
-    unaryOperatorGraphBuilder,
 } from '../index.js';
 
 // prettier-ignore
@@ -52,7 +49,7 @@ export function defineExpressionTermGraph(builder: GraphBuilder) {
         .transition(parseString, skipSeparators)
         .transition(parseNumber, skipSeparators)
         .transition(parseBoolean, skipSeparators)
-        .transition(parseString, skipSeparators)
+        .transition(parseDate, skipSeparators)
         .transition(parseQualifiedIdentifier, skipSeparators)
         .subGraph('literal-list', literalListGraph)
         .subGraph('literal-map', literalMapGraph)
@@ -64,9 +61,9 @@ export function defineExpressionTermGraph(builder: GraphBuilder) {
         .transition(parseBoolean, skipSeparators)
         .transition(parseString, skipSeparators)
         .transition(parseQualifiedIdentifier, skipSeparators)
-        .subGraph('unary-literal-list', literalListGraphBuilder.build())
-        .subGraph('unary-literal-map', literalMapGraphBuilder.build())
-        .subGraph('unary-sub-expression', subExpressionGraphBuilder.build())
-        .subGraph('double-unary', unaryOperatorGraphBuilder.build(), 'unary')
+        .subGraph('unary-literal-list', literalListGraph)
+        .subGraph('unary-literal-map', literalMapGraph)
+        .subGraph('unary-sub-expression', subExpressionGraph)
+        .subGraph('double-unary', unaryOperatorGraph, 'unary')
     .graph.build();
 }

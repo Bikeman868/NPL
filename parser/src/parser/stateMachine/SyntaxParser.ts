@@ -17,6 +17,7 @@ import {
     intDigit,
     stringDelimiter,
     lineCommentDelimiter,
+    backQuote,
 } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
@@ -81,7 +82,7 @@ export const parseBoolean = buildKeywordParser(['true', 'false'], 'BooleanLitera
  */
 export function buildSymbolParser(symbol: string, tokenType: TokenType): SyntaxParser {
     return {
-        description: '`' + symbol + '`',
+        description: symbol,
         parseFunction: (context: IContext) => {
             if (context.buffer.peek(symbol.length) == symbol) {
                 context.buffer.skipCount(symbol.length);
@@ -361,17 +362,21 @@ export function buildNumberParser(): SyntaxParser {
 
 export const parseNumber = buildNumberParser();
 
-export function buildStringParser(): SyntaxParser {
+export function buildStringParser(description: string): SyntaxParser {
     return {
-        description: ' string literal',
+        description,
         parseFunction: (context: IContext) => {
             if (!stringDelimiter.includes(context.buffer.peek(1))) return undefined;
 
             const delimiter = context.buffer.extractCount(1);
-            const text = context.buffer.extractString(delimiter);
+            const text = delimiter == backQuote 
+                ? context.buffer.extractString(delimiter) 
+                : context.buffer.extractString(delimiter).replace(/^ +/gm, '');
+
             return { text, tokenType: 'StringLiteral' };
         },
     };
 }
 
-export const parseString = buildStringParser();
+export const parseString = buildStringParser('string literal');
+export const parseDate = buildStringParser('date literal');

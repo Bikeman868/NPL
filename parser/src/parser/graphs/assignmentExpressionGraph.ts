@@ -1,15 +1,12 @@
-import { openCurlyBracket, comma } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { buildSymbolParser, skipSeparators } from '../stateMachine/SyntaxParser.js';
 import {
     binaryOperatorGraph,
     eolGraph,
     expressionTermGraph,
     functionCallGraph,
     indexExpressionGraph,
-    messageConstructorGraph,
-    parseEndFunctionCallSymbol,
-    parseStartFunctionCallSymbol,
+    literalMapGraph,
+    literalMessageGraph,
 } from '../index.js';
 
 // prettier-ignore
@@ -39,6 +36,11 @@ import {
         }
     }<EOL>
 
+    {
+        'key1' 'value1'
+        'key2' 'value2'
+    }<EOL>
+
 */
 export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
     builder.clear()
@@ -49,7 +51,8 @@ export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
         .subGraph('operator', binaryOperatorGraph, 'second-term')
         .subGraph('indexer', indexExpressionGraph, 'operator')
         .subGraph('function-call', functionCallGraph, 'operator')
-        .subGraph('message-literal', messageConstructorGraph, 'operator')
+        .subGraph('map-literal', literalMapGraph, 'operator')
+        .subGraph('message-literal', literalMessageGraph, 'operator')
     .graph.state('second-term')
         .subGraph('second-term', expressionTermGraph, 'operator')
     .graph.build();

@@ -12,6 +12,8 @@ import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph.js';
 
 import { TokenPrinter } from './printer/TokenPrinter.js';
 import { SyntaxErrorPrinter } from './printer/SyntaxErrorPrinter.js';
+import { printSyntaxGraph } from './printer/SyntaxGraphPrinter.js';
+import { assignmentExpressionGraph, binaryOperatorGraph, conditionalExpressionGraph, eolGraph, functionCallGraph, indexExpressionGraph, messageMessageGraph, unaryOperatorGraph } from '#parser/index.js';
 
 // Pass name of NPL source file or a directory path on command line
 const source = process.argv[2] || '.';
@@ -32,6 +34,20 @@ if (fs.statSync(source).isDirectory()) {
 
 // The syntax graph defines the syntax of the NPL language
 const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
+
+// To help with debugging, syntax graphs can be printed out here
+/*
+printSyntaxGraph(
+    assignmentExpressionGraph, 
+    0, 
+    [
+        eolGraph, 
+        binaryOperatorGraph, 
+        indexExpressionGraph, 
+        functionCallGraph,
+        unaryOperatorGraph,
+    ]);
+*/
 
 for (let fileName of fileNames) {
     console.log(fileName);

@@ -24,7 +24,7 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
     }<EOL>
 
 */
-export function defineMessageLiteralGraph(builder: GraphBuilder) {
+export function defineLiteralMessageGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
         .transition(parseStartMessageLiteral, skipSeparators, 'message')
