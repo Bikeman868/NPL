@@ -6,7 +6,7 @@ import {
     parseQualifiedIdentifier,
     parseOpenScope,
 } from '../stateMachine/SyntaxParser.js';
-import { applicationGraph, enumGraph, eolGraph, messageDefinitionGraph, networkGraph, usingGraph } from '../index.js';
+import { applicationGraph, constGraph, enumGraph, eolGraph, messageDefinitionGraph, networkGraph, usingGraph } from '../index.js';
 
 const parseNamespace = buildKeywordParser(['namespace'], 'Keyword');
 
@@ -45,6 +45,7 @@ export function defineNamespaceGraph(builder: GraphBuilder) {
         .subGraph('single-message', messageDefinitionGraph)
         .subGraph('single-network', networkGraph)
         .subGraph('single-enum', enumGraph)
+        .subGraph('single-const', constGraph)
         .subGraph('single-application', applicationGraph)
     .graph.state('statement')
         .transition(parseCloseScope, skipSeparators, 'end')
@@ -53,6 +54,7 @@ export function defineNamespaceGraph(builder: GraphBuilder) {
         .subGraph('message', messageDefinitionGraph, 'statement')
         .subGraph('network', networkGraph, 'statement')
         .subGraph('enum', enumGraph, 'statement')
+        .subGraph('const', constGraph, 'statement-block')
         .subGraph('application', applicationGraph, 'statement')
     .graph.state('end')
         .subGraph('end', eolGraph)

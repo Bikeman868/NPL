@@ -1,0 +1,28 @@
+// GetGraph messages are processed by retrieving the state transition graph from 
+// cache. If the cache is empty then a request is sent to the database to fetch
+// the state transition graph and store it in cache for next time
+namespace app.persistence {
+    network database {
+        const graphCacheKey 'graph'
+
+        process cachingLayer {
+            accept GetGraph getGraph {
+                emit npl.persistence.GetCachedData {
+                    message {
+                        cacheKey graphCacheKey
+                        request getGraph
+                    }
+                }
+            }
+
+            accept InvalidateCache {
+                emit npl.persistence.UpdateCachedData {
+                    message {
+                        cacheKey graphCacheKey
+                        request GetGraph {}
+                    }
+                }
+            }
+        }
+    }
+}

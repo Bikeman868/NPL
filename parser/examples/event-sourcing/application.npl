@@ -10,12 +10,18 @@ namespace app {
             }
             ingress egress app.persistence.database
         }
+
+        connection npl.persistence.InMemoryCache cache {
+            ingress app.persistence.database.cacheMiss
+        }
+
         connection npl.net.Http public {
             config {
                 port 8080
             }
             ingress egress app.endpoints.http
         }
+
         connection npl.scheduling.Emitter cacheInvalidateTrigger {
             config { 
                 interval 5 * 60 * 1000 // Invalidate cache every 5 minutes

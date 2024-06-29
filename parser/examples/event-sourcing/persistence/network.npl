@@ -2,6 +2,7 @@
 namespace app.persistence {
     network database {
         ingress egress default pipe routing
+        ingress cacheMiss pipe cacheMiss
         ingress reloadCache process reloadCache
 
         pipe routing {
@@ -15,7 +16,10 @@ namespace app.persistence {
                     prepend process cachingLayer
                     capture GetGraph {
                         // If the caching layer emits a GetGraph message, this is a
-                        // cache miss, and we should route it to the data access layer
+                        // cache miss, and we should route it to the data access layer.
+                        // For cache hits the caching layer will emit a Graph message
+                        // instead, and this will be routed back to the origin of the
+                        // original GetGraph message
                         prepend process dataAccessLayer
                     }
                 }
@@ -27,6 +31,13 @@ namespace app.persistence {
 
             route * {
                 // Route all other persistence requests to the data access layer
+                prepend process dataAccessLayer
+            }
+        }
+
+        // In the case of a cache miss, we always want to hit the database directly
+        pipe cacheMiss {
+            route * {
                 prepend process dataAccessLayer
             }
         }

@@ -55,38 +55,51 @@ Note that :
 
 ```sql
 create table snapshots (
-    entityKey varchar(255) not null primary key,
+    entityKey varchar(255) not null,
     timestamp timestamp not null,
-    stateCode varchar(50) not null
+    stateCode varchar(50) not null,
+    primary key (entityKey, timestamp)
 );
 
 create table events (
-    entityKey varchar(255) not null primary key,
+    entityKey varchar(255) not null,
     timestamp timestamp not null,
     eventCode varchar(50) not null
 );
 
-create table graph (
+create index events_by_timestamp on events (entityKey, timestamp);
+
+create table graphStates (
     stateCode varchar(50) not null,
     stateName varchar(50) not null,
+    startingStateCode varchar(50),
     transitions text not null
 );
 
-insert into graph
+create table graph (
+    startingStateCode varchar(50) not null
+)
+
+
+insert into graphStates
     (stateCode, stateName, transitions)
 values
     ("A", "State A", '[{"eventCode":"1", "nextStateCode":"B"}, {"eventCode":"2", "nextStateCode":"C"}]');
 
-insert into graph
+insert into graphStates
     (stateCode, stateName, transitions)
 values
     ("B", "State B", '[{"eventCode":"1", "nextStateCode":"A"}, {"eventCode":"2", "nextStateCode":"C"}]');
 
-insert into graph
+insert into graphStates
     (stateCode, stateName, transitions)
 values
     ("C", "State C", '[{"eventCode":"3", "nextStateCode":"A"}]');
 
+insert into graph
+    (startingStateCode)
+values
+    ("A");
 ```
 
 ## Testing with curl

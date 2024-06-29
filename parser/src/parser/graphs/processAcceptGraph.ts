@@ -11,6 +11,7 @@ import {
     constGraph,
     emitGraph,
     eolGraph,
+    functionCallGraph,
     parseAcceptKeyword,
     parseAnyMessageTypeKeyword,
     parseConditionalKeyword,
@@ -26,6 +27,22 @@ import {
 
 const statementGraphBuilder: GraphBuilder = new GraphBuilder('process-statement');
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-scope-block');
+const functionCallStatementGraphBuilder: GraphBuilder = new GraphBuilder('function-call-statement');
+
+// prettier-ignore
+/** Examples
+
+    myMap.set('key, 'value)<EOL>
+
+*/
+functionCallStatementGraphBuilder
+    .graph.start
+        .transition(parseQualifiedIdentifier, skipSeparators, 'function-call')
+    .graph.state('function-call')
+        .subGraph('function-call', functionCallGraph, 'end')
+    .graph.state('end')
+        .subGraph('end', eolGraph)
+    .graph.build();
 
 // prettier-ignore
 /** Examples
@@ -35,6 +52,8 @@ const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('process-s
     if config.flag {
         emit someMessage
     }<EOL>
+
+    myMap.set('key, 'value)<EOL>
 
 */
 statementGraphBuilder
@@ -49,6 +68,7 @@ statementGraphBuilder
         .subGraph('var', varGraph)
         .subGraph('set', setGraph)
         .subGraph('route', processRouteGraph)
+        .subGraph('function-call', functionCallStatementGraphBuilder.build())
     .graph.state('conditional')
         .subGraph('expression', conditionalExpressionGraph, 'conditional-eol')
     .graph.state('conditional-eol')

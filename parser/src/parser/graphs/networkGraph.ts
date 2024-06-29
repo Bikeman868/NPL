@@ -6,7 +6,7 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph, destinationListGraph, eolGraph, pipeGraph, processGraph } from '../index.js';
+import { configGraph, constGraph, destinationListGraph, eolGraph, pipeGraph, processGraph } from '../index.js';
 
 /* Examples
 
@@ -82,6 +82,7 @@ export function defineNetworkGraph(builder: GraphBuilder) {
         .subGraph('process', processGraph, 'statement-block')
         .subGraph('pipe', pipeGraph, 'statement-block')
         .subGraph('config', configGraph, 'statement-block')
+        .subGraph('const', constGraph, 'statement-block')
     .graph.state('entrypoint-statement')
         .subGraph('entrypoint-statement', destinationListGraph, 'statement-block')
     .graph.state('end')

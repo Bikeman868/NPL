@@ -3,10 +3,12 @@ import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildSymbolParser, skipSeparators } from '../stateMachine/SyntaxParser.js';
 import {
     binaryOperatorGraph,
+    eolGraph,
     expressionTermGraph,
     functionCallGraph,
     indexExpressionGraph,
     parseEndFunctionCallSymbol,
+    parseListSeparatorSymbol,
     parseStartFunctionCallSymbol,
 } from '../index.js';
 
@@ -17,6 +19,11 @@ import {
 
     (list[3], myString.indexOf(' '), 99)
 
+    (
+        list[3]
+        myString.indexOf(' ')
+        99
+    )
 */
 export function defineFunctionCallGraph(builder: GraphBuilder) {
     builder.clear()
@@ -27,7 +34,8 @@ export function defineFunctionCallGraph(builder: GraphBuilder) {
         .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .transition(parseEndFunctionCallSymbol, skipSeparators)
-        .transition(buildSymbolParser(comma, 'ListSeparator'), skipSeparators, 'parameter')
+        .transition(parseListSeparatorSymbol, skipSeparators, 'parameter')
+        .subGraph('line-break', eolGraph, 'parameter')
         .subGraph('operator', binaryOperatorGraph, 'parameter')
         .subGraph('indexer', indexExpressionGraph, 'operator')
         .subGraph('function-call', functionCallGraph, 'operator')
