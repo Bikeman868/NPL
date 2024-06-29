@@ -23,6 +23,14 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
         }
     }<EOL>
 
+    empty {
+        route prepend process process1
+    }
+
+    MyMessage.fromJson(
+        '{"name": "My name"}'
+    )<EOL>
+
 */
 export function defineLiteralMessageGraph(builder: GraphBuilder) {
     builder.clear()

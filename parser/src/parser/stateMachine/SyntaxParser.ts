@@ -62,7 +62,7 @@ export const skipWhitespace: WhitespaceSkipper = (context: IContext) => {
  */
 export function buildKeywordParser(keywords: string[], tokenType: TokenType): SyntaxParser {
     return {
-        description: 'keyword ' + keywords.map((k) => '"' + k + '"').join(' or '),
+        description: keywords.map((k) => '"' + k + '"').join(', '),
         parseFunction: (context: IContext) => {
             const startPosition = context.buffer.getPosition();
             const text = context.buffer.extractAny(keyword);

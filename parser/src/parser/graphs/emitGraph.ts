@@ -2,23 +2,42 @@ import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     skipSeparators,
     parseQualifiedIdentifier,
-    parseOpenScope,
-    parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
 import {
     eolGraph,
+    literalMessageGraph,
     messageContextGraph,
     messageMessageGraph,
     messageRouteGraph,
     parseEmitKeyword,
-    parseEmptyKeyword,
 } from '../index.js';
+
+// prettier-ignore
+/* Examples
+
+    empty route prepend network ns1.network1<EOL>
+
+    TextMessage message text 'Hello, world'<EOL>
+
+*/
+const oneLineMessageDefinitionGraph = new GraphBuilder('one-line-message-definition')
+    .graph.start
+        .subGraph('message', messageMessageGraph)
+        .subGraph('context', messageContextGraph)
+        .subGraph('route', messageRouteGraph)
+    .graph.build();
+
+const emptyMessageTypeGraph = new GraphBuilder('empty-message-definition')
+    .graph.start
+        .transition(parseQualifiedIdentifier, skipSeparators, 'end')
+    .graph.state('end')
+        .subGraph('end', eolGraph)
+    .graph.build();
 
 // prettier-ignore
 /* Examples
     emit empty<EOL>
 
-    emit empty route prepend network ns1.network1<EOL>
 
     emit MessageType {
         context {
@@ -64,21 +83,8 @@ export function defineEmitGraph(builder: GraphBuilder) {
     .graph.start
         .transition(parseEmitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition(parseEmptyKeyword, skipSeparators, 'definition')
-        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
-    .graph.state('definition')
-        .transition(parseOpenScope, skipSeparators, 'constructor')
-        .subGraph('empty-definition', eolGraph)
-        .subGraph('single-message-message', messageMessageGraph)
-        .subGraph('single-message-context', messageContextGraph)
-        .subGraph('single-message-route', messageRouteGraph)
-    .graph.state('constructor')
-        .transition(parseCloseScope, skipSeparators, 'end')
-        .subGraph('blank-line', eolGraph, 'constructor')
-        .subGraph('message-message', messageMessageGraph, 'constructor')
-        .subGraph('message-context', messageContextGraph, 'constructor')
-        .subGraph('message-route', messageRouteGraph, 'constructor')
-    .graph.state('end')
-        .subGraph('end', eolGraph)
+        .subGraph('message-literal', literalMessageGraph)
+        .subGraph('one-liner', oneLineMessageDefinitionGraph)
+        .subGraph('empty', emptyMessageTypeGraph)
     .graph.build();
 }
