@@ -18,6 +18,8 @@ import { dataTypeGraph } from '../index.js';
 
     string[]
 
+    date
+
     app.RequestMessage
 
 */

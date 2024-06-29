@@ -53,7 +53,6 @@ export const parseStartFunctionCallSymbol = buildSymbolParser(openRoundBracket, 
 export const parseEndFunctionCallSymbol = buildSymbolParser(closeRoundBracket, 'EndCallParams');
 export const parseStartMapLiteralSymbol = buildSymbolParser(openCurlyBracket, 'StartMapLiteral');
 export const parseEndMapLiteralSymbol = buildSymbolParser(closeCurlyBracket, 'EndMapLiteral');
-export const parseListSeparatorSymbol = buildSymbolParser(comma, 'ListSeparator');
 export const parseSpreadOperatorSymbol = buildSymbolParser(trippleDot, 'Operator');
 
 export const applicationConnectionGraphBuilder = new GraphBuilder('applicationConnection');

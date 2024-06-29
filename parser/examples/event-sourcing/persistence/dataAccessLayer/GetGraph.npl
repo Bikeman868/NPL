@@ -42,7 +42,9 @@ namespace app.persistence {
                                     message {
                                         stateCode row['stateCode']
                                         stateNname row['stateNname']
-                                        transitions JSON.parse(row['transitions'])
+                                        transitions JSON.parse(
+                                            row['transitions']
+                                        )
                                     }
                                 }
                             set states {

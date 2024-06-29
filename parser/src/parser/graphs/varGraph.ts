@@ -18,6 +18,8 @@ import { assignmentExpressionGraph, dataTypeGraph, eolGraph, parseVarKeyword } f
         'key1' 2
     }<EOL>
 
+    var date Date.now()
+
 */
 export function defineVarGraph(builder: GraphBuilder) {
     builder.clear()
@@ -27,7 +29,6 @@ export function defineVarGraph(builder: GraphBuilder) {
         .transition(parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('no-value', eolGraph)
-        .subGraph('data-type', dataTypeGraph, 'end')
         .subGraph('initial value expression', assignmentExpressionGraph)
     .graph.state('end')
         .subGraph('end', eolGraph)

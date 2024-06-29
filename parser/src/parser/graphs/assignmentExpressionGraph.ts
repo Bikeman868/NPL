@@ -41,6 +41,8 @@ import {
         'key2' 'value2'
     }<EOL>
 
+    Date.now()<EOL>
+
 */
 export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
     builder.clear()

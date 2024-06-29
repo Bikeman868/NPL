@@ -38,9 +38,9 @@ import {
         key2 value2
     }
 
-    Date.now()
+    Date.now
 
-    aMessage.field[i + 1]
+    aMessage.field
 
 */
 export function defineExpressionTermGraph(builder: GraphBuilder) {
