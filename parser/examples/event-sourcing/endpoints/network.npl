@@ -28,19 +28,13 @@ namespace app.endpoints {
                         emit npl.http.Response {
                             message {
                                 status 200
-                                body entityState.toJson()
+                                body entityState.json
                             }
                         }
                     }
                     elseif request.method == 'POST' {
-                        emit InputEvent {
-                            json request.body
-                        }
-                        emit npl.http.Response {
-                            message {
-                                status 200
-                            }
-                        }
+                        emit InputEvent json request.body
+                        emit npl.http.Response message status 200
                     }
                     else {
                         emit npl.http.Response {

@@ -29,7 +29,7 @@ export function defineVarGraph(builder: GraphBuilder) {
         .transition(parseIdentifier, skipSeparators, 'value')
     .graph.state('value')
         .subGraph('no-value', eolGraph)
-        .subGraph('initial value expression', assignmentExpressionGraph)
+        .subGraph('initial value', assignmentExpressionGraph)
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

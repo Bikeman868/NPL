@@ -1,9 +1,7 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { closeCurlyBracket } from '#interfaces/charsets.js';
 import { buildSymbolParser, parseStartMessageLiteral, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, messageContextGraph, messageJsonGraph, messageMessageGraph, messageRouteGraph } from '../index.js';
-
-const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral');
+import { eolGraph, messageContextGraph, messageJsonGraph, messageMessageGraph, messageRouteGraph, parseEndMessageSymbol } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -27,9 +25,9 @@ const parseEndMessage = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral'
         route prepend process process1
     }
 
-    MyMessage.fromJson(
-        '{"name": "My name"}'
-    )<EOL>
+    MyMessage {
+        json '{"name": "My name"}'
+    }<EOL>
 
 */
 export function defineLiteralMessageGraph(builder: GraphBuilder) {
@@ -37,7 +35,7 @@ export function defineLiteralMessageGraph(builder: GraphBuilder) {
     .graph.start
         .transition(parseStartMessageLiteral, skipSeparators, 'message')
     .graph.state('message')
-        .transition(parseEndMessage, skipSeparators, 'end')
+        .transition(parseEndMessageSymbol, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'message')
         .subGraph('message', messageMessageGraph, 'message')
         .subGraph('json', messageJsonGraph, 'message')

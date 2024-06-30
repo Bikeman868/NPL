@@ -55,6 +55,7 @@ export const parseEndFunctionCallSymbol = buildSymbolParser(closeRoundBracket, '
 export const parseStartMapLiteralSymbol = buildSymbolParser(openCurlyBracket, 'StartMapLiteral');
 export const parseEndMapLiteralSymbol = buildSymbolParser(closeCurlyBracket, 'EndMapLiteral');
 export const parseSpreadOperatorSymbol = buildSymbolParser(trippleDot, 'Operator');
+export const parseEndMessageSymbol = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral');
 
 export const applicationConnectionGraphBuilder = new GraphBuilder('applicationConnection');
 export const applicationGraphBuilder = new GraphBuilder('application');

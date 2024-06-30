@@ -11,6 +11,7 @@ import {
     messageMessageGraph,
     messageRouteGraph,
     parseEmitKeyword,
+    parseEmptyKeyword,
 } from '../index.js';
 
 // prettier-ignore
@@ -20,20 +21,23 @@ import {
 
     TextMessage message text 'Hello, world'<EOL>
 
+    empty<EOL>
+
+    MyTriger<EOL>
+
+    Response json '{}'
+
 */
 const oneLineMessageDefinitionGraph = new GraphBuilder('one-line-message-definition')
     .graph.start
+        .transition(parseEmptyKeyword, skipSeparators, 'definition')
+        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
+    .graph.state('definition')
         .subGraph('message', messageMessageGraph)
         .subGraph('context', messageContextGraph)
         .subGraph('route', messageRouteGraph)
         .subGraph('json', messageJsonGraph)
-    .graph.build();
-
-const emptyMessageTypeGraph = new GraphBuilder('empty-message-definition')
-    .graph.start
-        .transition(parseQualifiedIdentifier, skipSeparators, 'end')
-    .graph.state('end')
-        .subGraph('end', eolGraph)
+        .subGraph('empty', eolGraph)
     .graph.build();
 
 // prettier-ignore
@@ -87,6 +91,5 @@ export function defineEmitGraph(builder: GraphBuilder) {
     .graph.state('message-type')
         .subGraph('message-literal', literalMessageGraph)
         .subGraph('one-liner', oneLineMessageDefinitionGraph)
-        .subGraph('empty', emptyMessageTypeGraph)
     .graph.build();
 }

@@ -407,7 +407,10 @@ namespace namespace1 {
                         append process process1
                     }
                 }
-                set name myString.substring(0, myString.length() - 1)
+                set name myString.substring(
+                    0
+                    myString.length() - 1
+                )
             }
         }
     }
