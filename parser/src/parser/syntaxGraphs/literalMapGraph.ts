@@ -1,6 +1,12 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { parseIdentifier, parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { assignmentExpressionGraph, eolGraph, parseEndMapLiteralSymbol, parseSpreadOperatorSymbol, parseStartMapLiteralSymbol } from '../index.js';
+import {
+    assignmentExpressionGraph,
+    eolGraph,
+    parseEndMapLiteralSymbol,
+    parseSpreadOperatorSymbol,
+    parseStartMapLiteralSymbol,
+} from '../index.js';
 
 // prettier-ignore
 /* Examples 

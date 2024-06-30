@@ -1,10 +1,5 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    skipSeparators,
-    parseOpenScope,
-    parseCloseScope,
-    parseIdentifier,
-} from '../stateMachine/SyntaxParser.js';
+import { skipSeparators, parseOpenScope, parseCloseScope, parseIdentifier } from '../stateMachine/SyntaxParser.js';
 import { eolGraph, assignmentExpressionGraph, parseJsonKeyword } from '../index.js';
 
 // prettier-ignore

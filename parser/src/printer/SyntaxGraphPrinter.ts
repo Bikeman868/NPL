@@ -1,15 +1,15 @@
-import { State } from "#interfaces/State";
-import { SubGraphTransition } from "#interfaces/SubGraphTransition";
-import { SyntaxGraph } from "#interfaces/SyntaxGraph.js";
+import { State } from '#interfaces/State';
+import { SubGraphTransition } from '#interfaces/SubGraphTransition';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 function printState(state: State, subGraphs: Map<string, SubGraphTransition>, indent: number, stack: SyntaxGraph[]) {
     const indentation = '  '.repeat(indent);
 
     for (const transition of state.transitions) {
-        const msg = `${indentation}${transition.parser.description}`
+        const msg = `${indentation}${transition.parser.description}`;
         if (transition.nextStateName) {
             console.log(msg + ' => "' + transition.nextStateName + '"');
-        } else  {
+        } else {
             console.log(msg + ' =|');
         }
     }
@@ -36,7 +36,7 @@ export function printSyntaxGraph(graph: SyntaxGraph, indent: number = 0, stack?:
 
         for (const mapEntry of graph.states) {
             const stateName = mapEntry[0];
-            const state = mapEntry[1]
+            const state = mapEntry[1];
             console.log(`${indentation}"${stateName}" state`);
             printState(state, graph.subGraphs, indent + 1, stack);
         }

@@ -1,8 +1,5 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    skipSeparators,
-    parseQualifiedIdentifier,
-} from '../stateMachine/SyntaxParser.js';
+import { skipSeparators, parseQualifiedIdentifier } from '../stateMachine/SyntaxParser.js';
 import {
     eolGraph,
     literalMessageGraph,

@@ -1,24 +1,23 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    buildKeywordParser,
-    skipSeparators,
-    parseIdentifier,
-    parseOpenScope,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
-import { dataTypeGraph, eolGraph } from '../index.js';
-
-const parseMessage = buildKeywordParser(['message'], 'Keyword');
+import { skipSeparators, parseIdentifier, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
+import { dataTypeGraph, eolGraph, parseMessageFieldQualifierKeyword, parseMessageKeyword } from '../index.js';
 
 /* Examples:
     string[] myString
 
-    boolean  flag
+    boolean flag
+
+    new number quantity
+
+    deprecated boolean enabled
 */
 // prettier-ignore
 const messageFieldGraph = new GraphBuilder('message-field')
     .graph.start
+        .transition(parseMessageFieldQualifierKeyword, skipSeparators, 'type')
         .subGraph('type', dataTypeGraph, 'identifier')
+    .graph.state('type')
+        .subGraph('qualified-type', dataTypeGraph, 'identifier')
     .graph.state('identifier')
         .transition(parseIdentifier, skipSeparators)
     .graph.build();
@@ -45,7 +44,7 @@ const messageFieldGraph = new GraphBuilder('message-field')
 export function defineMessageDefinitionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(parseMessage, skipSeparators, 'name')
+        .transition(parseMessageKeyword, skipSeparators, 'name')
     .graph.state('name')
         .transition(parseIdentifier, skipSeparators, 'definition')
     .graph.state('definition')

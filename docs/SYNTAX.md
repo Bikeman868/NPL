@@ -1,9 +1,10 @@
 # NPL Syntax
 
-This document defines what is valid for an NPL program.
+This document defines what is valid for an NPL program. If you want a more formal definition, then the language is fully
+defined by the [syntax graphs](./parser/src/parser/syntaxGraphs) in the parser.
 
-Note that this document defines the syntax. It is possible for code to be syntactically correct but structurally invalid. For 
-example having multiple application definitions within a source file is structurally invalid but syntactially correct.
+Note that this document defines the syntax. It is possible for code to be syntactically correct but semantically invalid. For 
+example having multiple application definitions within a source file is not allowed, but is syntactially correct.
 
 ## Contents
 
@@ -24,8 +25,8 @@ providing multi-line comments.
 
 Anywhere where a space is required, you can put one or more spaces, or tabs.
 
-There are a few places in the syntax of NPL where line breaks are significant. In these places, the newline character is not
-whitespace, but has significance. In most places, where newline is not part of the syntax, line breaks are treated the
+There are many places in the syntax of NPL where newline characters are significant. In these places, the newline character is not
+whitespace, but has significance. In most places, where newline is not part of the syntax, newlines are treated the
 same as spaces.
 
 The linefeed character is ignored everywhere, so you can save your source files in Linux or Windows format.
@@ -47,7 +48,7 @@ Examples of valid qualified identifiers are: message.id npl.scheduling.emitter
 ## Scope blocks
 
 A scope block is a section of code enclosed in `{}`. Scope blocks can be nested as deeply as required. When the
-compiler needs to resolve an identifier, it searches the current scope first, then the outer scopes from inside to outside.
+compiler needs to resolve an identifier, it searches the current scope first, then the nested scopes from inside to outside.
 
 When the outermost scope has been searched, if the identifier has not been resolved, then namespaces defined by `using`
 statements are searched.
@@ -56,9 +57,8 @@ Scope blocks are not only used to define an area of code to search when resolvin
 define blocks of code that are executed only in certain contexts. For example `if` statements can be followed by a scope
 block, and the code in that block is only executed if the `if` expression evaluates to `true`.
 
-NPL is quite strict about where the opening `{` is placed to provide shorthand syntax for cases where there is only one
-thing inside of the scope block. If you are declaring something that has a scope block, the opening `{` must appear on the
-same line as the declaration.
+NPL is quite strict about where the opening `{` is placed. If you are declaring something that has a scope block, 
+the opening `{` must appear on the same line as the declaration.
 
 Because of this rule, you can omit the `{}` when there are zero or one statement inside the scope block. In this case the
 statement must be all on one line.
@@ -128,7 +128,7 @@ The following veriations are all valid for an empty scope block:
 ``
 
 Note that you can never put multiple statements on one line. NPL does not use a terminator like semi-colon to separate
-statements. Statements are separated by line breaks. 
+statements. Statements are separated by newline characters. 
 
 ## Syntax patterns
 
@@ -154,7 +154,20 @@ Note that the opening `{` of the <scope-block> must be on the same line as the <
 
 Note that the `{}` is optional if you only have one statement
 
-Note that you can not omit multiple nested pairs of `{}` on the same line.
+Note that you can not omit multiple nested pairs of `{}` on the same line, so that instead of typing
+
+```npl
+emit MyMessage {
+    route {
+        append process process process1
+    }
+}
+```
+
+You can abbrebiate it to
+```npl
+emit MyMessage route append process process1
+```
 
 ### Scope config
 
@@ -177,14 +190,27 @@ namespace app {
 ```
 
 You can only include `config` statements where the scope block has a name, because otherwise there is no
-way specify the runtime values for these configurations.
+way specify the runtime values for these configurations. The nesting structure of your config file must
+match the structure of your source code, so for the example above, you can change the runtime configuration
+with this yaml file:
+
+```yaml
+---
+app
+    timeout: 20
+    myProcess:
+        directory '~/data'
+---
+```
 
 ### Message instances
 
-Message types define the characteristics of a type of message, and also serve to constructor a message, similar to a
-constructor in object oriented languages. In general <message-type> <scope-block> will create a new message.
+Message types define the characteristics of all messages of the same type, and also serve to construct a message.
+Messages are similar to classes in object oriented languages, excapt that they do not define behavior (methods)
+and do define context and routing.
 
-For example to define a message type, then construct an instance of that message type, we can write:
+In general <message-type> <scope-block> will create a new message. For example to define a message type,
+then construct an instance of that message type, we can write:
 
 ```npl
 message MyMessage {
@@ -200,7 +226,7 @@ const myMessage MyMessage {
 emit myMessage
 ```
 
-Becasue of the scope block rules, this can be abbreviated, although messages with one field are rately that useful:
+Becasue of the scope block rules, this can be abbreviated to a single line when there is only one field as follows:
 
 ```npl
 message MyMessage string field1
@@ -234,10 +260,26 @@ const message2 message1 {
 }
 ```
 
+You can also construct messages from strings of JSON, for example:
+
+```npl
+message MyMessage {
+    string field1
+    string field2
+}
+
+const message1 MyMessage {
+    json '{"field1": "value1", "field2": "value2"}'
+}
+```
+
 ## Source files
 
 Each source code file can start with any number of `using` statements, including none, followed by one or more `namespace`
 statements. You can put as much whitespace and comments as you like around these statements.
+
+Using statements at the source file level apply to the whole file. Using statements can also be placed within the
+namespace scope block to apply only within that scope block.
 
 ## Using
 Using statements start with the reserved word `using`, followed by at least one space, then the qualified identifier for
@@ -264,7 +306,7 @@ Namespace statements start with the reserved word `namespace`, followed by at le
 the namespace, followed by a scope block. You can have whitespace between the namespace name and the opening `{` of the scope block.
 Unlike many curly brace languages, in NPL you can not have newline characters before the opening `{` of the scope block.
 
-The scope block may contain any number of `using`, `application`, `network`, `message` and `enum` statements.
+The scope block may contain any number of `const`, `config`, `using`, `application`, `network`, `message` and `enum` statements.
 
 These are valid `namespace` statements:
 
@@ -276,13 +318,15 @@ namespace drivers{}
 namespace app.data {
     using npl.data
 }
+
+namespace app const applicationName 'My next big thing'
 ```
 
 ## Application
 
 Application statements start with the reserved word `application` followed by at least one space, then the name of the application
 as an identifier. This is usually followed by a scope block, but it's also permitted to have an application placeholder with no 
-scope block, but in this case the application will not do anything if you run it.
+scope block - in this case the application will not do anything if you run it.
 
 When you run an NPL program, you must specify a source file that contains exactly one `application` statement. Any `application`
 statements in other source files will be ignored.
@@ -298,9 +342,9 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.HttpListener httpListener{
-            config { port 80 }
-            ingress egress network http.Router
+        connection npl.connection.HttpListener httpListener {
+            config port 80
+            ingress egress http.Router
         }
     }
 }
@@ -325,11 +369,11 @@ namespace app {
 }
 ```
 
-More typically, you will define messages with some fields, because they are not useful otherwise. In this case the
+More typically, you will define messages with some fields, because they are marginally useful otherwise. In this case the
 opening `{` for the scope block must be on the same line as the `message` keyword, and each field must be on a separate 
 line. Line breaks are significant.
 
-If your message type only has one field, then you can put the whole declaration on a single line, and in this case the `{}` are optional.
+If your message type only has one field, then you can put the whole declaration on a single line, and omit the `{}`.
 
 Each message field comprises an optional qualifier, the type name, and the field name identifier. These elements must be separated
 by at least 1 space, but must not be separated by a line break. The optional qualifiers are `new` and `deprecated` are only
@@ -581,7 +625,9 @@ namespace app {
             ingress egress network http.router
         }
 
-        connection npl.scheduling.Emitter emitter { ingress network1 }
+        connection npl.scheduling.Emitter emitter { 
+            ingress network1
+        }
 
         connection npl.io.ConsoleLogger consoleLogger egress network2.entryPoint1
     }

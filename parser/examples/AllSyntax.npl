@@ -65,6 +65,75 @@ namespace app {
     }
 }
 
+// === Messages ===
+
+namespace app {
+    message MyMessage
+
+    message MyMessage string onlyField
+
+    message MyMessage new string onlyField
+
+    message MyMessage deprecated string onlyField
+
+    message MyMessage {
+        string stringField
+        number numberField
+        new string newRequiredField
+        new date? newOptionaldField
+        deprecated string deprecatedField
+    }
+
+    const message1 MyMessage {
+        message {
+            field1 value1
+            field2 value2
+        }
+    }
+
+    const clonedMessage originalMessage {
+        message {
+            field2 newField2Value
+        }
+    }
+
+    const message1 MyMessage
+
+    const message1 MyMessage {
+        message {
+            field1 value1
+            field2 value2
+        }
+        context {
+            origin {
+                origin1 value1
+                origin2 value2
+            }
+            message {
+                context1 value1
+                context2 value2
+            }
+            network {
+                network1 value1
+                network2 value2
+            }
+        }
+        route {
+            clear
+            append pipe pipe1
+            append process process1
+            capture OutputMessage {
+                clear
+                append process logger
+            }
+        }
+    }
+
+    const message1 MyMessage {
+        json '{"field1": "field1Value"}'
+    }
+}
+
 // === Networks ===
 
 namespace app {
