@@ -105,9 +105,11 @@ export class TokenPrinter {
                     this.printCloseArray();
                     break;
                 case 'StartMessageLiteral':
+                case 'StartMapLiteral':
                     this.printStartMessageLiteral();
                     break;
                 case 'EndMessageLiteral':
+                case 'EndMapLiteral':
                     this.printEndMessageLiteral();
                     break;
                 default:

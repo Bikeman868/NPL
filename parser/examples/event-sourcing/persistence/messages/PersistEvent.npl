@@ -1,0 +1,7 @@
+// When the persistence network receives this message, it will persist
+// the event in the database
+namespace app.persistence {
+    message PersistEvent {
+        InputEvent event
+    }
+}

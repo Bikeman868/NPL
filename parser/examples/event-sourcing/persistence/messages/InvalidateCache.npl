@@ -1,0 +1,5 @@
+// When this message is sent to the persistence network, it invalidates cached data
+// forcing it to be reloaded from the database
+namespace app.persistence {
+    message InvalidateCache
+}

@@ -1,0 +1,59 @@
+// The app.endpoints.http network processes http requests and produces http responses
+namespace app.endpoints {
+    using app.interface
+
+    network http {
+        ingress egress default process httpRequest
+
+        process httpRequest {
+            accept npl.http.Request request {
+                const entityPath '/entity/state/'
+                const isEntityState request.path.startsWith(
+                    entityPath
+                )
+
+                if (isEntityState) {
+                    const entitykey request.path.subString(
+                        entityPath.length
+                    )
+
+                    if request.method == 'GET' {
+                        emit StateRequest {
+                            message {
+                                entityKey entitykey
+                                pointInTime Date.now()
+                            }
+                        }
+                        await StateResponse entityState
+                        emit npl.http.Response {
+                            message {
+                                status 200
+                                body entityState.json
+                            }
+                        }
+                    }
+                    elseif request.method == 'POST' {
+                        emit InputEvent json request.body
+                        emit npl.http.Response message status 200
+                    }
+                    else {
+                        emit npl.http.Response {
+                            message {
+                                status 400
+                                body 'Invalid method ' + request.method + ' for ' + request.path + ' resource'
+                            }
+                        }
+                    }
+                }
+                else {
+                    emit npl.http.Response {
+                        message {
+                            status 400
+                            body 'Invalid resource path ' + request.path
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

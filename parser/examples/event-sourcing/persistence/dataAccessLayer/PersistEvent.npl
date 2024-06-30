@@ -1,0 +1,31 @@
+namespace app.persistence {
+    using npl.persistence
+    network database {
+        process dataAccessLayer {
+            accept PersistEvent persistEvent { 
+                emit npl.persistence.Query {
+                    message {
+                        name 'persistEvent' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'insert into events
+                                (
+                                    entityKey,
+                                    timestamp,
+                                    eventCode
+                                ) values (
+                                    @entityKey,
+                                    @timeStamp,
+                                    @eventCode
+                                )'
+                        parameters {
+                            entityKey persistEvent.entityKey
+                            timeStamp persistEvent.timeStamp
+                            eventCode persistEvent.eventCode
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+// InputEvent messages are processed by persisting them to the database and
+// deleting any snapshots that are newer then the received event
+namespace app.events {
+    using app.interface
+    using app.persistence
+
+    network eventSource {
+        process eventSource {
+            accept InputEvent inputEvent {
+                emit PersistEvent {
+                    message {
+                        event inputEvent
+                    }
+                }
+                emit DeleteSnapshots {
+                    message {
+                        entityKey inputEvent.entityKey
+                        timestamp inputEvent.timestamp
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,7 @@
+// The Transition message represents a possible transition to a new state
+namespace app.stateGraph {
+    message Transition {
+        string eventCode
+        string nextStateCode
+    }
+}

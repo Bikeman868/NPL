@@ -1,0 +1,528 @@
+/* 
+    This is not a working npl program, and it will not compile or run.
+    This source file is used to verify that all supported syntax varients are 
+    sucessfully parsed by the parser.
+    You can use this file as examples of syntax that is supported by the npl parser.
+*/
+
+// === namespaces ===
+
+namespace    app   {}
+
+namespace app {  }  
+
+/* namespace app {} */
+
+/* 
+namespace app {}
+*/
+
+namespace app {
+}
+
+// comment
+//comment
+namespace app { // comment
+    // comment
+    // comment
+} // comment
+
+
+namespace app message message1 date dateField
+
+namespace app {
+    message message1
+}
+
+namespace app {
+    message message1 {
+    }
+}
+
+namespace app {
+    message myMessage {
+        string stringField
+    }
+}
+
+// === Data types ===
+
+namespace app {
+    message myMessage {
+        string stringField
+        number numberField
+        date dateField
+        boolean booleanField
+        MyMessage messageField
+        string[] stringListField
+        number[] numberListField
+        date[] dateListField
+        boolean[] booleanListField
+        MyMessage[] messageListField
+        map<string date> mapField
+        map<number string> mapField
+        map<date map<number boolean>> mapField
+    }
+}
+
+// === Networks ===
+
+namespace app {
+    network network1
+
+    network network1 ingress default process process1
+
+    network network1 ingress egress default pipe pipe1
+
+    network network1 egress ingress default network network1
+
+    network network1 egress ingress entrypoint1 network network2
+
+    network network1 egress ingress entrypoint1 network network2.entrypoint1
+
+    network network1 egress ingress default { process process1 }
+
+    network network1 egress ingress default { 
+        process process1
+        pipe pipe1
+        network network2.entrypoint1
+    }
+
+    network network1 {
+        ingress default process process1
+        egress default process process1
+        ingress namedEntrypoint process process2
+        egress namedEntrypoint process process2
+    }
+
+    network network1 {
+        egress ingress default { 
+            process process1
+            pipe pipe1
+            network network2.entrypoint1
+        }
+    }
+
+    network network1 {
+        egress ingress default process process1
+        process process1
+        pipe pipe1
+    }
+
+    network network1 {
+        egress ingress default process process1
+        config {
+            // Network wide configurable values
+        }
+        process process1 {
+            // Definition of process1 within network1
+        }
+        pipe pipe1 {
+            // Definition of pipe1 within network1
+        }
+    }
+
+    network network1 {
+        egress entrypoint1 {
+            process process1
+        }
+        ingress entrypoint1 {
+            pipe pipe1
+            network network2
+        }
+        config {
+            // Network wide configurable values
+        }
+        process process1 {
+            // Definition of process1 within network1
+        }
+        pipe pipe1 {
+            // Definition of pipe1 within network1
+        }
+    }
+}
+
+// === Process accept ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept namespace.MyMessage
+            accept namespace.MyMessage myMessage
+            accept namespace.MyMessage {}
+            accept namespace.MyMessage myMessage {}
+            accept namespace.MyMessage {
+            }
+            accept namespace.MyMessage myMessage {
+            }
+            accept empty name {
+                emit name
+            }
+            accept * anyMessage {
+                const myValue 10
+                emit empty
+                var variable myValue + 1
+            }
+        }
+    }
+}
+
+// === Process config ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            config oneConfig 'value'
+            config {
+                config1 1
+                config2 2
+            }
+        }
+    }
+}
+
+// === Process emit ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept empty {
+                emit empty
+                emit empty route prepend network ns1.network1
+                emit MessageType
+                emit MessageType {}
+                emit MessageType {
+                }
+                emit messageClone {
+                    message field value
+                    context message contextField value
+                    route clear
+                }
+                emit MessageType {
+                    message {
+                        field1 value1
+                        field2 value2
+                    }
+                    context {
+                        origin {
+                            origin1 value1
+                            origin2 value2
+                        }
+                        message {
+                            context1 value1
+                            context2 value2
+                        }
+                        network {
+                            network1 value1
+                            network2 value2
+                        }
+                    }
+                    route {
+                        clear
+                        append pipe pipe1
+                    }
+                }
+            }
+        }
+    }
+}
+
+// === Process route ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept LogMessage logMessage {
+                route logMessage {
+                    append pipe pipe1
+                }
+            }
+        }
+    }
+}
+
+
+// === Control flow ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept * {
+                if true {
+                    emit empty
+                }
+                elseif false {
+                    emit empty context origin source 'from me'
+                }
+                var flag true
+                while flag {
+                    set flag false
+                    emit empty {
+                        context {
+                            origin {
+                                source 'another'
+                            }
+                        }
+                    }
+                }
+                const tenants [
+                    'tenant1'
+                    'tenant2'
+                ]
+                for tenant of tenants {
+                    emit LogMessage {
+                        message {
+                            tenant tenant
+                        }
+                    }
+                }
+                for index in tenants {
+                    emit LogMessage {
+                        message {
+                            tenant tenants[index]
+                        }
+                    }
+                }
+            }
+        }
+        pipe pipe1 {
+            route LogMessage {
+                if message.level == LogLevel.debug {
+                    clear
+                }
+                elseif message.className == 'MyBuggyCLass' {
+                    append network logging.traceOutput
+                }
+            }
+        }
+    }
+}
+
+// === Pipes ===
+
+namespace namespace1 {
+    network network1 {
+        pipe pipe1
+        pipe pipe1 {}
+        pipe pipe1 {
+        }
+        pipe pipe1 {
+            config {
+                enabled true
+            }
+        }
+        pipe pipe1 {
+            route MyMessage {
+                clear
+                append process process1
+                append pipe pipe1
+                append network network1
+                append network network1.entryPoint1
+                append { process process1 }
+                append { 
+                    process process1 
+                    process process2
+                    pipe pipe1
+                }
+                prepend pipe pipe1
+                capture Error {
+                    clear
+                    append network logger.errors
+                }
+            }
+        }
+    }
+}
+
+// === Pipe config ===
+
+namespace namespace1 {
+    network network1 {
+        pipe pipe1 {
+            config oneConfig 'value'
+            config {
+                config1 1
+                config2 2
+            }
+        }
+    }
+}
+
+
+// === Enums ===
+
+namespace namespace1 {
+    enum option option1 option2 option3
+    enum option {
+        option1
+        option2
+        option3
+    }
+}
+
+// === Expressions ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept * {
+                const name 1.3e-4
+                const name 23
+                const name 'A string literal'
+                const name "A string literal"
+                const name `A multi-line
+                            string literal`
+                const name true
+                const name false
+                const name 1 + 2 + 3
+                const name (1 + 2) * 3
+                const name myArray[index]
+                const name myArray[(i + 1) * 2]
+                const name ((myArray[index]) + (myArray[index+1]))
+                const name [
+                    [
+                        myArray[0]
+                        2
+                        3
+                    ] 
+                    [
+                        4
+                        5
+                        6
+                    ]
+                ][index][1]
+                var name !enabled || logger == undefined
+                var name MyMessageType {}
+                var name MessageType { 
+                        message {
+                            name 'Some name'
+                            disabled !false
+                        }
+                    }
+                var name myMessage { 
+                    message field1 field1Value
+                    context message id 99
+                    route {
+                        clear
+                        append process process1
+                    }
+                }
+                set name myString.substring(
+                    0
+                    myString.length() - 1
+                )
+            }
+        }
+    }
+}
+
+// === Built-in functions ===
+
+/*
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            accept * {
+                const name someString.substring(1, 3)
+            }
+        }
+    }
+}
+*/
+
+// === Unit tests ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            test 'Test description' {
+            }
+            test {
+            }
+            test {
+                emit empty
+                expect empty
+            }
+        }
+    }
+}
+
+// === Test expects ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            test {
+                expect empty
+                expect empty route prepend network ns1.network1
+                expect MessageType
+                expect MessageType {}
+                expect MessageType {
+                }
+                expect MessageType {
+                    message {
+                        field1 value1
+                        field2 value2
+                    }
+                    context {
+                        origin {
+                            origin1 value1
+                            origin2 value2
+                        }
+                        message {
+                            context1 value1
+                            context2 value2
+                        }
+                        network {
+                            network1 value1
+                            network2 value2
+                        }
+                    }
+                    route {
+                        clear
+                        append pipe pipe1
+                    }
+                }
+            }
+        }
+    }
+}
+
+// === Application ===
+
+namespace namespace1 {
+    application app
+    application app {}
+    application app {
+    }
+    application app {
+        config {
+            config1 1
+            config2 2
+        }
+    }
+    application app {
+        connection npl.io.Console console {
+            ingress egress network1
+        }
+    }
+    application app {
+        connection ConnectionType connection1 {
+            ingress network1
+        }
+        connection ConnectionType connection1 {
+            egress network1
+        }
+        connection ns1.ns2.ConnectionType connection1 {
+            egress ingress network1
+        }
+    }
+    application app {
+        connection npl.io.Console console {
+            config { 
+                mode npl.io.ConsoleMode.lines
+            }
+            egress network1
+        }
+    }
+}

@@ -25,6 +25,7 @@ export const underscore = '_';
 export const singleQuote = "'";
 export const doubleQuote = '"';
 export const backQuote = '`';
+export const trippleDot = '...';
 
 export const lowercase: Charset = [
     'a',

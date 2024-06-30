@@ -1,0 +1,27 @@
+// The DeleteSnapshots message is processed by executing a query that deletes
+// all snapshots on or after the specified start timestamp
+namespace app.persistence {
+    network database {
+        process dataAccessLayer {
+            accept DeleteSnapshots deleteSnapshots { 
+                emit npl.persistence.Query {
+                    message {
+                        name 'deleteSnapshots' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'delete
+                               from snapshots 
+                               where
+                                 entityKey = @entityKey
+                               and 
+                                 timestamp >= @timestamp'
+                        parameters {
+                            entityKey deleteSnapshots.entityKey
+                            timestamp deleteSnapshots.timestamp
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

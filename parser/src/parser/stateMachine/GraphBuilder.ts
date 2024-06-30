@@ -1,10 +1,10 @@
-import { SyntaxParser, WhitespaceSkipper } from './SyntaxParser';
-import { Graph } from './Graph.js';
-import { State } from './State.js';
-import { SubGraphTransition } from './SubGraphTransition.js';
+import { SyntaxParser, WhitespaceSkipper } from './SyntaxParser.js';
+import { State } from '#interfaces/State.js';
+import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 export class GraphBuilder {
-    private _graph: Graph;
+    private _graph: SyntaxGraph;
 
     constructor(name: string) {
         this._graph = {
@@ -18,6 +18,17 @@ export class GraphBuilder {
         };
     }
 
+    clear(): GraphBuilder {
+        this._graph.start = {
+            name: this._graph.start.name,
+            subGraphNames: [],
+            transitions: [],
+        };
+        this._graph.states = new Map<string, State>();
+        this._graph.subGraphs = new Map<string, SubGraphTransition>([]);
+        return this;
+    }
+
     state(name: string): GraphStateBuilder {
         if (this._graph.states.get(name))
             throw Error(`There are two ${name} states in the ${this._graph.start.name} graph`);
@@ -25,6 +36,32 @@ export class GraphBuilder {
         const stateBuilder = new GraphStateBuilder(this, name);
         this._graph.states.set(name, stateBuilder.build());
         return stateBuilder;
+    }
+
+    private _checkIsGraphBuilt(graph: SyntaxGraph, visited: Set<SyntaxGraph>): void {
+        if (visited.has(graph)) return;
+        visited.add(graph);
+
+        if (!graph.start.subGraphNames || graph.start.subGraphNames.length == 0) {
+            if (!graph.start.transitions || graph.start.transitions.length == 0)
+                throw Error(`The ${graph.start.name} graph has no start sub-graphs or start transitions`);
+        }
+
+        for (let subGraph of graph.subGraphs) {
+            const subGraphTranstion = subGraph[1];
+            if (!subGraphTranstion || !subGraphTranstion.graph)
+                throw Error(`The ${subGraph[0]} sub-graph of the ${graph.start.name} graph is undefined`);
+            this._checkIsGraphBuilt(subGraphTranstion.graph, visited);
+        }
+    }
+
+    checkIsBuilt(): void {
+        const checkedGraphs = new Set<SyntaxGraph>();
+        try {
+            this._checkIsGraphBuilt(this._graph, checkedGraphs);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     get graph(): GraphBuilder {
@@ -35,18 +72,12 @@ export class GraphBuilder {
         return new GraphStartBuilder(this);
     }
 
-    build(): Graph {
+    build(): SyntaxGraph {
         return this._graph;
     }
 
-    startTransition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphBuilder {
+    startTransition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphBuilder {
         this._graph.start.transitions.push({
-            description,
             nextStateName,
             parser,
             whitespaceSkipper,
@@ -54,13 +85,13 @@ export class GraphBuilder {
         return this;
     }
 
-    startSubGraph(name: string, graph: Graph, nextStateName?: string): GraphBuilder {
+    startSubGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphBuilder {
         this.defineSubGraph(name, graph, nextStateName);
         this._graph.start.subGraphNames.push(name);
         return this;
     }
 
-    defineSubGraph(name: string, graph: Graph, nextStateName?: string) {
+    defineSubGraph(name: string, graph: SyntaxGraph, nextStateName?: string) {
         if (this._graph.subGraphs.get(name))
             throw Error(`There are two ${name} sub-graphs in the ${this._graph.start.name} graph`);
 
@@ -78,13 +109,8 @@ export class GraphStartBuilder {
         this._graphBuilder = graphBuilder;
     }
 
-    transition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphStartBuilder {
-        this._graphBuilder.startTransition(description, parser, whitespaceSkipper, nextStateName);
+    transition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphStartBuilder {
+        this._graphBuilder.startTransition(parser, whitespaceSkipper, nextStateName);
         return this;
     }
 
@@ -92,7 +118,7 @@ export class GraphStartBuilder {
         return this._graphBuilder;
     }
 
-    subGraph(name: string, graph: Graph, nextStateName?: string): GraphStartBuilder {
+    subGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphStartBuilder {
         this._graphBuilder.startSubGraph(name, graph, nextStateName);
         return this;
     }
@@ -111,14 +137,8 @@ export class GraphStateBuilder {
         };
     }
 
-    transition(
-        description: string,
-        parser: SyntaxParser,
-        whitespaceSkipper?: WhitespaceSkipper,
-        nextStateName?: string,
-    ): GraphStateBuilder {
+    transition(parser: SyntaxParser, whitespaceSkipper?: WhitespaceSkipper, nextStateName?: string): GraphStateBuilder {
         this._state.transitions.push({
-            description,
             parser,
             whitespaceSkipper,
             nextStateName,
@@ -134,7 +154,7 @@ export class GraphStateBuilder {
         return this._state;
     }
 
-    subGraph(name: string, graph: Graph, nextStateName?: string): GraphStateBuilder {
+    subGraph(name: string, graph: SyntaxGraph, nextStateName?: string): GraphStateBuilder {
         this._graphBuilder.defineSubGraph(name, graph, nextStateName);
         this._state.subGraphNames.push(name);
         return this;

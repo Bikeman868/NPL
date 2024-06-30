@@ -1,0 +1,70 @@
+// GetGraph messages are processed by reading records from the database
+// and emitting a Graph message containing the state transition graph
+namespace app.persistence {
+    network database {
+        process dataAccessLayer {
+            accept GetGraph getGraph {
+                emit npl.persistence.Query {
+                    message {
+                        name 'getGraphStates'
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'select 
+                                 stateCode, stateNname, transitions
+                               from graphStates'
+                    }
+                }
+                
+                emit npl.persistence.Query {
+                    message {
+                        name 'getGraph'
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'select startingStateCode from graph'
+                    }
+                }
+
+                var states {}
+                var startingStateCode ''
+                const expectedResults [
+                    'getGraphStates'
+                    'getGraph'
+                ]
+
+                for result of expectedResults {
+
+                    await npl.persistence.QueryResult queryResult
+
+                    if queryResult.name == 'getGraphStates' {
+                        for row of queryResult.rows {
+                            const stateCode row['stateCode']
+                            const state app.stateGraph.State { 
+                                    message {
+                                        stateCode row['stateCode']
+                                        stateNname row['stateNname']
+                                        transitions JSON.parse(
+                                            row['transitions']
+                                        )
+                                    }
+                                }
+                            set states {
+                                ...states
+                                stateCode state
+                            }
+                        }
+                    }
+                    elseif queryResult.name == 'getGraph' {
+                        set startingStateCode queryResult.rows[0]['startingStateCode']
+                    }
+                }
+                
+                emit app.stateGraph.Graph {
+                    message {
+                        startingStateCode config.startingStateCode
+                        states states
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+namespace app.interface {
+    // External events that cause state transitions
+    message InputEvent {
+        date timestamp
+        string entityKey
+        string eventCode
+    }
+}

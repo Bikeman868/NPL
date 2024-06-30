@@ -1,0 +1,53 @@
+// The app.persistence.database network encapsulates all database operations
+namespace app.persistence {
+    network database {
+        ingress egress default pipe routing
+        ingress cacheMiss pipe cacheMiss
+        ingress reloadCache process reloadCache
+
+        pipe routing {
+            config {
+                cacheEnabled true
+            }
+
+            route GetGraph {
+                if config.cacheEnabled {
+                    // Route requests to get the state transition graph to the cache
+                    prepend process cachingLayer
+                    capture GetGraph {
+                        // If the caching layer emits a GetGraph message, this is a
+                        // cache miss, and we should route it to the data access layer.
+                        // For cache hits the caching layer will emit a Graph message
+                        // instead, and this will be routed back to the origin of the
+                        // original GetGraph message
+                        prepend process dataAccessLayer
+                    }
+                }
+                else {
+                    // If caching is disabled, route the request directly to the data access layer
+                    prepend process dataAccessLayer
+                }
+            }
+
+            route * {
+                // Route all other persistence requests to the data access layer
+                prepend process dataAccessLayer
+            }
+        }
+
+        // In the case of a cache miss, we always want to hit the database directly
+        pipe cacheMiss {
+            route * {
+                prepend process dataAccessLayer
+            }
+        }
+
+        process reloadCache {
+            accept empty {
+                emit InvalidateCache {
+                    route append process cachingLayer
+                }
+            }
+        }
+    }
+}

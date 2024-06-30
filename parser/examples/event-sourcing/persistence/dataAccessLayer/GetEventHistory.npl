@@ -1,0 +1,58 @@
+// GetEventHistory messages are processed by reading records from the database
+// and emitting an EventHistory message containing stored events for the entity
+namespace app.persistence {
+    using npl.persistence
+    network database {
+        process dataAccessLayer {
+            accept GetEventHistory getEventHistory { 
+                emit npl.persistence.Query {
+                    message {
+                        name 'getEventHistory' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'select
+                                 entityKey, timestamp, eventCode 
+                              from events 
+                              where 
+                                entityKey = @entityKey
+                              and 
+                                timestamp >= @startTimestamp
+                              and
+                                timestamp < @endTimestamp'
+                        parameters {
+                            entityKey getEventHistory.entityKey
+                            startTimestamp getEventHistory.startTimestamp
+                            endTimestamp getEventHistory.endTimestamp
+                        }
+                    }
+                }
+                
+                await npl.persistence.QueryResult queryResult
+
+                var events []
+                
+                for row of queryResult.rows {
+                    set events [
+                        ...events
+                        app.stateGraph.InputEvent { 
+                            message {
+                                entityKey row['entityKey']
+                                timestamp row['timestamp']
+                                eventCode row['eventCode']
+                            }
+                        }
+                    ]
+                }
+                
+                emit app.events.EventHistory {
+                    message {
+                        entityKey getEventHistory.entityKey
+                        startTimestamp getEventHistory.startTimestamp
+                        endTimestamp getEventHistory.endTimestamp
+                        events events
+                    }
+                }
+            }
+        }
+    }
+}

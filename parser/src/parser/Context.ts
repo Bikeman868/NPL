@@ -2,6 +2,7 @@ import { IParsable } from '#interfaces/IParsable.js';
 import { Position } from '#interfaces/Position.js';
 import { IContext } from '#interfaces/IContext.js';
 import { SyntaxError } from '#interfaces/SyntaxError.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 export class Context implements IContext {
     private _buffer: IParsable;
@@ -10,12 +11,14 @@ export class Context implements IContext {
     private _isDryRun: boolean;
     private _debugOutput: (line: String) => void;
     private _statePath: string[] = [];
+    private _syntaxGraph: SyntaxGraph;
 
     debugLogging: (context: IContext) => boolean = () => false;
     traceLogging: (context: IContext) => boolean = () => false;
 
-    constructor(buffer: IParsable, isDryRun?: boolean, debugOutput?: (line: String) => void) {
+    constructor(buffer: IParsable, syntaxGraph: SyntaxGraph, isDryRun?: boolean, debugOutput?: (line: String) => void) {
         this._buffer = buffer;
+        this._syntaxGraph = syntaxGraph;
         this._isDryRun = !!isDryRun;
         this._position = buffer.getPosition();
         this._syntaxErrors = [];
@@ -24,6 +27,10 @@ export class Context implements IContext {
 
     get buffer() {
         return this._buffer;
+    }
+
+    get syntaxGraph() {
+        return this._syntaxGraph;
     }
 
     get isDryRun() {

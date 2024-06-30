@@ -1,0 +1,47 @@
+// GetLastSnapshot messages are processed by reading a snapshot record from the database
+// and emitting a Snapshot message
+namespace app.persistence {
+    using npl.persistence
+    network database {
+        process dataAccessLayer {
+            accept GetLastSnapshot getLastSnapshot{ 
+                emit npl.persistence.Query {
+                    message {
+                        name 'getGraph' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'select 
+                                 entityKey, timestamp, stateCode 
+                               from snapshots 
+                               where
+                                 entityKey = @entityKey
+                               and 
+                                 timestamp >= @timestamp
+                               order by timestamp desc
+                               limit 1'
+                        parameters {
+                            entityKey getLastSnapshot.entityKey
+                            timestamp getLastSnapshot.timestamp
+                        }
+                    }
+                }
+                
+                await npl.persistence.QueryResult queryResult
+
+                const row queryResult.rows[0]
+                if row {
+                    emit app.events.Snapshot {
+                        message {
+                            entityKey row['entityKey']
+                            timestamp row['timestamp']
+                            stateCode row['stateCode']
+                        }
+                    }
+                }
+                else {
+                    emit NotFound
+                }
+            }
+        }
+    }
+}

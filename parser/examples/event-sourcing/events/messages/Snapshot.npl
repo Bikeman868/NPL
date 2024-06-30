@@ -1,0 +1,8 @@
+// The Snapshot message contains the state of an entity at a specific point in time
+namespace app.events {
+    message Snapshot {
+        string entityKey
+        date timestamp
+        string stateCode
+    }
+}

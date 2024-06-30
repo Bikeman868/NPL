@@ -1,0 +1,33 @@
+namespace app.persistence {
+    using npl.persistence
+    network database {
+        process dataAccessLayer {
+            accept PersistSnapshot persistSnapshot { 
+                emit npl.persistence.Query {
+                    message {
+                        name 'persistSnapshot' // For debug logging
+                        language 'SQL'
+                        version 'MySQL'
+                        query 'insert into snapshots
+                                (
+                                    entityKey,
+                                    timestamp,
+                                    stateCode
+                                ) values (
+                                    @entityKey,
+                                    @timeStamp,
+                                    @stateCode
+                                )
+                                on duplicate key update
+                                    stateCode = @stateCode'
+                        parameters {
+                            entityKey persistSnapshot.entityKey
+                            timeStamp persistSnapshot.timeStamp
+                            stateCode persistSnapshot.stateCode
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

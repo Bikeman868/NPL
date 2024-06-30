@@ -1,0 +1,6 @@
+// The app.events.eventSource network implements the event sourcing algorithm
+namespace app.events {
+    network eventSource {
+        ingress egress default process eventSource
+    }
+}

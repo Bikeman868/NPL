@@ -3,8 +3,7 @@ import { IToken } from '#interfaces/IToken.js';
 import { Token } from './Token.js';
 import { ParseResult } from './ParseResult.js';
 import { whitespace, blockCommentStart, blockCommentEnd, separator } from '#interfaces/charsets.js';
-import { nplGraph } from './graphs/nplGraph.js';
-import { parseNextToken } from './stateMachine/Graph.js';
+import { parseNextToken } from './stateMachine/graphFunctions.js';
 
 export function parseToken(context: IContext): IToken | undefined {
     const indent = context.getDebugIndent();
@@ -20,7 +19,7 @@ export function parseToken(context: IContext): IToken | undefined {
         context.buffer.skipAny(separator);
         result = { tokenType: 'Comment', text };
     } else {
-        result = parseNextToken(context, nplGraph);
+        result = parseNextToken(context);
     }
 
     const endPosition = context.buffer.getPosition();

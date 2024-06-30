@@ -1,0 +1,5 @@
+// When the persistence network receives this message, it will respond
+// with the state transition graph from the database
+namespace app.persistence {
+    message GetGraph
+}

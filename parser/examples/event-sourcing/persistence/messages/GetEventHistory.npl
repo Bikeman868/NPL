@@ -1,0 +1,9 @@
+// When the persistence network receives this message, it will respond
+// with the state transition history for an entity
+namespace app.persistence {
+    message GetEventHistory {
+        string entityKey
+        date startTimestamp
+        date endTimestamp
+    }
+}

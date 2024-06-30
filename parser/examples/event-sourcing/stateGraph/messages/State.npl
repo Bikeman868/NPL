@@ -1,0 +1,8 @@
+// The State message defines a node on a state transition graph
+namespace app.stateGraph {
+    message State {
+        string stateCode
+        string stateName
+        Transition[] transitions
+    }
+}

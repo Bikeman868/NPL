@@ -1,0 +1,7 @@
+namespace app.interface {
+    // A request for the state of an entity at a specific point in time
+    message StateRequest {
+        string entityKey
+        date pointInTime
+    }
+}

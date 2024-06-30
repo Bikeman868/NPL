@@ -17,16 +17,24 @@ import {
     intDigit,
     stringDelimiter,
     lineCommentDelimiter,
+    backQuote,
 } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
 /**
- * Defines a function that will attempt to parse the input stream. Returns a result if parsing
+ * Defines a, object that encapsulates a function that will attempt to parse the input stream,
+ * and a description of the expected syntax. The function returns a result if parsing
  * was sucessful and undefined if the input could not be parsed. When undefined is returned, the
  * context must not be modified because multiple parsers will be tried in succession to decide
  * which way the syntax is going.
+ *
+ * If no parsers are found, then the descriptions are used to tell the user what was expected in
+ * the syntax at this point.
  */
-export type SyntaxParser = (context: IContext) => ParseResult | undefined;
+export type SyntaxParser = {
+    description: string;
+    parseFunction: (context: IContext) => ParseResult | undefined;
+};
 
 /**
  * Defines a function that skips over whitespace
@@ -53,14 +61,17 @@ export const skipWhitespace: WhitespaceSkipper = (context: IContext) => {
  * after the keyword ready for the next parser
  */
 export function buildKeywordParser(keywords: string[], tokenType: TokenType): SyntaxParser {
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        const text = context.buffer.extractAny(keyword);
-        if (keywords.includes(text)) {
-            return { text, tokenType };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+    return {
+        description: keywords.map((k) => '"' + k + '"').join(', '),
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            const text = context.buffer.extractAny(keyword);
+            if (keywords.includes(text)) {
+                return { text, tokenType };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -70,12 +81,15 @@ export const parseBoolean = buildKeywordParser(['true', 'false'], 'BooleanLitera
  * Builds a parser that expects a specific string of characters in the input stream
  */
 export function buildSymbolParser(symbol: string, tokenType: TokenType): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.peek(symbol.length) == symbol) {
-            context.buffer.skipCount(symbol.length);
-            return { text: symbol, tokenType };
-        }
-        return undefined;
+    return {
+        description: symbol,
+        parseFunction: (context: IContext) => {
+            if (context.buffer.peek(symbol.length) == symbol) {
+                context.buffer.skipCount(symbol.length);
+                return { text: symbol, tokenType };
+            }
+            return undefined;
+        },
     };
 }
 
@@ -85,14 +99,17 @@ export function buildSymbolParser(symbol: string, tokenType: TokenType): SyntaxP
  * after the identifier ready for the next parser
  */
 export function buildIdentifierParser(): SyntaxParser {
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        const text = context.buffer.extractAny(identifier);
-        if (text) {
-            return { text, tokenType: 'Identifier' };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+    return {
+        description: 'identifier name',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            const text = context.buffer.extractAny(identifier);
+            if (text) {
+                return { text, tokenType: 'Identifier' };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -104,14 +121,17 @@ export const parseIdentifier = buildIdentifierParser();
  * after the identifier ready for the next parser
  */
 export function buildQualifiedIdentifierParser(): SyntaxParser {
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        const text = context.buffer.extractAny(qualifiedIdentifier);
-        if (text) {
-            return { text, tokenType: 'QualifiedIdentifier' };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+    return {
+        description: 'fully qualified identifier',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            const text = context.buffer.extractAny(qualifiedIdentifier);
+            if (text) {
+                return { text, tokenType: 'QualifiedIdentifier' };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -123,12 +143,15 @@ export const parseQualifiedIdentifier = buildQualifiedIdentifierParser();
  * but not line breaks after the { ready for the next parser
  */
 export function buildOpenScopeParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.hasScope()) {
-            context.buffer.skipCount(1);
-            return { text: openCurlyBracket, tokenType: 'StartScope' };
-        }
-        return undefined;
+    return {
+        description: openCurlyBracket,
+        parseFunction: (context: IContext) => {
+            if (context.buffer.hasScope()) {
+                context.buffer.skipCount(1);
+                return { text: openCurlyBracket, tokenType: 'StartScope' };
+            }
+            return undefined;
+        },
     };
 }
 
@@ -140,28 +163,33 @@ export const parseOpenScope = buildOpenScopeParser();
  * after the } ready for the next parser
  */
 export function buildCloseScopeParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.isEndScope()) {
-            context.buffer.skipCount(1);
-            return { text: closeCurlyBracket, tokenType: 'EndScope' };
-        }
-        return undefined;
+    return {
+        description: closeCurlyBracket,
+        parseFunction: (context: IContext) => {
+            if (context.buffer.isEndScope()) {
+                context.buffer.skipCount(1);
+                return { text: closeCurlyBracket, tokenType: 'EndScope' };
+            }
+            return undefined;
+        },
     };
 }
 
 export const parseCloseScope = buildCloseScopeParser();
 
 /**
- * Builds a parser function that will expect a line break and skip over any whitespace
- * ready for the next parser
+ * Builds a parser function that will expect a line break
  */
 export function buildEolParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.isEol()) {
-            context.buffer.skipCount(1);
-            return { text: newline, tokenType: 'LineBreak' };
-        }
-        return undefined;
+    return {
+        description: '\\n',
+        parseFunction: (context: IContext) => {
+            if (context.buffer.isEol()) {
+                context.buffer.skipCount(1);
+                return { text: newline, tokenType: 'LineBreak' };
+            }
+            return undefined;
+        },
     };
 }
 
@@ -172,13 +200,16 @@ export const parseEol = buildEolParser();
  * up to the next end of line
  */
 export function buildEolCommentParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.peek(lineCommentDelimiter.length) == lineCommentDelimiter) {
-            context.buffer.skipCount(lineCommentDelimiter.length);
-            const text = context.buffer.extractToAny([newline]).trim();
-            return { text, tokenType: 'Comment' };
-        }
-        return undefined;
+    return {
+        description: lineCommentDelimiter,
+        parseFunction: (context: IContext) => {
+            if (context.buffer.peek(lineCommentDelimiter.length) == lineCommentDelimiter) {
+                context.buffer.skipCount(lineCommentDelimiter.length);
+                const text = context.buffer.extractToAny([newline]).trim();
+                return { text, tokenType: 'Comment' };
+            }
+            return undefined;
+        },
     };
 }
 
@@ -192,23 +223,26 @@ export const parseEolComment = buildEolCommentParser();
  */
 export function buildBasicTypeParser(): SyntaxParser {
     const types = ['string', 'number', 'date', 'boolean'];
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        let text = context.buffer.extractAny(keyword);
-        if (types.includes(text)) {
-            context.buffer.skipAny(separator);
-            const arrayPosition = context.buffer.getPosition();
-            if (context.buffer.extractCount(1) == openSquareBracket) {
+    return {
+        description: '"string", "number", "date", "boolean", "string[]", "number[]", "date[]" or "boolean[]"',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            let text = context.buffer.extractAny(keyword);
+            if (types.includes(text)) {
                 context.buffer.skipAny(separator);
-                if (context.buffer.extractCount(1) == closeSquareBracket) {
-                    text += openSquareBracket + closeSquareBracket;
+                const arrayPosition = context.buffer.getPosition();
+                if (context.buffer.extractCount(1) == openSquareBracket) {
                     context.buffer.skipAny(separator);
+                    if (context.buffer.extractCount(1) == closeSquareBracket) {
+                        text += openSquareBracket + closeSquareBracket;
+                        context.buffer.skipAny(separator);
+                    } else context.buffer.setPosition(arrayPosition);
                 } else context.buffer.setPosition(arrayPosition);
-            } else context.buffer.setPosition(arrayPosition);
-            return { text, tokenType: 'Type' };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+                return { text, tokenType: 'Type' };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -219,18 +253,21 @@ export const parseBasicType = buildBasicTypeParser();
  */
 export function buildGenericTypeOpenParser(): SyntaxParser {
     const genericTypes = ['map'];
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        const text = context.buffer.extractAny(keyword);
-        if (genericTypes.includes(text)) {
-            context.buffer.skipAny(separator);
-            if (context.buffer.peek(openAngleBracket.length) == openAngleBracket) {
-                context.buffer.skipCount(openAngleBracket.length);
-                return { text, tokenType: 'StartGeneric' };
+    return {
+        description: 'map<k v>',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            const text = context.buffer.extractAny(keyword);
+            if (genericTypes.includes(text)) {
+                context.buffer.skipAny(separator);
+                if (context.buffer.peek(openAngleBracket.length) == openAngleBracket) {
+                    context.buffer.skipCount(openAngleBracket.length);
+                    return { text, tokenType: 'StartGeneric' };
+                }
             }
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -240,12 +277,15 @@ export const parseGenericOpen = buildGenericTypeOpenParser();
  * Builds a parser function that will expect the start of a generic type
  */
 export function buildGenericTypeCloseParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (context.buffer.peek(closeAngleBracket.length) == closeAngleBracket) {
-            context.buffer.skipCount(closeAngleBracket.length);
-            return { text: closeAngleBracket, tokenType: 'EndGeneric' };
-        }
-        return undefined;
+    return {
+        description: closeAngleBracket,
+        parseFunction: (context: IContext) => {
+            if (context.buffer.peek(closeAngleBracket.length) == closeAngleBracket) {
+                context.buffer.skipCount(closeAngleBracket.length);
+                return { text: closeAngleBracket, tokenType: 'EndGeneric' };
+            }
+            return undefined;
+        },
     };
 }
 
@@ -256,22 +296,25 @@ export const parseGenericClose = buildGenericTypeCloseParser();
  * identifier. Allows [] after the message type qualified identifier
  */
 export function buildMessageTypeParser(): SyntaxParser {
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        let text = context.buffer.extractAny(qualifiedIdentifier);
-        if (text) {
-            context.buffer.skipAny(separator);
-            const arrayPosition = context.buffer.getPosition();
-            if (context.buffer.extractCount(1) == openSquareBracket) {
+    return {
+        description: 'MessageType or MessageType[]',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            let text = context.buffer.extractAny(qualifiedIdentifier);
+            if (text) {
                 context.buffer.skipAny(separator);
-                if (context.buffer.extractCount(1) == closeSquareBracket) {
-                    text += openSquareBracket + closeSquareBracket;
+                const arrayPosition = context.buffer.getPosition();
+                if (context.buffer.extractCount(1) == openSquareBracket) {
+                    context.buffer.skipAny(separator);
+                    if (context.buffer.extractCount(1) == closeSquareBracket) {
+                        text += openSquareBracket + closeSquareBracket;
+                    } else context.buffer.setPosition(arrayPosition);
                 } else context.buffer.setPosition(arrayPosition);
-            } else context.buffer.setPosition(arrayPosition);
-            return { text, tokenType: 'Type' };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+                return { text, tokenType: 'Type' };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
@@ -281,46 +324,59 @@ export const parseMessageType = buildMessageTypeParser();
  * Builds a parser for parsing the start of a message literal
  */
 export function buildStartMessageLiteralParser(): SyntaxParser {
-    return (context: IContext) => {
-        const startPosition = context.buffer.getPosition();
-        let text = context.buffer.extractAny(qualifiedIdentifier);
-        if (text) {
-            context.buffer.skipAny(separator);
-            if (context.buffer.extractCount(1) == openCurlyBracket) {
-                return { text, tokenType: 'StartMessageLiteral' };
+    return {
+        description: 'MessageType{} or MessageIdentifier{}',
+        parseFunction: (context: IContext) => {
+            const startPosition = context.buffer.getPosition();
+            let text = context.buffer.extractAny(qualifiedIdentifier);
+            if (text) {
+                context.buffer.skipAny(separator);
+                if (context.buffer.extractCount(1) == openCurlyBracket) {
+                    return { text, tokenType: 'StartMessageLiteral' };
+                }
             }
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
 export const parseStartMessageLiteral = buildStartMessageLiteralParser();
 
 export function buildNumberParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (!intDigit.includes(context.buffer.peek(1))) return undefined;
+    return {
+        description: 'number literal',
+        parseFunction: (context: IContext) => {
+            if (!intDigit.includes(context.buffer.peek(1))) return undefined;
 
-        const startPosition = context.buffer.getPosition();
-        let text = context.buffer.extractAny(floatDigit);
-        if (text) {
-            return { text, tokenType: 'NumberLiteral' };
-        }
-        context.buffer.setPosition(startPosition);
-        return undefined;
+            const startPosition = context.buffer.getPosition();
+            let text = context.buffer.extractAny(floatDigit);
+            if (text) {
+                return { text, tokenType: 'NumberLiteral' };
+            }
+            context.buffer.setPosition(startPosition);
+            return undefined;
+        },
     };
 }
 
 export const parseNumber = buildNumberParser();
 
-export function buildStringParser(): SyntaxParser {
-    return (context: IContext) => {
-        if (!stringDelimiter.includes(context.buffer.peek(1))) return undefined;
+export function buildStringParser(description: string): SyntaxParser {
+    return {
+        description,
+        parseFunction: (context: IContext) => {
+            if (!stringDelimiter.includes(context.buffer.peek(1))) return undefined;
 
-        const delimiter = context.buffer.extractCount(1);
-        const text = context.buffer.extractString(delimiter);
-        return { text, tokenType: 'StringLiteral' };
+            const delimiter = context.buffer.extractCount(1);
+            const text = delimiter == backQuote 
+                ? context.buffer.extractString(delimiter) 
+                : context.buffer.extractString(delimiter).replace(/^ +/gm, '');
+
+            return { text, tokenType: 'StringLiteral' };
+        },
     };
 }
 
-export const parseString = buildStringParser();
+export const parseString = buildStringParser('string literal');
+export const parseDate = buildStringParser('date literal');
