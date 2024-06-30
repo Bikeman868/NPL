@@ -2,6 +2,6 @@
 // the event in the database
 namespace app.persistence {
     message PersistEvent {
-        inputEvent event
+        InputEvent event
     }
 }

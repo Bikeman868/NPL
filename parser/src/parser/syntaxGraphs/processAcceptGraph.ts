@@ -14,6 +14,7 @@ import {
     functionCallGraph,
     parseAcceptKeyword,
     parseAnyMessageTypeKeyword,
+    parseBreakKeyword,
     parseConditionalKeyword,
     parseElseKeyword,
     parseEmptyKeyword,
@@ -61,6 +62,7 @@ statementGraphBuilder
         .transition(parseConditionalKeyword, skipSeparators, 'conditional')
         .transition(parseForKeyword, skipSeparators, 'for-loop')
         .transition(parseElseKeyword, skipSeparators, 'else')
+        .transition(parseBreakKeyword, skipSeparators)
         .subGraph('blank-line', eolGraph)
         .subGraph('emit', emitGraph)
         .subGraph('await', processAwaitGraph)

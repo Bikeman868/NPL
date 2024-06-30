@@ -43,6 +43,7 @@ export const parseUsingKeyword = buildKeywordParser(['using'], 'Keyword');
 export const parseVarKeyword = buildKeywordParser(['var'], 'Keyword');
 export const parseMessageKeyword = buildKeywordParser(['message'], 'Keyword');
 export const parseJsonKeyword = buildKeywordParser(['json'], 'Keyword');
+export const parseBreakKeyword = buildKeywordParser(['break'], 'Keyword');
 
 export const parseStartSubExpressionSymbol = buildSymbolParser(openRoundBracket, 'StartSubExpression');
 export const parseEndSubExpressionSymbol = buildSymbolParser(closeRoundBracket, 'EndSubExpression');

@@ -26,7 +26,7 @@ namespace app.events {
                 await Graph graph
 
                 var stateCode graph.startingStateCode
-                var timestamp Date.now()
+                var timestamp Date.zero
                 
                 if snapshot {
                     set stateCode snapshot.stateCode
@@ -44,11 +44,24 @@ namespace app.events {
                 await EventHistory eventHistory
 
                 for event of eventHistory.events {
-                    // TODO: Build state from event history
+                    const state graph.states[stateCode]
+                    for transition of state.transitions {
+                        if transition.eventCode == event.eventCode {
+                            set stateCode transition.nextStateCode
+                            break
+                        }
+                    }
                 }
 
                 if eventHistory.events.length() > 5 {
-                    // TODO: Create a new snapshot
+                    const snapshot Snapshot {
+                        message {
+                            entityKey stateRequest.entityKey
+                            timestamp timestamp
+                            stateCode stateCode
+                        }
+                    }
+                    emit PersistSnapshot message snapshot snapshot
                 }
 
                 const stateName graph.states[stateCode].stateName
