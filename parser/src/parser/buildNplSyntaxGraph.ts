@@ -42,6 +42,7 @@ import {
     literalMapGraphBuilder,
     subExpressionGraphBuilder,
     unaryOperatorGraphBuilder,
+    messageJsonGraphBuilder,
 } from './index.js';
 
 import { defineDataTypeGraph } from './graphs/dataTypeGraph.js';
@@ -87,6 +88,7 @@ import { defineLiteralListGraph } from './graphs/literalListGraph.js';
 import { defineLiteralMapGraph } from './graphs/literalMapGraph.js';
 import { defineSubExpressionGraph } from './graphs/subExpressionGraph.js';
 import { defineUnaryOperatorGraph } from './graphs/unaryOperatorGraph.js';
+import { defineMessageJsonGraph } from './graphs/messageJsonGraph.js';
 
 export function buildNplSyntaxGraph(): SyntaxGraph {
     defineApplicationConnectionGraph(applicationConnectionGraphBuilder);
@@ -112,6 +114,7 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineMessageContextGraph(messageContextGraphBuilder);
     defineMessageDefinitionGraph(messageDefinitionGraphBuilder);
     defineMessageInitGraph(messageInitGraphBuilder);
+    defineMessageJsonGraph(messageJsonGraphBuilder);
     defineLiteralMessageGraph(literalMessageGraphBuilder);
     defineMessageMessageGraph(messageMessageGraphBuilder);
     defineMessageRouteGraph(messageRouteGraphBuilder);

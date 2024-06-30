@@ -7,6 +7,7 @@ import {
     eolGraph,
     literalMessageGraph,
     messageContextGraph,
+    messageJsonGraph,
     messageMessageGraph,
     messageRouteGraph,
     parseEmitKeyword,
@@ -25,6 +26,7 @@ const oneLineMessageDefinitionGraph = new GraphBuilder('one-line-message-definit
         .subGraph('message', messageMessageGraph)
         .subGraph('context', messageContextGraph)
         .subGraph('route', messageRouteGraph)
+        .subGraph('json', messageJsonGraph)
     .graph.build();
 
 const emptyMessageTypeGraph = new GraphBuilder('empty-message-definition')

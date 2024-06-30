@@ -33,9 +33,9 @@ namespace app.endpoints {
                         }
                     }
                     elseif request.method == 'POST' {
-                        emit InputEvent.fromJson(
-                            request.body
-                        )
+                        emit InputEvent {
+                            json request.body
+                        }
                         emit npl.http.Response {
                             message {
                                 status 200
