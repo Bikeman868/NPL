@@ -6,7 +6,7 @@ import {
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { configGraph, eolGraph, processAcceptGraph, testGraph } from '../index.js';
+import { configGraph, constGraph, eolGraph, messageDefinitionGraph, processAcceptGraph, testGraph } from '../index.js';
 
 const parseProcess = buildKeywordParser(['process'], 'Keyword');
 
@@ -15,6 +15,14 @@ const parseProcess = buildKeywordParser(['process'], 'Keyword');
     process process1<EOL>
 
     process process1 {
+        const count 1
+
+        message InternalDebug string text
+
+        accept InternalDebug debug {
+            emit npl.io.console.Text message ...debug
+        }
+
         accept empty {
             emit MyMessage {
                 message {
@@ -47,9 +55,11 @@ export function defineProcessGraph(builder: GraphBuilder) {
     .graph.state('statements')
         .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
+        .subGraph('config', configGraph, 'statements')
+        .subGraph('const', constGraph, 'statements')
+        .subGraph('message', messageDefinitionGraph, 'statements')
         .subGraph('accept', processAcceptGraph, 'statements')
         .subGraph('test', testGraph, 'statements')
-        .subGraph('config', configGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

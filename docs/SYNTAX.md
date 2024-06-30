@@ -407,13 +407,11 @@ namespace app {
 
     message Message3 string theOnly field
 
-    message Message4 { string theOnly field }
-
     message Message5
 }
 ```
 
-The type name can be:
+The type name for each field can be:
 - The qualified identifier for another message type
 - The qualified identifier for an `enum` type
 - One of the following reserved words: `string`, `number`, `boolean`, `date`
@@ -512,7 +510,7 @@ namespace app {
 
         egress outgoing
 
-        egress ingress default { process process1 }
+        egress ingress default process process1
 
         egress logging { 
             process process1 
@@ -522,8 +520,8 @@ namespace app {
 
         ingress egress input1 network network2.entrypoint1
 
-        ingress splitEntrypoint { netwoek network3 }
-        egress splitEntrypoint { network network4 } 
+        ingress splitEntrypoint netwoek network3
+        egress splitEntrypoint network network4
     }
 }
 ```
@@ -568,9 +566,9 @@ Examples of valid enum syntax:
 
 ```npl
 namespace app {
-    enum Enum1 { value1 value2 value3 }
-    enum Enum2 value1 value2 value3
-    enum Enum3 { 
+    enum Enum1 value1 value2 value3
+
+    enum Enum2 { 
         value1 
         value2 
         value3
@@ -600,16 +598,15 @@ values by providing a yaml file when you run the program.
 As well as configuring your connection, you also need to route messages to/from the connection to a network
 entry point within your application.
 
-To configure the messages incomming from the connection to the application, use `ingress network` followed 
+To configure the messages incomming from the connection to the application, use `ingress` followed 
 by the qualified identifier of the network or network entry point.
 
-To configure the messages outgoing from the application to the connection, use `egress network` followed 
+To configure the messages outgoing from the application to the connection, use `egress` followed 
 by the qualified identifier of the network or network entry point.
 
 If the qualified identifier refers to a network, then the default entry point will be used.
 
-You can also combine `ingress` and `egress` in the same statement, and the reserved work `network` is
-optional, because it must always refer to network entry point.
+You can also combine `ingress` and `egress` in the same statement.
 
 These are examples of valid `connection` statements:
 
@@ -621,8 +618,8 @@ namespace app {
         }
 
         connection npl.io.HttpListener httpListener {
-            config { port 80 }
-            ingress egress network http.router
+            config port 80
+            ingress egress http.router
         }
 
         connection npl.scheduling.Emitter emitter { 
@@ -655,11 +652,12 @@ will search outward through the nested scopes to resolve the name.
 The value part is a constant expression that must be able to be evaluated at compile time. This usually means that it
 is a literal. The literal can be a string, date, number or boolean. It can also be an array or map of any of these types.
 
-For the most part, you can define any config values you like in `config` statements. The only case where this is not
-exactly the same, is in a `config` statement for a `connection`. In this case you define the `config` with the same
-syntax, but this configures the connection, and must conform the the connections expectations for what can be configured.
-Connection configuration can be defined in the configuration yaml file that is passed on the command line, regardless 
-of whether you added a config definition or not in your application.
+For the most part, you define any config values you like in `config` statements. The other use case for the config statement
+case where you are supplying the config for a `connection`. In this case you define the `config` with the same
+syntax, and these configs can still be overriden by a config yaml file, but this configures the connection, and must 
+conform the the connections expectations for what can be configured. Connection configuration can be defined in the 
+configuration yaml file that is passed on the command line, regardless of whether you added a config definition or not
+in your application.
 
 These are examples of valid config statements and expressions
 
@@ -669,7 +667,11 @@ namespace app {
         delay 10
         text 'It\'s going great'
         enabled true
-        tenants ['tenant1', 'tenant2', 'tenant3']
+        tenants [
+            'tenant1'
+            'tenant2'
+            'tenant3'
+        ]
     }
 
     network network1 {
@@ -677,7 +679,7 @@ namespace app {
 
         process process1 {
             accept empty {
-                for (var tenant of config.tenants) {
+                for tenant of config.tenants {
                     emit MyMessage { 
                         message {
                             tenant tenant
@@ -689,6 +691,16 @@ namespace app {
             }
         }
     }
+
+    application myApp {
+        connection npl.scheduling.Emitter emitter { 
+            config {
+                interval 1000
+                count 10
+            }
+            ingress network1
+        }
+    }
 }
 ```
 
@@ -696,12 +708,12 @@ namespace app {
 
 A process statement starts with the reserved word `process` within a `network` scope block, and is followed by at least 
 one space, then the name of the process. If you just want to declare the process name, you can stop 
-here, or you can add a scope block to define the process. If defining the process, the opening `{` must be on the same
-line as the `process` reserved word.
+here, or you can add a scope block to define how the process handles messages. If defining the process, the opening 
+`{` must be on the same line as the `process` reserved word.
 
 A process must be defined within the scope block of a `network` definition.
 
-A process definition comprises any number of `config`, `message`, `accept`, `internal` and `test` statements as defined below.
+A process definition comprises any number of `config`, `const`, `message`, `accept` and `test` statements as defined below.
 
 These are valid `process` statements:
 
@@ -715,14 +727,15 @@ namespace app {
 
             accept DebugMessage debugMessage {
                 emit console.Text {
-                    message { ...debugMessage }
+                    message text debugMessage.text
+                }
+                emit logger.Info {
+                    message text debugMessage.text
                 }
             }
 
             accept * {
-                emit DebugMessage {
-                    message { text 'Hello, world' }
-                }
+                emit DebugMessage message text 'Hello, world'
             }
 
             test 'should emit console text' {
@@ -760,7 +773,7 @@ namespace app {
     network http {
         pipe router {
             route httpListener.HttpRequest {
-                append { process logger }
+                append process logger
             }
         }
         pipe pipe2
@@ -793,10 +806,12 @@ For example:
 ```npl
 pipe myPipe {
     route Query {
-        if message.language == 'GraphQL'
+        if message.language == 'GraphQL' {
             prepend process graphQlProcess
-        else
+        }
+        else {
             prepend process sqlProcess
+        }
     }
 }
 ```
@@ -814,8 +829,8 @@ For example:
 ```npl
 process myProcess {
     accept Query query {
-        emit query { language 'SQL' } // Emit a clone of `query` with language field changed to `SQL`
-        route query { clear } // Clear the route for the incomming message to supress any further processing
+        emit query language 'SQL' // Emit a clone of `query` with language field changed to `SQL`
+        route query clear // Clear the route for the incomming message to supress any further processing
     }
 }
 ```
@@ -846,10 +861,11 @@ other constant expressions.
 
 Expression syntax in NPL is very similar to [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators) with the following exceptions:
 - There are no functions, so function pointers and lambda expressions are not supported.
-- Data structures are immutable, so pre/post increment and decrement operators only work with `var` identifiers.
+- Data structures are immutable, so there are no pre/post increment and decrement operators.
 - Object syntax is not supported. You can not write `{ x: 1, y: 2 }` expressions.
 - Since there are no objects in NPL, there is no `new`, `this`, or `super` operator.
-- There is no object destructuring support in NPL, but you can use the destructuring operator `...` to initialize a message with fields from another message.
+- There is no object destructuring support in NPL, but you can use the destructuring operator `...` to initialize a message, list or map
+with data from another message, list or map.
 - NPL does not have a concept of `null`. Messages with optional fields can contain the value `undefined` as per JavaScript.
 
 NPL has some additional reserved words that can be used in expressions as follows:
@@ -906,6 +922,57 @@ process myProcess {
 }
 ```
 
+You can also construct messages and assign them to `var` or `const` identifiers, for example:
+
+```npl
+message MyMessageType {
+    string name
+}
+
+process myProcess {
+    accept * {
+        const response MyMessageType {
+            message {
+                name 'This is my name'
+            }
+        }
+        emit response
+    }
+}
+```
+
+When messages are constructed, you can also specify a route and a context for the message using the `route` and
+`context` keywords respectively. Additionally there are 3 types of context (more fully described elsewhere) that
+can be specified with the keywords `message`, `network` and `origin`. This is an example of a fully defined message:
+
+```npl
+const response MyMessageType {
+    message {
+        name 'This is my name'
+        id 'ABC87987275'
+    }
+    route {
+        clear
+        append network dataAccessLayer
+    }
+    context {
+        message {
+            field1 value1
+            field2 value2
+        }
+        origin {
+            field1 value1
+            field2 value2
+        }
+        network {
+            field1 value1
+            field2 value2
+        }
+    }
+}
+
+```
+
 ### Literal values
 
 When you put a literal value into an expression, the following formats are accepted:
@@ -917,23 +984,23 @@ following are valid: `123`, `+123`, `-123`, `+123.45`, `-123e-3`.
 - **strings** literals can be enclosed in single quotes, double quotes or back ticks. To embed a quote into a string
 delimited with the same quote character, prefix the quotation mark with `\`. To add `\` to a string you need to put 
 two `\\` characters. The `\` can also be used to add control characters in the usual way, so `"\n"` is a string 
-containg a newline character. Similarly you can use `\r`, `\t` and `\f`.
+containg a newline character. Similarly you can use `\r`, `\t` and `\f`. All string types support multi-line strings,
+but single and double quotes trim additional spaces after a newline character and back tick delimited strings are verbatim.
 
 - **date** literals are rare in code, but maybe useful in unit tests. For places where you need them, date variables
 can be initialized with a string that conforms to RFC 3339.
 
 - **boolean** literals must use the reserved words `true` and `false`.
 
-- **arrays** can be initialized with a list of expressions enclosed in a scope block. Each expression must either
-be on a separate line (recommended) or enclosed in parentheses (in our opinion less readable).
+- **lists** can be initialized with a list of expressions enclosed in square brackets and separated by newline charaters.
+Each expression must be on a separate line.
 
 - **maps** can be initialized with a list of key/value pairs enclosed in a scope block. Each pair must be on
 a separate line, and the key must be separated from the value by at least one space. If the key is an expression
 then it must be enclosed in parentheses.
 
-Note that strings delimited with single or double quotes must be closed before the end of the line, but
-strings delimited with back ticks can contain multiple lines of text. Strings with back ticks also support string
-interpolation where `${<expression>}` is replaced by the result of the evaluating the expression.
+Note that strings with single and double quotes support string interpolation where `${<expression>}` is replaced by the
+result of the evaluating the expression. Strings delimited with back ticks are verbatim.
 
 For example:
 
@@ -945,7 +1012,7 @@ namespace app {
             string aString
             boolean aBoolean
             date aDate
-            string[] anArray
+            string[] aList
             map<string number> aMap
         }
 
@@ -956,7 +1023,7 @@ namespace app {
                         aNumber 34.6
                         aBoolean true
                         aDate "2023-08-16T09:00Z"
-                        anArray {
+                        aList {
                             "Element 0"
                             'Element 1'
                             "Element 2"
@@ -1007,9 +1074,9 @@ The following is an example of a process that can process any kind of message:
 ```npl
 process dateAppender {
     accept * someMessage{
-        var dateText = someMessage.text + ' ' + date().toString()
+        var dateText someMessage.text + ' ' + date().toString()
         emit Response { 
-            message { text dateText }
+            message text dateText
         }
     }
 }
@@ -1025,7 +1092,7 @@ Emit statements can only exist within the scope blocks of `accept` or `test` sta
 Very often, the expression after the `emit` statement is an expression that constructs a new message. You can
 consutruct a message from scratch using the message type identifier followed by a scope block that initializes
 the message, or you can use a message instance followed by a scope block to clone an existing message modifying
-some of it's properties along the way.
+some of its properties along the way.
 
 Inside the scope block you can have three further scope blocks. The `message` scope block defines the fields of
 the message to emit, the `context` scope block optionally adjusts the context of the new message, and the `route`
@@ -1071,12 +1138,12 @@ emit empty
 
 emit empty {
     context {
-        origin { process 'MyProcess' }
+        origin process 'MyProcess'
     }
 }
 
 emit MyMessage {
-    message { field1 'New value' }
+    message field1 'New value'
 }
 
 emit MyMessage {
@@ -1087,7 +1154,7 @@ emit MyMessage {
 }
 
 accept Message1 message1 {
-    await { Message3 message3 }
+    await Message3 message3
 
     emit message3 {
         message {
@@ -1097,7 +1164,7 @@ accept Message1 message1 {
         }
         context {
             message {
-                dateEmitted date()
+                dateEmitted Date.now()
                 tenant message3.tenantName
             }
             origin {
@@ -1113,37 +1180,32 @@ accept Message1 message1 {
 
 ## If
 
-The `if` reserved word can be used within a `route` or `accept` scope block. Several syntax options are supported.
+The `if` reserved word can be used within a `route` or `accept` scope block. Several syntax options are supported. The
+reserved word `if` must be followed by at least 1 space, then an expression, and a scope block. The statements inside the
+scope block are only executed if the expression is truthy (as defined by JavaScript). The opening `{` of the scope
+block must be on the same line as the expression.
 
-Syntax 1 is: `if` followed by at least 1 space, followed by an expression, then a line break, then a single statement.
-
-Syntax 2 is: `if` followed by an expression enclosed in `()` followed by a single statement all on one line.
-
-Syntax 3 is: `if` followed by at least 1 space, followed by an expression, followed by the open scope `{` symbol all 
-on one line, then multiple statements on successive lines, and finally a closing `}`. In this syntax the expression
-can optionally be enclosed in `()`.
-
-These syntax options are illustrated by these valid examples:
+This syntax is illustrated by these valid examples:
 
 ```npl
-    if message.path.startsWith('/ux') {
+    const isUxPath message.path.startsWith(
+        '/ux'
+    )
+    if  isUxPath {
         append {
             process logger
             pipe uxRouting
         }
     }
 
-    if (message.path.startsWith('/ux')) append process logger
+    if (message.path == '/ux') {
+        append process logger
+    }
 
-    if message.path.startsWith('/ux') {
+    if myBooleanVariable {
         clear
         if message.verb == 'POST'
             append { process logger }
-    }
-
-    if (message.path.startsWith('/ux')) {
-        clear
-        if (message.verb == 'POST) append process logger
     }
 ```
 

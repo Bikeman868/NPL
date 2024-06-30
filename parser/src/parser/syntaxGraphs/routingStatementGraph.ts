@@ -9,17 +9,23 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import {
     conditionalExpressionGraph,
+    constGraph,
     destinationGraph,
     eolGraph,
     parseAnyMessageTypeKeyword,
     parseCaptureKeyword,
     parseClearKeyword,
     parseConditionalKeyword,
+    parseConstKeyword,
     parseElseKeyword,
     parseEmptyKeyword,
     parseForKeyword,
     parseRouteEndKeyword,
+    parseSetKeyword,
+    parseVarKeyword,
     routingStatementGraph,
+    setGraph,
+    varGraph,
 } from '../index.js';
 
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('route-scope-block');
@@ -109,6 +115,9 @@ export function defineRoutingStatementGraph(builder: GraphBuilder) {
         .transition(parseElseKeyword, skipSeparators, 'else')
         .transition(parseForKeyword, skipSeparators, 'for')
         .subGraph('"capture"', captureGraphBuilder.build())
+        .subGraph('const', constGraph)
+        .subGraph('var', varGraph)
+        .subGraph('set', setGraph)
     .graph.state('route')
         .transition(parseOpenScope, skipSeparators, 'destinations')
         .subGraph('single-destination', destinationGraph, 'end')
