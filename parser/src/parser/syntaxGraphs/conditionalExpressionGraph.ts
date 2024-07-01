@@ -1,6 +1,5 @@
-import { openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { buildSymbolParser, parseOpenScope, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import { parseOpenScope, skipSeparators } from '../stateMachine/SyntaxParser.js';
 import { binaryOperatorGraph, expressionTermGraph, functionCallGraph, indexExpressionGraph } from '../index.js';
 
 // prettier-ignore

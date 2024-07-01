@@ -864,7 +864,7 @@ Expression syntax in NPL is very similar to [JavaScript](https://developer.mozil
 - Data structures are immutable, so there are no pre/post increment and decrement operators.
 - Object syntax is not supported. You can not write `{ x: 1, y: 2 }` expressions.
 - Since there are no objects in NPL, there is no `new`, `this`, or `super` operator.
-- There is no object destructuring support in NPL, but you can use the destructuring operator `...` to initialize a message, list or map
+- There is no object destructuring support in NPL, but you can use the spread operator `...` to initialize a message, list or map
 with data from another message, list or map.
 - NPL does not have a concept of `null`. Messages with optional fields can contain the value `undefined` as per JavaScript.
 
@@ -997,10 +997,11 @@ Each expression must be on a separate line.
 
 - **maps** can be initialized with a list of key/value pairs enclosed in a scope block. Each pair must be on
 a separate line, and the key must be separated from the value by at least one space. If the key is an expression
-then it must be enclosed in parentheses.
+then it must be enclosed in `()`.
 
 Note that strings with single and double quotes support string interpolation where `${<expression>}` is replaced by the
-result of the evaluating the expression. Strings delimited with back ticks are verbatim.
+result of the evaluating the expression, and `%NAME%` is replaced by the value of an environment variable. Strings 
+delimited with back ticks are not interpolated, but used verbatim, including newlines and whitespace.
 
 For example:
 
@@ -1038,6 +1039,143 @@ namespace app {
         }
     }
 }
+```
+
+### Function calls
+
+NPL does not allow you to define functions (or methods) in your application, instead of function calls you should `emit`
+a request message and `await` for a response.
+
+The NPL runtime is JavaScript, and it comes with a framework that does provide many essential functions, so calling these
+in necessary for NPL to be useful. For example functions that split and join strings are necessary to write useful programs.
+
+The syntax for function calls in many languages is to enclose a comma separated list in `()` brackets. I considered doing this
+for NPL, and the `,` symbol is not designated for any other purpose, but this would make the function call statement have a different
+look and feel from the rest of the language (which uses line breaks to separate items). Finally, I decided to use the `()` to denote
+a function call, but separate the parameters with line breaks. A concequence of this desicion is that function calls loog a 
+bit odd when embedded into an expression, and I recommend separating the function call into a statement that assigns the
+result of the function call to a `const` or `var`.
+
+Wheras it's valid to write:
+
+```npl
+if request.path.substring(
+        1
+        8
+    ) == 'invoice' {
+    // do something for invoice case
+}
+```
+
+I think it is more readable written like this:
+
+```npl
+const isInvoice request.path.substring(
+        1
+        8
+    ) == 'invoice'
+if isInvoice {
+    // do something for invoice case
+}
+```
+
+In function calls you need a line break after each parameter value. When there are no parameters you can use `()` as follows:
+
+```npl
+const now = Date.now()
+```
+
+### The spread operator
+
+Similar to TypeScript, the `...` operator will efficiently copy an existing data structure when you are constructing a new
+one. This is necessary because NPL is a functional language and all data is immutable. In NPL you can declare local stack-based 
+variables and mutate their values, but you can not modify the body of a message, map or list after construction.
+
+Note that the spread operator can be very efficient even for large structures, because everything is immutable. It's never
+necessary to do a deep copy on immutable data structures. If I make a new list that comprises all the elements of two existing
+lists, my new list just has to reference the two existing lists, and no actual copying takes place.
+
+For example, to extend an existing list:
+
+```npl
+const weekdays [
+    'Monday'
+    'Tuesday'
+    'Wednesday'
+    'Thursday'
+    'Friday'
+]
+
+const weekendDays [
+    'Saturday'
+    'Sunday'
+]
+
+const days [
+    ...weekdays
+    ...weekendDays
+]
+```
+
+Note that for lists, if both lists contain the same value then this value will appear twice in the combined list.
+For maps, you can't have two entries with the same key, so maps that are merged later will hide keys from maps that are
+merged earlier. For example:
+
+```npl
+const map1 {
+    'key1' 'value1'
+    'key2' 'value2'
+}
+
+const map2 {
+    ...map1
+    'key2' 'newValue2'
+}
+```
+
+Results in `map2` having `key1` equal to `value1` and `key2` equal to `newValue2`.
+
+If you want to build a list or map itteratively, it's efficient to use the spread operator in a loop. For example:
+
+```npl
+const originalList queryResult.rows
+
+var filteredList []
+for row of rows {
+    if row['date'] > startDate {
+        set filteredList [
+            ...filteredList
+            row
+        ]
+    }
+}
+```
+
+The spread operator can also be used with messages, in which case it "copies" by reference the fields of an existing
+message into the new message being constructed where the field names and data types match. You can also use the `...`
+operator to initialize the fields of a message from a map.
+
+For example:
+
+```npl
+message Address {
+    string addressLine1
+    string addressLine2
+    string city
+    string postalCode
+    string country
+}
+
+const addressFields {
+    ('addressLine' + 1) "Address line 1"
+    ('addressLine' + 2) "Address line 2"
+}
+
+const shippingAddress Address {
+    ...addressFields
+    city 'Some city'
+}
+
 ```
 
 ## Accept
