@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildCloseScopeParser,
@@ -16,13 +15,10 @@ import {
     parseCaptureKeyword,
     parseClearKeyword,
     parseConditionalKeyword,
-    parseConstKeyword,
     parseElseKeyword,
     parseEmptyKeyword,
     parseForKeyword,
     parseRouteEndKeyword,
-    parseSetKeyword,
-    parseVarKeyword,
     routingStatementGraph,
     setGraph,
     varGraph,
@@ -41,6 +37,8 @@ const captureGraphBuilder = new GraphBuilder('route-message-capture');
         append process ns1.process1
     }<EOL>
 
+    capture MyMessage<EOL>
+
 */
 captureGraphBuilder
     .graph.start
@@ -51,6 +49,7 @@ captureGraphBuilder
         .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition(parseOpenScope, skipSeparators, 'statements')
+        .subGraph('clear-capture', eolGraph)
         .subGraph('single-route', routingStatementGraph)
     .graph.state('statements')
         .transition(parseCloseScope, skipSeparators, 'end')

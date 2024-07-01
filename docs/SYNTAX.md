@@ -1180,9 +1180,9 @@ accept Message1 message1 {
 
 ## If
 
-The `if` reserved word can be used within a `route` or `accept` scope block. Several syntax options are supported. The
-reserved word `if` must be followed by at least 1 space, then an expression, and a scope block. The statements inside the
-scope block are only executed if the expression is truthy (as defined by JavaScript). The opening `{` of the scope
+The `if` reserved word can be used within a `route` or `accept` scope block. The reserved word `if` must be 
+followed by at least 1 space, then an expression, and a scope block. The statements inside the scope block
+are only executed if the expression is truthy (as defined by JavaScript). The opening `{` of the scope
 block must be on the same line as the expression.
 
 This syntax is illustrated by these valid examples:
@@ -1213,7 +1213,7 @@ This syntax is illustrated by these valid examples:
 
 An `else` statement must follow an `if` or an `elseif` statement within a `route` or `accept` scope block.
 
-The `else` statement has a scope block containg instructions to execute if the preceeding `if` condition is `false`.
+The `else` statement has a scope block containg instructions to execute if the preceeding `if` condition is falsy.
 
 ## Elseif
 
@@ -1223,7 +1223,7 @@ These two code blocks are funtionally identical:
 
 ```npl
 if a {
-
+    // Do something
 }
 else {
     if b {
@@ -1235,7 +1235,7 @@ else {
 
 ```npl
 if a {
-
+    // Do something
 }
 elseif b {
     // Do something
@@ -1246,23 +1246,22 @@ elseif b {
 ## While
 
 While statements are syntactially the same as `if` statements defined above, but instead of executing the code in the 
-scope block just once if the expression is true, the `while` statement repeats the code inside the scope block until 
-the expression evaluates to false.
+scope block just once if the expression is truthy, the `while` statement repeats the code inside the scope block until 
+the expression is falsy.
 
 This is an example of a valid `while` statement
 
 ```npl
 var x 10
 while x > 0 {
-    emit MyMessage { 
-        message { index x-- }
-    }
+    emit MyMessage message index x
+    set x x-1
 }
 ```
 
 ## For
 
-The `for` statement will enumerate the elements of an array or map. There are two types of `for` statement, one that
+The `for` statement will enumerate the elements of a list or map. There are two types of `for` statement, one that
 enumerates the keys and another that enumerates the values. These are the same as the options in TypeScript, and use
 the same `for <index-variable> in <collection> {}` to enumerate indexes, and `for <value-variable> of <collection> {}`
 to enumerate the values.
@@ -1271,7 +1270,10 @@ This is an example of a valid `for` statement:
 
 ```npl
 config {
-    tenants ['tenant1, tenen2']
+    tenants [
+        'tenant1'
+        'tenant2'
+    ]
 }
 
 for tenant of config.tenants {
@@ -1296,6 +1298,33 @@ The keyword `append` should be followed by a scope block containing a list of ro
 If there are multiple destinations, then each one must be on a separate line. If you have only one destination
 then the statement can be all on one line.
 
+Note that including multiple destinations is equivalent to multiple append statements, so that the following
+two route statements are functionally equivalent:
+
+```npl
+namespace app {
+    network myNetwork {
+        route * {
+            append {
+                process process1
+                process process2
+                process process3
+            }
+        }
+    }
+}
+
+namespace app {
+    network myNetwork {
+        route * {
+            append process process1
+            append process process2
+            append process process3
+        }
+    }
+}
+```
+
 ## Prepend
 
 The `prepend` reserved word can be used within the scope block of a `route`, and adds new destinations to the beginning
@@ -1309,18 +1338,55 @@ The keyword `prepend` should be followed by a scope block containing a list of r
 If there are multiple destinations, then each one must be on a separate line. If you have only one destination
 then the statement can be all on one line.
 
+Note that including multiple destinations is equivalent to multiple prepend statements, so that the following
+two route statements are functionally equivalent:
+
+```npl
+namespace app {
+    network myNetwork {
+        route * {
+            prepend {
+                process process1
+                process process2
+                process process3
+            }
+        }
+    }
+}
+
+namespace app {
+    network myNetwork {
+        route * {
+            prepend process process1
+            prepend process process2
+            prepend process process3
+        }
+    }
+}
+```
+
+## remove
+
+The `remove` reserved word can be used within the scope block of a `route`, and removes destinations from the 
+route of the message that is being routed. The specified destinations will be removed from the route nomatter
+where they are in the routing list.
+
+You can only have `remove` statements within the scope block of a `route` statement. They affect the message
+that is currently being routed.
+
+The keyword `remove` should be followed by a scope block containing a list of routing destinations (see below).
+If there are multiple destinations, then each one must be on a separate line. If you have only one destination
+then the statement can be all on one line.
+
 ## Routing destinations
 
-Routing destinations are defined within the scope block of a `prepend` or `append` statement, and define a place
-to send the message to. Each destination starts with the keyword `process`, `pipe` or `network` followed by at least
-one space, and an identifier. As expected, if you use the `process` reserved word, then the identifier must
-refer to a `process` definition etc.
+Routing destinations are defined within the scope block of a `prepend`, `append` or `remove` statement, and 
+define a place where the message will be sent to. Each destination starts with the keyword `process`, `pipe` 
+or `network` followed by at least one space, and an identifier. As expected, if you use the `process` reserved 
+word, then the identifier must refer to a `process` identifier etc.
 
-For a process, the identifier must ne the name of a process within the same network. You cannot route messages
-directly to a process in another network.
-
-For a pipe, the identifier must ne the name of a pipe within the same network. You cannot route messages
-directly to a pipe in another network.
+For a process or pipe, the identifier must ne the name of a process or pipe within the same network. You cannot
+route messages directly to something internal to another network.
 
 For a network, the identifier can reference a network or a network entry point. If the identifier is the name
 of a network, then the `default` entry point is assumed. The compiler tries to resolve the network identifier
@@ -1333,10 +1399,12 @@ For example:
 using namespace1
 using namespace2.namespace3
 
-namespace4 {
+namespace namespace4 {
     network myNetwork {
         route * {
-            append { network anotherNetwork.entryPoint1 }
+            append {
+                network anotherNetwork.entryPoint1
+            }
         }
     }
 }
@@ -1354,10 +1422,12 @@ You can also specify the network identifier explicitly using the fully qualified
 using namespace1
 using namespace2.namespace3
 
-namespace4 {
+namespace namespace4 {
     network myNetwork {
         route * {
-            append { network namespace1.anotherNetwork.entryPoint1 }
+            append { 
+                network namespace1.anotherNetwork.entryPoint1
+            }
         }
     }
 }
@@ -1368,7 +1438,9 @@ In which case the `using` statements are not required.
 ## Clear
 
 The reserved word `clear` can be used in the scope block of a `route` statement, and clears the
-routing table for the message.
+routing table for the message. After clearing the routing table, the message will not be procesed any
+further by the application unless the `clear` statement is followed by a `append` or `prepend` to establish
+a new route
 
 ## Capture
 
@@ -1382,13 +1454,25 @@ destination, the capture lists are used to modify the routes of any messages tha
 Emitted messages are compared to the capture list associatd with the destination first, then the global capture list.
 
 The capture lists are effectively a map of message type and route. If the message type in the capture list
-matches the type of the emitted message, then the route from the capture list is merged with the route of
-the message.
+matches the type of the emitted message, then the route from the capture list will be applied to the newly emitted
+message as follows:
+
+1. Whenever a process constructs a new message, the new message initially has copy of the route from the message that
+the process is processing, including any global or destination specific captures that are defined for that route.
+
+2. The route is ammended by routing statements within the message constructor. If these routing statements include
+a `clear` statement, this resets the route to empty, and removes any captures that are destination specific. Note that
+the `clear` statement will not delete global captures - more on this below.
+
+3. The route is ammended by applicable captures. These captures can also `clear` the route and define a new route for
+the newly constructed message. Destination specific captures are applied before global captures.
+
+The emitted message is now processed according to the resulting route.
 
 ### Global capture
 
-The global capture list is initialized with an entry that matches all message types, and routes the message
-back to the originator of the message that is being processed. This means that if you don't use any `capture`
+The global capture list for a message is initialized with an entry that matches all message types, and routes the
+message back to the originator of the message that is being processed. This means that if you don't use any `capture`
 statements, then emitted messages will be routed to the process, or connection that emitted the original
 message.
 
@@ -1403,28 +1487,43 @@ pipe dataAccess {
     route * {
         capture GraphQlRequest {
             clear
-            prepend { network graphQl }
+            prepend network graphQl
         }
     }
 }
 ```
 
-This code means that for all messages routed to this pipe, add an entry to the global capture
+This code means that for all messages routed to the `datAccess` pipe, add an entry to the global capture
 list of the message saying that any `GraphQlRequest` messages that are emitted during its
 processing should be sent only to the `graphQl` network's default entry point.
 
 To unpack this a little, `route * {}` sets up a routing rule in the pipe for all other message 
 types not explicitly routed, where the contents of the scope block defines how to modify the 
-message's routing table.
+message's routing.
 
 The `capture GraphQlRequest {}` part means add a new entry in the global capture list for messages of
 type `GraphQlRequest`, or replace the existing one. The code inside the scope block defines 
 how to modify the routing table of any `GraphQlRequest` messages that are emitted during processing
 of the original message that we are routing.
 
-Inside this scope block we have `clear` then `prepend { network graphQl }` which deletes the contents
+Inside this scope block we have `clear` then `prepend network graphQl` which deletes the contents
 of the routing table entirely, then adds just one destination `network graphQl`, routing all emitted
-`GraphQlRequest` messages to `network graphQl`.
+`GraphQlRequest` messages to `network graphQl` and nowhere else.
+
+Note that any `capture` statement replaces and existing global capture for the same message type, so
+you can delete an existing capture with a new one that does nothing like this:
+
+```npl
+pipe dataAccess {
+    route * {
+        capture GraphQlRequest // Do nothing with emitted GraphQlRequest messages
+    }
+}
+```
+
+Note that you can also `capture *` to define emit capturing for all other message types. This
+capture statement will be used for all other types of message that are not explicitly captured.
+
 
 ### Destination capture
 
@@ -1441,7 +1540,7 @@ pipe dataAccess {
             process myProcess {
                 capture GraphQlRequest {
                     clear
-                    prepend { network graphQl }
+                    prepend network graphQl
                 }
             }
         }
@@ -1449,11 +1548,11 @@ pipe dataAccess {
 }
 ```
 
-This means for all messages routed to this pipe, append `myProcess` to the list of destinations, and
-if `myProcess` emits a `GraphQlRequest` then route it to `network graphQl`.
+This means for all messages routed to the `dataAccess` pipe, append `myProcess` to the list of destinations, 
+and if `myProcess` emits a `GraphQlRequest` then route it to `network graphQl`.
 
-Note that in this example if any other processes along the route emit a `GraphQlRequest` then they
-will not be affected by this capture, because it is specific to the `process myProcess` destination.
+Note that in this example if any other processes along the route emits a `GraphQlRequest` then it
+will not be affected by this capture, because the capture is specific to the `process myProcess` destination.
 
 You may heve noticed that append and prepend statements can have capture statements within them, and 
 capture statements have append and prepend within them, so these can be nested to any depth. This is
@@ -1462,7 +1561,17 @@ strongly discouraged.
 
 If a message is emitted that matches a destination capture rule and a global capture rule, the destination
 rule is executed first, and the global rule afterwards. For this reason you should be very careful about
-adding global capture rules that `clear` the route.
+adding global capture rules that `clear` the route. This cascade exists for the following scenario:
+
+Assume that we want to send all database queries to the data access layer, and we define this as a global
+capture rule on all messages entering a network. Assume that we also want to log queries that are emitted
+by a specific process, and we set this up as a destination specific capture rule by prepending the logging
+process to the route. In this case we want any database queries emitted to go to the logger, but we also
+want them to go to the data access layer for processing. This is why destination specific captures and global
+captures are both applied to emitted messages.
+
+As with global captures, you can also remove destination specific captures by adding a `capture` with an empty
+scope block.
 
 ## Clone
 
@@ -1481,9 +1590,11 @@ from the original incomming `Message1` so that it is not routed any further.
 process process1 {
     accept Message1 message1 {
         emit message1 {
-            field3 96
+            message {
+                field3 96
+            }
         }
-        route message1 { clear }
+        route message1 clear
     }
 }
 ```
@@ -1496,7 +1607,7 @@ of `message2` with one of the fields copied from `message1`.
 process process1 {
     accept Message1 message1 {
         await Message2 message2
-        emit message2 { field3 message1.field3 }
+        emit message2 message field3 message1.field3
     }
 }
 ```
@@ -1504,8 +1615,12 @@ process process1 {
 ## Await
 
 You can use an `await` statement in a process scope block to suspend processing until a particular combination
-of messages have been received. You can only await messages that were received in response to messages that
-were emitted by this process so that the processing context is preserved.
+of messages have been received.
+
+Note that you can only `await` messages that were received in response to messages that were emitted by this
+process so that the processing context is preserved. Every message contains an internal reference to the execution
+context in which the message was emitted. The `await` statement waits for a message to be received that has the
+same execution context, then continues processing.
 
 NPL applications are designed to process millions of messages concurrently. If your application emits a message
 in the context of processing a specific message, and awaits a response, then the response will be processed
@@ -1531,7 +1646,7 @@ namespace app {
                     message { 
                         query "{ tenant(id: $tenantId)\n{ taxRate\n}\n}"
                         params { 
-                            tenantId invoice.tenantId
+                            'tenantId' invoice.tenantId
                         }
                     }
                 }
@@ -1569,8 +1684,24 @@ will not perform this check on `var`.
 The keyword `const` or `var` is followed by an identifier and an optional expression. This must be all on one 
 line, and the keyword, identifier and expression must be separated by at least 1 space.
 
-The type of the variable is determined by the type of the expression. For the `var` keyword, the expression is
-optional, and for the `const` keyword the expression is required.
+The type of the variable is determined by the type of the expression, so the expression is required. Literal values
+are distinguishable by syntax. The reserved words `true` and `false` denote a boolean value, string delimiters (single
+quote, double quote and back tick) denote a string value, digits denote a number value, a qualified identifier
+followed by `{` denote a message, `{}` without a preceeding identifier denote a `map` and `[]` denotes a list. Anything
+else is an expression.
+
+To subsequently update the value of a `var` you must use the `set` statement. For example:
+
+```npl
+var x 10
+while x  > 0 {
+    // do something
+    set x x-1
+}
+```
+
+The syntax of set statements is the reserved word `set` followed by at least one space, then the name of the
+variable followed by at least one space, followed by an expression to evaluate.
 
 ## Test
 
@@ -1591,8 +1722,8 @@ are defined with the `emit` and `expect` reserved words within the `test` scope 
 Below is an example of a process that performs simple arithmetic and has some unit tests:
 
 ```npl
-namespace App {
-    enum Operation { add subtract multiply divide }
+namespace app {
+    enum Operation add subtract multiply divide
 
     message MathQuestion {
         number a
@@ -1610,19 +1741,13 @@ namespace App {
         process doMath {
             accept MathQuestion question {
                 if question.operation == Operation.add {
-                    emit MathAnswer { 
-                        message { answer question.a + question.b }
-                    }
+                    emit MathAnswer message answer question.a + question.b
                 }
                 elseif question.operation == Operation.subtract {
-                    emit MathAnswer {
-                        message { answer question.a - question.b }
-                    }
+                    emit MathAnswer message answer question.a - question.b
                 }
                 else {
-                    emit Exception { 
-                        message { text `Unknown math operation ${question.operation}`}
-                    }
+                    emit Exception message text `Unknown math operation ${question.operation}`
                 }
             }
 
