@@ -1,4 +1,3 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     buildCloseScopeParser,
@@ -9,6 +8,7 @@ import {
 } from '../stateMachine/SyntaxParser.js';
 import {
     conditionalExpressionGraph,
+    constGraph,
     destinationGraph,
     eolGraph,
     parseAnyMessageTypeKeyword,
@@ -20,6 +20,8 @@ import {
     parseForKeyword,
     parseRouteEndKeyword,
     routingStatementGraph,
+    setGraph,
+    varGraph,
 } from '../index.js';
 
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('route-scope-block');
@@ -35,6 +37,8 @@ const captureGraphBuilder = new GraphBuilder('route-message-capture');
         append process ns1.process1
     }<EOL>
 
+    capture MyMessage<EOL>
+
 */
 captureGraphBuilder
     .graph.start
@@ -45,6 +49,7 @@ captureGraphBuilder
         .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
     .graph.state('identifier')
         .transition(parseOpenScope, skipSeparators, 'statements')
+        .subGraph('clear-capture', eolGraph)
         .subGraph('single-route', routingStatementGraph)
     .graph.state('statements')
         .transition(parseCloseScope, skipSeparators, 'end')
@@ -109,6 +114,9 @@ export function defineRoutingStatementGraph(builder: GraphBuilder) {
         .transition(parseElseKeyword, skipSeparators, 'else')
         .transition(parseForKeyword, skipSeparators, 'for')
         .subGraph('"capture"', captureGraphBuilder.build())
+        .subGraph('const', constGraph)
+        .subGraph('var', varGraph)
+        .subGraph('set', setGraph)
     .graph.state('route')
         .transition(parseOpenScope, skipSeparators, 'destinations')
         .subGraph('single-destination', destinationGraph, 'end')

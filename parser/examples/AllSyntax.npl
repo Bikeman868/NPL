@@ -65,6 +65,76 @@ namespace app {
     }
 }
 
+// === Messages ===
+
+namespace app {
+    message MyMessage
+
+    message MyMessage string onlyField
+
+    message MyMessage new string onlyField
+
+    message MyMessage deprecated string onlyField
+
+    message MyMessage {
+        string stringField
+        number numberField
+        new string newRequiredField
+        new date? newOptionaldField
+        deprecated string deprecatedField
+    }
+
+    const message1 MyMessage {
+        message {
+            field1 value1
+            field2 value2
+        }
+    }
+
+    const clonedMessage originalMessage {
+        message {
+            field2 newField2Value
+        }
+    }
+
+    const message1 MyMessage
+
+    const message1 MyMessage {
+        message {
+            field1 value1
+            field2 value2
+        }
+        context {
+            origin {
+                origin1 value1
+                origin2 value2
+            }
+            message {
+                context1 value1
+                context2 value2
+            }
+            network {
+                network1 value1
+                network2 value2
+            }
+        }
+        route {
+            clear
+            append pipe pipe1
+            append process process1
+            capture OutputMessage {
+                clear
+                append process logger
+            }
+            capture AnotherMessage
+        }
+    }
+
+    const message1 MyMessage {
+        json '{"field1": "field1Value"}'
+    }
+}
+
 // === Networks ===
 
 namespace app {
@@ -181,6 +251,24 @@ namespace namespace1 {
     }
 }
 
+// === Process internal handlers ===
+
+namespace namespace1 {
+    network network1 {
+        process process1 {
+            const days 1
+            message InternalRequest date date
+            message InternalResponse date date
+            accept InternalRequest request {
+                const newDate request.date.addDays(
+                    days
+                )
+                emit InternalResponse message date newDate
+            }
+        }
+    }
+}
+
 // === Process emit ===
 
 namespace namespace1 {
@@ -190,6 +278,8 @@ namespace namespace1 {
                 emit empty
                 emit empty route prepend network ns1.network1
                 emit MessageType
+                emit MessageType message field1 value1
+                emit MessageType json '{"field1": "value1"}'
                 emit MessageType {}
                 emit MessageType {
                 }
@@ -290,9 +380,18 @@ namespace namespace1 {
                 if message.level == LogLevel.debug {
                     clear
                 }
-                elseif message.className == 'MyBuggyCLass' {
+                elseif message.processName == 'MyBuggyProcess' {
                     append network logging.traceOutput
                 }
+                var done false
+                while !done {
+                    append process process1
+                    set done true
+                }
+                const destinations [
+                    'one'
+                    'two'
+                ]
             }
         }
     }
@@ -325,6 +424,7 @@ namespace namespace1 {
                     pipe pipe1
                 }
                 prepend pipe pipe1
+                remove pipe pipe2
                 capture Error {
                     clear
                     append network logger.errors
@@ -376,12 +476,12 @@ namespace namespace1 {
                 const name false
                 const name 1 + 2 + 3
                 const name (1 + 2) * 3
-                const name myArray[index]
-                const name myArray[(i + 1) * 2]
-                const name ((myArray[index]) + (myArray[index+1]))
+                const name myList[index]
+                const name myList[(i + 1) * 2]
+                const name ((myList[index]) + (myList[index+1]))
                 const name [
                     [
-                        myArray[0]
+                        myList[0]
                         2
                         3
                     ] 
@@ -411,6 +511,18 @@ namespace namespace1 {
                     0
                     myString.length() - 1
                 )
+                const myMap {
+                    'field1' 'value1'
+                    'field2' 'value2'
+                    (prefix + customerId) customerValue
+                }
+                const anotherMap {
+                    ...myMap
+                    'additionalKey' 'value'
+                    true 'The true value'
+                    false 'The false value'
+                    19 'Nineteen'
+                }
             }
         }
     }
@@ -418,17 +530,18 @@ namespace namespace1 {
 
 // === Built-in functions ===
 
-/*
 namespace namespace1 {
     network network1 {
         process process1 {
             accept * {
-                const name someString.substring(1, 3)
+                const name someString.substring(
+                    1
+                    3
+                )
             }
         }
     }
 }
-*/
 
 // === Unit tests ===
 

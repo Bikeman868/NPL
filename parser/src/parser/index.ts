@@ -37,13 +37,15 @@ export const parseForOfInKeyword = buildKeywordParser(['of', 'in'], 'Keyword');
 export const parseIngressKeyword = buildKeywordParser(['ingress'], 'Keyword');
 export const parsePipeKeyword = buildKeywordParser(['pipe'], 'Keyword');
 export const parseRouteKeyword = buildKeywordParser(['route'], 'Keyword');
-export const parseRouteEndKeyword = buildKeywordParser(['append', 'prepend'], 'Keyword');
+export const parseRouteEndKeyword = buildKeywordParser(['append', 'prepend', 'remove'], 'Keyword');
 export const parseSetKeyword = buildKeywordParser(['set'], 'Keyword');
 export const parseUsingKeyword = buildKeywordParser(['using'], 'Keyword');
 export const parseVarKeyword = buildKeywordParser(['var'], 'Keyword');
 export const parseMessageKeyword = buildKeywordParser(['message'], 'Keyword');
 export const parseJsonKeyword = buildKeywordParser(['json'], 'Keyword');
 export const parseBreakKeyword = buildKeywordParser(['break'], 'Keyword');
+export const parseConnectionKeyword = buildKeywordParser(['connection'], 'Keyword');
+export const parseMessageFieldQualifierKeyword = buildKeywordParser(['new', 'deprecated'], 'Keyword');
 
 export const parseStartSubExpressionSymbol = buildSymbolParser(openRoundBracket, 'StartSubExpression');
 export const parseEndSubExpressionSymbol = buildSymbolParser(closeRoundBracket, 'EndSubExpression');

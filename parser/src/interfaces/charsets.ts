@@ -17,6 +17,7 @@ export const closeSquareBracket = ']';
 export const openAngleBracket = '<';
 export const closeAngleBracket = '>';
 export const comma = ',';
+export const questionMark = '?';
 export const lineCommentDelimiter = '//';
 export const blockCommentStart = '/*';
 export const blockCommentEnd = '*/';

@@ -13,7 +13,16 @@ import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph.js';
 import { TokenPrinter } from './printer/TokenPrinter.js';
 import { SyntaxErrorPrinter } from './printer/SyntaxErrorPrinter.js';
 import { printSyntaxGraph } from './printer/SyntaxGraphPrinter.js';
-import { assignmentExpressionGraph, binaryOperatorGraph, conditionalExpressionGraph, eolGraph, functionCallGraph, indexExpressionGraph, messageMessageGraph, unaryOperatorGraph } from '#parser/index.js';
+import {
+    assignmentExpressionGraph,
+    binaryOperatorGraph,
+    conditionalExpressionGraph,
+    eolGraph,
+    functionCallGraph,
+    indexExpressionGraph,
+    messageMessageGraph,
+    unaryOperatorGraph,
+} from '#parser/index.js';
 
 // Pass name of NPL source file or a directory path on command line
 const source = process.argv[2] || '.';
@@ -58,7 +67,7 @@ for (let fileName of fileNames) {
     // The parser requires parsable text
     const buffer = new ParsableString(sourceFileText);
     const context = new Context(buffer, nplLanguageSyntax);
-    context.debugLogging = (context: IContext) => false;//context.position.line > 401;
+    context.debugLogging = (context: IContext) => false; //context.position.line > 401;
     context.traceLogging = (context: IContext) => false;
 
     // Tokenise the source file

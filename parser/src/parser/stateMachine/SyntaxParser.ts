@@ -18,6 +18,7 @@ import {
     stringDelimiter,
     lineCommentDelimiter,
     backQuote,
+    questionMark,
 } from '#interfaces/charsets.js';
 import { TokenType } from '#interfaces/TokenType.js';
 
@@ -223,21 +224,26 @@ export const parseEolComment = buildEolCommentParser();
  */
 export function buildBasicTypeParser(): SyntaxParser {
     const types = ['string', 'number', 'date', 'boolean'];
+    const description = types.map((t) => '"' + t + '", "' + t + '?", "' + t + '[]"').join(', ');
     return {
-        description: '"string", "number", "date", "boolean", "string[]", "number[]", "date[]" or "boolean[]"',
+        description,
         parseFunction: (context: IContext) => {
             const startPosition = context.buffer.getPosition();
             let text = context.buffer.extractAny(keyword);
             if (types.includes(text)) {
                 context.buffer.skipAny(separator);
-                const arrayPosition = context.buffer.getPosition();
-                if (context.buffer.extractCount(1) == openSquareBracket) {
+                const suffixPosition = context.buffer.getPosition();
+                const suffixChar = context.buffer.extractCount(1);
+                if (suffixChar == openSquareBracket) {
                     context.buffer.skipAny(separator);
                     if (context.buffer.extractCount(1) == closeSquareBracket) {
                         text += openSquareBracket + closeSquareBracket;
                         context.buffer.skipAny(separator);
-                    } else context.buffer.setPosition(arrayPosition);
-                } else context.buffer.setPosition(arrayPosition);
+                    } else context.buffer.setPosition(suffixPosition);
+                } else if (suffixChar == questionMark) {
+                    text += questionMark;
+                    context.buffer.skipAny(separator);
+                } else context.buffer.setPosition(suffixPosition);
                 return { text, tokenType: 'Type' };
             }
             context.buffer.setPosition(startPosition);
@@ -369,9 +375,10 @@ export function buildStringParser(description: string): SyntaxParser {
             if (!stringDelimiter.includes(context.buffer.peek(1))) return undefined;
 
             const delimiter = context.buffer.extractCount(1);
-            const text = delimiter == backQuote 
-                ? context.buffer.extractString(delimiter) 
-                : context.buffer.extractString(delimiter).replace(/^ +/gm, '');
+            const text =
+                delimiter == backQuote
+                    ? context.buffer.extractString(delimiter)
+                    : context.buffer.extractString(delimiter).replace(/^ +/gm, '');
 
             return { text, tokenType: 'StringLiteral' };
         },

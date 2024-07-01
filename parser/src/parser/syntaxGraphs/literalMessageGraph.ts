@@ -1,7 +1,14 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { closeCurlyBracket } from '#interfaces/charsets.js';
 import { buildSymbolParser, parseStartMessageLiteral, skipSeparators } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, messageContextGraph, messageJsonGraph, messageMessageGraph, messageRouteGraph, parseEndMessageSymbol } from '../index.js';
+import {
+    eolGraph,
+    messageContextGraph,
+    messageJsonGraph,
+    messageMessageGraph,
+    messageRouteGraph,
+    parseEndMessageSymbol,
+} from '../index.js';
 
 // prettier-ignore
 /* Examples

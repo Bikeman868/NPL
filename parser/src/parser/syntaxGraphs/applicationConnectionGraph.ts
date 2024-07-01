@@ -1,13 +1,12 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import {
-    buildKeywordParser,
     parseOpenScope,
     skipSeparators,
     parseQualifiedIdentifier,
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { parseIngressKeyword, parseEgressKeyword, configGraph, eolGraph } from '../index.js';
+import { parseIngressKeyword, parseEgressKeyword, configGraph, eolGraph, parseConnectionKeyword } from '../index.js';
 
 // prettier-ignore
 /* Examples
@@ -25,7 +24,7 @@ import { parseIngressKeyword, parseEgressKeyword, configGraph, eolGraph } from '
 export function defineApplicationConnectionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(buildKeywordParser(['connection'], 'Keyword'), skipSeparators, 'type')
+        .transition(parseConnectionKeyword, skipSeparators, 'type')
     .graph.state('type')
         .transition(parseQualifiedIdentifier, skipSeparators, 'name')
     .graph.state('name')

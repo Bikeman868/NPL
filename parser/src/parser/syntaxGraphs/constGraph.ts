@@ -11,7 +11,7 @@ import { assignmentExpressionGraph, literalMessageGraph, parseConstKeyword } fro
 
     const myMessage = MyMessage {
         message fieldName 'string value'
-    }
+    }<EOL>
 
 */
 export function defineConstGraph(builder: GraphBuilder) {

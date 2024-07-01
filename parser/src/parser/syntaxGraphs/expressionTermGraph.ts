@@ -7,12 +7,7 @@ import {
     parseString,
     skipSeparators,
 } from '../stateMachine/SyntaxParser.js';
-import {
-    literalListGraph,
-    literalMapGraph,
-    subExpressionGraph,
-    unaryOperatorGraph,
-} from '../index.js';
+import { literalListGraph, literalMapGraph, subExpressionGraph, unaryOperatorGraph } from '../index.js';
 
 // prettier-ignore
 /* Examples:
