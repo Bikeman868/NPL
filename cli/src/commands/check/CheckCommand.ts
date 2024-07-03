@@ -6,14 +6,25 @@ export class CheckCommand implements ICommand {
 
     execute(context: CommandContext): undefined {}
 
+    getName(): string {
+        return 'check';
+    }
+
     getDescription(): string {
         return 'Syntax checks npl source code';
     }
 
-    getValidOptions(): Map<string, string> | undefined {
+    getExample(): string {
+        return 'npl check myfile.npl -continue -strict';
+    }
+
+    getValidOptions(): Map<string, string> {
         const opts: Map<string, string> = new Map();
+        opts.set('<filename>', 'The name of the source file of directory path to check');
         opts.set('-s[trict]', 'Treats all warnings as errors');
         opts.set('-c[ontinue]', 'Continues parsing the source file after the first syntax error');
+        opts.set('-o[utput] <filename>', 'Writes syntax errors to the specified file');
+        opts.set('-r[ecursive]', 'Recursively enumerates sub-directories if the <filename> param is a directory');
         return opts;
     }
 

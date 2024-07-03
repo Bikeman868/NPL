@@ -2,7 +2,9 @@ import { CommandContext } from '#interfaces/CommandContext.js';
 
 export interface ICommand {
     execute(context: CommandContext): undefined;
+    getName(): string;
     getDescription(): string;
-    getValidOptions(): Map<string, string> | undefined;
+    getExample(): string;
+    getValidOptions(): Map<string, string>;
     printDocumentation(context: CommandContext): undefined;
 }
