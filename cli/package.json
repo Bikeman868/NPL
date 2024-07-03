@@ -1,7 +1,7 @@
 {
-    "name": "@npl/parser",
+    "name": "@npl/cli",
     "version": "1.0.0",
-    "description": "A parser library for the Network Programming Language",
+    "description": "A CLI for the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
