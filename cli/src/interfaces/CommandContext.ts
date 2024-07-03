@@ -1,7 +1,7 @@
-import { ICommandOutput } from "./ICommandOutput.js"
+import { ICommandOutput } from '#interfaces/ICommandOutput.js';
 
 export type CommandContext = {
-    subCommand: String,
-    options: Map<String, String>
-    output: ICommandOutput
-}
+    commandName: String;
+    options: Map<String, String>;
+    output: ICommandOutput;
+};

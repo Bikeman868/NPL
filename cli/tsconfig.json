@@ -8,7 +8,7 @@
             "#exceptions/*": ["./exceptions/*"],
             "#interfaces/*": ["./interfaces/*"],
             "#utils/*": ["./utils/*"],
-            "#parser/*": ["./parser/*"]
+            "#commands/*": ["./commands/*"]
         }
     },
     "include": ["./src/**/*.ts"]

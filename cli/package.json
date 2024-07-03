@@ -10,7 +10,7 @@
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
-        "#parser/*": "./dist/parser/*"
+        "#commands/*": "./dist/commands/*"
     },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
