@@ -92,7 +92,7 @@ export class HelpCommand implements ICommand {
 
     getValidOptions(): Map<string, string> {
         const opts: Map<string, string> = new Map();
-        opts.set('<command>', 'Prints documentation for the specified command, for example "npl help run"');
+        opts.set('[command]', 'Prints documentation for the specified command, for example "npl help run"');
         return opts;
     }
 
