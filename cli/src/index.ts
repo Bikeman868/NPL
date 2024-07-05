@@ -13,8 +13,8 @@ const helpCommand = new HelpCommand(commands);
 
 commands.set('help', helpCommand);
 commands.set('check', new CheckCommand());
-commands.set('compile', new CompileCommand());
-commands.set('run', new RunCommand());
+// commands.set('compile', new CompileCommand());
+// commands.set('run', new RunCommand());
 
 const commandName = process.argv[2] || 'help';
 const command: ICommand = commands.get(commandName) || helpCommand;
