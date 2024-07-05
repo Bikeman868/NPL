@@ -1,5 +1,5 @@
 {
-    "name": "@npl/cli",
+    "name": "npl-cli",
     "version": "1.0.0",
     "description": "A CLI for the Network Programming Language",
     "author": "Martin Halliday",
