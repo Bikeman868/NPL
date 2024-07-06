@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\cli\\src\\index.ts",
+            "program": "${workspaceFolder}/cli/src/index.ts",
+            "args":["check", "C:/Git/Martin/NPL/parser/examples"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]

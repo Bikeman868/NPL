@@ -13,8 +13,12 @@ const helpCommand = new HelpCommand(commands);
 
 commands.set('help', helpCommand);
 commands.set('check', new CheckCommand());
+
+// TODO: Other CLI commands
 // commands.set('compile', new CompileCommand());
+// commands.set('debug', new DebugCommand());
 // commands.set('run', new RunCommand());
+// commands.set('format', new FormatCommand());
 
 const commandName = process.argv[2] || 'help';
 const command: ICommand = commands.get(commandName) || helpCommand;
@@ -46,7 +50,7 @@ for (let i = 3; i < process.argv.length; i++) {
             }
         }
         if (!option) {
-            throw Error(`"${argv}" is not a valid option for the "${command.getName()}" command, Run "npl help ${command.getName()}" for more information`);
+            throw Error(`"${argv}" is not a valid option for the "${command.getName()}" command, run "npl help ${command.getName()}" for more information`);
         }
     } else {
         if (!option) {
@@ -58,7 +62,7 @@ for (let i = 3; i < process.argv.length; i++) {
             }
         }
         if (!option) {
-            throw Error(`The "${command.getName()}" command does not take parameters, Run "npl help ${command.getName()}" for more information`);
+            throw Error(`The "${command.getName()}" command does not take parameters, run "npl help ${command.getName()}" for more information`);
         }
         option.arguments.push(argv)
     }
@@ -76,6 +80,15 @@ for (const [name, option] of options.entries()) {
         console.error(`The "${name}" option takes a maximum of ${maximumParameterCount} arguments but ${option.arguments.length} were provided.`);
     if (option.name) echo += ' ' + option.name;
     if (option.arguments.length > 0) echo += ' ' + option.arguments.join(' ');
+}
+
+if (!options.get('')) {
+    for (let validOption of validOptions) {
+        if (validOption.startsWith('<')) {
+            console.error(`The "${command.getName()}" command requires parameters, run "npl help ${command.getName()}" for more information.`);
+            process.exit();
+        }
+    }
 }
 
 console.log(echo);
