@@ -23,6 +23,7 @@ import {
     messageMessageGraph,
     unaryOperatorGraph,
 } from '#parser/index.js';
+import { IToken } from '#interfaces/IToken.js';
 
 // Pass name of NPL source file or a directory path on command line
 const source = process.argv[2] || '.';
@@ -86,3 +87,16 @@ for (let fileName of fileNames) {
     }
 }
 
+function parse(sourceText: string): IToken[] {
+    const buffer = new ParsableString(sourceText);
+    const context = new Context(buffer, nplLanguageSyntax);
+    return new Parser().parse(context);
+}
+
+module.exports = {
+    ParsableString,
+    Context,
+    Parser,
+    nplLanguageSyntax,
+    parse,
+}
