@@ -13,6 +13,9 @@
         "#utils/*": "./dist/utils/*",
         "#parser/*": "./dist/parser/*"
     },
+    "exports": {
+        ".": "./index.js"
+    },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
         "generate:buildinfo.win": "echo export default { version: \"Windows\", date: \"Windows\" } > ./src/buildInfo.ts",
