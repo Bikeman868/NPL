@@ -85,3 +85,4 @@ for (let fileName of fileNames) {
         printer.print();
     }
 }
+
