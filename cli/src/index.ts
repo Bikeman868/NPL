@@ -11,14 +11,14 @@ import { RunCommand } from '#commands/run/RunCommand.js';
 const commands: Map<string, ICommand> = new Map();
 const helpCommand = new HelpCommand(commands);
 
-commands.set('help', helpCommand);
-commands.set('check', new CheckCommand());
+function addCommand(command: ICommand) {
+    commands.set(command.getName(), command)
+}
 
-// TODO: Other CLI commands
-// commands.set('compile', new CompileCommand());
-// commands.set('debug', new DebugCommand());
-// commands.set('run', new RunCommand());
-// commands.set('format', new FormatCommand());
+addCommand(helpCommand);
+addCommand(new CheckCommand());
+
+// TODO: Other CLI commands: compile, debug, run, format
 
 const commandName = process.argv[2] || 'help';
 const command: ICommand = commands.get(commandName) || helpCommand;

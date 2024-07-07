@@ -15,13 +15,43 @@ This library includes a very basic printer that will parse a the source file and
 
 The parser is in `./src/parser/Parser.ts` and implements `./src/interfaces/IParser.ts`.
 
+Add a dependency on the parser package with:
+
+```shell
+npm install npl-parser
+```
+
 If you just want to tokenize some source code:
 
 ```typescript
+import {
+    ParsableString,
+    Context,
+    Parser,
+    nplLanguageSyntax
+} from 'npl-parser';
+
+// ParsableString implements IParsableString for an in-memory string containing the entire source code to parse.
+// You don't have to use the ParsableString class, you can write your own implementation of IParsableString
 const buffer = new ParsableString(sourceCode);
-const context = new Context(buffer);
+
+// The parser itself is completely stateless. The current state is stored in IContext alowing parsing to be performed
+// incrementally. You can implement IContext yourself, and you could even extend the NPL syntax here.
+const context = new Context(buffer, nplLanguageSyntax);
+
+// You will want to construct a parser. The parser is stateless and thread safe
 const parser = new Parser();
+
+// You can parse the entire source file in one go, and return an array of tokens like this. There are other methods
+// of the parser class that allow for partial parsing and incremental parsing
 const tokens = parser.parse(context);
+```
+
+If you want default behaviors, this can be abbreviated to:
+```typescript
+import { parse } from 'npl-parser';
+
+const tokens = parse(sourceCode);
 ```
 
 The `parser.parse()` method takes `IContext` so you can provide your own implementation. The constructor

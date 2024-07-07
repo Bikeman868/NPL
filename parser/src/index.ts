@@ -86,13 +86,3 @@ for (let fileName of fileNames) {
         printer.print();
     }
 }
-
-function parse(sourceText: string): IToken[] {
-    const buffer = new ParsableString(sourceText);
-    const context = new Context(buffer, nplLanguageSyntax);
-    return new Parser().parse(context);
-}
-
-export { ParsableString } from '#parser/ParsableString.js';
-export { Parser } from '#parser/Parser.js';
-export { Context } from '#parser/Context.js';
