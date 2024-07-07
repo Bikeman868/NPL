@@ -48,8 +48,8 @@ export class CheckCommand implements ICommand {
         }
     }
 
-    private checkSourceFile(context: CommandContext, fileName: string) {
-        context.output.writeBody(fileName);
+    private checkSourceFile(commandContext: CommandContext, fileName: string) {
+        commandContext.output.writeBody(fileName);
         const sourceFileBytes = readFileSync(fileName);
         const sourceFileText = sourceFileBytes.toString('utf8', 0, sourceFileBytes.length);
     
@@ -59,9 +59,10 @@ export class CheckCommand implements ICommand {
     
         // Tokenise the source file
         const parser = new Parser();
-        const tokens = parser.parse(context);
+        const tokens = parser.parse(parserContext);
     
-        if (context.syntaxErrors.length > 0) {
+        if (parserContext.syntaxErrors.length > 0) {
+            commandContext.output.writeBody(`${fileName} contains ${parserContext.syntaxErrors.length} syntax errors`);
         }
     }
 
