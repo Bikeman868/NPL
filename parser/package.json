@@ -1,6 +1,6 @@
 {
     "name": "npl-parser",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A parser library for the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
@@ -14,7 +14,7 @@
         "#parser/*": "./dist/parser/*"
     },
     "exports": {
-        ".": "./index.js"
+        ".": "./dist/index.js"
     },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",

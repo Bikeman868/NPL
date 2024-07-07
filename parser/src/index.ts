@@ -43,7 +43,7 @@ if (fs.statSync(source).isDirectory()) {
 }
 
 // The syntax graph defines the syntax of the NPL language
-const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
+export const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
 
 // To help with debugging, syntax graphs can be printed out here
 /*
@@ -93,10 +93,6 @@ function parse(sourceText: string): IToken[] {
     return new Parser().parse(context);
 }
 
-module.exports = {
-    ParsableString,
-    Context,
-    Parser,
-    nplLanguageSyntax,
-    parse,
-}
+export { ParsableString } from '#parser/ParsableString.js';
+export { Parser } from '#parser/Parser.js';
+export { Context } from '#parser/Context.js';

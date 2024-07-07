@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { CommandContext } from '#interfaces/CommandContext.js';
 import { ICommand } from '#interfaces/ICommand.js';
-import { ParsableString } from 'npl-parser';
+import { ParsableString, Context, Parser, nplLanguageSyntax } from 'npl-parser';
 
 export class CheckCommand implements ICommand {
     constructor() {}
@@ -56,21 +56,12 @@ export class CheckCommand implements ICommand {
         // The parser requires parsable text
         const buffer = new ParsableString(sourceFileText);
         const parserContext = new Context(buffer, nplLanguageSyntax);
-        context.debugLogging = (parserContext: IContext) => false; //context.position.line > 401;
     
         // Tokenise the source file
         const parser = new Parser();
         const tokens = parser.parse(context);
     
         if (context.syntaxErrors.length > 0) {
-            const printer = new SyntaxErrorPrinter();
-            printer.includeConsoleColors = true;
-            printer.print(sourceFileText, context.syntaxErrors);
-        } else {
-            // Pretty print the code
-            const printer = new TokenPrinter(tokens);
-            printer.includeConsoleColors = true;
-            printer.print();
         }
     }
 
