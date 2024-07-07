@@ -85,3 +85,9 @@ for (let fileName of fileNames) {
         printer.print();
     }
 }
+
+module.exports = {
+    ParsableString,
+    Context,
+    Parser,
+}
