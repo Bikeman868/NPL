@@ -13,6 +13,6 @@ export function defineConfigFieldGraph(builder: GraphBuilder) {
     .graph.start
         .transition(parseIdentifier, skipSeparators, 'field-value')
     .graph.state('field-value')
-        .subGraph('default value', assignmentExpressionGraph)
+        .subGraph('default-value', assignmentExpressionGraph)
     .graph.build();
 }

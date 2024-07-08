@@ -47,7 +47,7 @@ export function definePipeRouteGraph(builder: GraphBuilder) {
     .graph.state('statements')
         .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
-        .subGraph('routing statement', routingStatementGraph, 'statements')
+        .subGraph('routing-statement', routingStatementGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

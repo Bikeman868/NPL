@@ -1,0 +1,55 @@
+using npl.connection
+
+namespace App {
+    application Website {
+        connection HttpListener httpListener {
+            config port 80
+            ingress egress Http.Router
+        }
+    }
+
+    network Http {
+        ingress egress Router pipe Router
+
+        pipe Router {
+            route httpListener.HttpRequest {
+                if message.path.startsWith(
+                    '/api'
+                    ) {
+                    append process Logger
+                    prepend network Api.Request
+                    capture ApiResponse { 
+                        prepend process Json
+                    }
+                }
+                elseif message.path.startsWith(
+                    '/ux'
+                    ) {
+                    append process Logger
+                    prepend network Html.Request
+                    capture HtmlResponse { 
+                        prepend processs Html
+                    }
+                }
+                else {
+                    prepend process NotFound
+                }
+            }
+        }
+
+        process Logger
+        process Html
+        process Json
+        process NotFound
+    }
+}
+
+namespace App {
+    network Api {
+        config { 
+            requiredRole roles.admin
+            timeoutSeconds 10
+        }
+    }
+}
+

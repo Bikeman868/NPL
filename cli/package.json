@@ -1,21 +1,18 @@
 {
-    "name": "npl-parser",
-    "version": "1.0.6",
-    "description": "A parser library for the Network Programming Language",
+    "name": "npl-cli",
+    "version": "1.0.0",
+    "description": "A CLI for the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
     "type": "module",
-    "files": ["dist"],
     "imports": {
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
-        "#parser/*": "./dist/parser/*"
+        "#commands/*": "./dist/commands/*"
     },
-    "exports": {
-        ".": "./dist/parser.js"
-    },
+    "exports": "./dist/index.js",
     "scripts": {
         "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
         "generate:buildinfo.win": "echo export default { version: \"Windows\", date: \"Windows\" } > ./src/buildInfo.ts",
@@ -29,6 +26,9 @@
         "compile": "tsc",
         "build": "npm run clean && npm run generate && npm run compile",
         "test": "vitest"
+    },
+    "dependencies": {
+        "npl-parser": "^1.0.3"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.22.5",

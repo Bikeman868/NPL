@@ -1,4 +1,4 @@
-import { SyntaxError } from '#interfaces/SyntaxError';
+import { SyntaxError } from '#interfaces/SyntaxError.js';
 import textStyle from './consoleEscape.js';
 
 /**

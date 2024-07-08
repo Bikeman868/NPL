@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { parseNextToken } from './graphFunctions';
-import { ParsableString } from '../ParsableString';
-import { Context } from '../Context';
-import { IContext } from '#interfaces/IContext';
-import { ParseResult } from '../ParseResult';
-import { TokenType } from '#interfaces/TokenType';
-import { SyntaxGraph } from '#interfaces/SyntaxGraph';
-import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph';
+import { parseNextToken } from './graphFunctions.js';
+import { ParsableString } from '../ParsableString.js';
+import { Context } from '../Context.js';
+import { IContext } from '#interfaces/IContext.js';
+import { ParseResult } from '../ParseResult.js';
+import { TokenType } from '#interfaces/TokenType.js';
+import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
+import { buildNplSyntaxGraph } from '#parser/buildNplSyntaxGraph.js';
 
 const nplGraph = buildNplSyntaxGraph();
 

@@ -113,7 +113,7 @@ export function defineRoutingStatementGraph(builder: GraphBuilder) {
         .transition(parseConditionalKeyword, skipSeparators, 'conditional')
         .transition(parseElseKeyword, skipSeparators, 'else')
         .transition(parseForKeyword, skipSeparators, 'for')
-        .subGraph('"capture"', captureGraphBuilder.build())
+        .subGraph('capture', captureGraphBuilder.build())
         .subGraph('const', constGraph)
         .subGraph('var', varGraph)
         .subGraph('set', setGraph)

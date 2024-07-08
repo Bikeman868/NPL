@@ -23,6 +23,7 @@ import {
     messageMessageGraph,
     unaryOperatorGraph,
 } from '#parser/index.js';
+import { IToken } from '#interfaces/IToken.js';
 
 // Pass name of NPL source file or a directory path on command line
 const source = process.argv[2] || '.';
@@ -42,7 +43,7 @@ if (fs.statSync(source).isDirectory()) {
 }
 
 // The syntax graph defines the syntax of the NPL language
-const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
+export const nplLanguageSyntax: SyntaxGraph = buildNplSyntaxGraph();
 
 // To help with debugging, syntax graphs can be printed out here
 /*
@@ -84,10 +85,4 @@ for (let fileName of fileNames) {
         printer.includeConsoleColors = true;
         printer.print();
     }
-}
-
-module.exports = {
-    ParsableString,
-    Context,
-    Parser,
 }

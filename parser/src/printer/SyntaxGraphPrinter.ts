@@ -1,5 +1,5 @@
-import { State } from '#interfaces/State';
-import { SubGraphTransition } from '#interfaces/SubGraphTransition';
+import { State } from '#interfaces/State.js';
+import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
 function printState(state: State, subGraphs: Map<string, SubGraphTransition>, indent: number, stack: SyntaxGraph[]) {
