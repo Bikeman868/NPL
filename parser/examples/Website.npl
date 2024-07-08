@@ -1,55 +1,59 @@
 using npl.connection
 
-namespace App {
-    application Website {
+namespace app {
+    application website {
         connection HttpListener httpListener {
             config port 80
-            ingress egress Http.Router
+            ingress egress http.router
         }
     }
 
-    network Http {
-        ingress egress Router pipe Router
+    network http {
+        ingress egress router pipe Router
 
-        pipe Router {
+        pipe router {
             route httpListener.HttpRequest {
-                if message.path.startsWith(
-                    '/api'
-                    ) {
-                    append process Logger
-                    prepend network Api.Request
+                const isApi message.path.startsWith(
+                    '/api'                    
+                    )
+
+                const isUx message.path.startsWith(
+                    '/ux'
+                    )
+
+                if isApi {
+                    append process logger
+                    prepend network api.request
                     capture ApiResponse { 
-                        prepend process Json
+                        prepend process json
                     }
                 }
-                elseif message.path.startsWith(
-                    '/ux'
-                    ) {
-                    append process Logger
-                    prepend network Html.Request
+                elseif isUx {
+                    append process logger
+                    prepend network html.request
                     capture HtmlResponse { 
-                        prepend processs Html
+                        prepend process html
                     }
                 }
                 else {
-                    prepend process NotFound
+                    prepend process notFound
                 }
             }
         }
 
-        process Logger
-        process Html
-        process Json
-        process NotFound
+        process logger
+        process html
+        process json
+        process notFound
     }
 }
 
-namespace App {
-    network Api {
-        config { 
-            requiredRole roles.admin
-            timeoutSeconds 10
-        }
+namespace app {
+    network api {
     }
 }
 
+namespace app {
+    network html {
+    }
+}
