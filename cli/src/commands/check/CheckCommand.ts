@@ -66,18 +66,22 @@ export class CheckCommand implements ICommand {
         const elapsedMs = performance.now() - startMs;
     
         // Check for syntax errors
+        commandContext.output.writeBody(fileName);
+        commandContext.output.writeBody(` `);
         if (parserContext.syntaxErrors.length > 0) {
-            commandContext.output.writeBodyLine(`${fileName} contains ${parserContext.syntaxErrors.length} syntax errors (${elapsedMs.toFixed(1)}ms)`);
+            commandContext.output.writeBody('contains ');
+            commandContext.output.writeColor(`${parserContext.syntaxErrors.length} syntax errors`, 'red');
+            commandContext.output.writeBody(` (${elapsedMs.toFixed(1)}ms)`);
             if (printSource) {
+                commandContext.output.flushLine();
                 const printer = new SyntaxErrorPrinter(commandContext.output, true, true);
                 printer.print(sourceFileText, parserContext.syntaxErrors, linesToPrint);
             }
         } else {
-            commandContext.output.writeBody(fileName);
-            commandContext.output.writeColor(' OK', 'green');
+            commandContext.output.writeColor('OK', 'green');
             commandContext.output.writeBody(` (${elapsedMs.toFixed(1)}ms)`);
-            commandContext.output.flushLine();
         }
+        commandContext.output.flushLine();
     }
 
     execute(commandContext: CommandContext): undefined {
@@ -87,7 +91,6 @@ export class CheckCommand implements ICommand {
         if (params && params.arguments && params.arguments.length > 0)
             source = params.arguments[0];
 
-        const outputOption = commandContext.options.get('-output');
         const recursiveOption = commandContext.options.get('-recursive');
         const detailedOption = commandContext.options.get('-detailed');
         const linesOption = commandContext.options.get('-lines');
@@ -108,6 +111,7 @@ export class CheckCommand implements ICommand {
 
         if (fileNames.length == 0) {
             commandContext.output.writeColor('No NPL source files found', 'red');
+            commandContext.output.flushLine();
         } else if (fileNames.length == 1) {
             this.checkSourceFile(commandContext, fileNames[0], true, linesToPrint)
         } else {

@@ -58,8 +58,7 @@ export class SyntaxErrorPrinter {
             }
 
             while (error?.line == lineNumber) {
-                const indent = lineNumberWidth + error.column;
-                this.writeSpaces(indent);
+                this.writeSpaces(lineNumberWidth + error.column);
                 this.writeError('^ ' + error.message);
 
                 if (this.includeStateStack) {
