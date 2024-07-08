@@ -11,6 +11,8 @@ This is a shared library for parsing NPL source files. It is used by many develo
 
 This library includes a very basic printer that will parse a the source file and pretty print the tokens. You can run it after compiling with `node dist <filename>.npl`. This repo contains a couple of sample NPL single source file applications that you can test with.
 
+Documentation on the NPL language, framework and supporting tools can be found in [the GitHub repo](https://github.com/Bikeman868/NPL).
+
 ## Using the parser
 
 The parser is in `./src/parser/Parser.ts` and implements `./src/interfaces/IParser.ts`.

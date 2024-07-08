@@ -2,6 +2,8 @@
 
 This is a command line tool for developers wanting to use the NPL programming language.
 
+Documentation on the NPL language, framework and supporting tools can be found in [the GitHub repo](https://github.com/Bikeman868/NPL).
+
 ## Installation
 
 A better installer is in prograss, but for now you need to clone the GitHub repo and run a script to install the CLI.
