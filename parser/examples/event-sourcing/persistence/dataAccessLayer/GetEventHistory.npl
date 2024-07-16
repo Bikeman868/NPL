@@ -25,9 +25,7 @@ namespace app.persistence {
                             endTimestamp getEventHistory.endTimestamp
                         }
                     }
-                }
-                
-                await npl.persistence.QueryResult queryResult
+                } await npl.persistence.QueryResult queryResult
 
                 var events []
                 

@@ -3,44 +3,33 @@ import { skipSeparators, parseQualifiedIdentifier } from '../stateMachine/Syntax
 import {
     eolGraph,
     literalMessageGraph,
-    messageContextGraph,
-    messageJsonGraph,
-    messageMessageGraph,
-    messageRouteGraph,
     parseEmitKeyword,
-    parseEmptyKeyword,
+    awaitGraph,
 } from '../index.js';
 
 // prettier-ignore
-/* Examples
+/* 
+    This exists because transitions take priority over sub-graphs
+    Examples
 
-    empty route prepend network ns1.network1<EOL>
-
-    TextMessage message text 'Hello, world'<EOL>
-
-    empty<EOL>
-
-    MyTriger<EOL>
-
-    Response json '{}'
-
+        myMessageVariable
 */
-const oneLineMessageDefinitionGraph = new GraphBuilder('one-line-message-definition')
+const identifierGraph = new GraphBuilder('identifier')
     .graph.start
-        .transition(parseEmptyKeyword, skipSeparators, 'definition')
-        .transition(parseQualifiedIdentifier, skipSeparators, 'definition')
-    .graph.state('definition')
-        .subGraph('message', messageMessageGraph)
-        .subGraph('context', messageContextGraph)
-        .subGraph('route', messageRouteGraph)
-        .subGraph('json', messageJsonGraph)
-        .subGraph('empty', eolGraph)
+        .transition(parseQualifiedIdentifier, skipSeparators)
     .graph.build();
 
 // prettier-ignore
 /* Examples
-    emit empty<EOL>
 
+    emit empty {} await {
+        TextMessage textMessage
+        NotFound notFound
+    }<EOL>
+
+    emit myMessageVariable<EOL>
+
+    emit myMessageVariable await Response<EOL>
 
     emit MessageType {
         context {
@@ -57,7 +46,10 @@ const oneLineMessageDefinitionGraph = new GraphBuilder('one-line-message-definit
         route {
             clear
             prepend process process2
-        }
+        }        
+    } await {
+        NotFound notFound
+        DataRow row
     }<EOL>
 
     emit messageClone {
@@ -86,7 +78,10 @@ export function defineEmitGraph(builder: GraphBuilder) {
     .graph.start
         .transition(parseEmitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .subGraph('message-literal', literalMessageGraph)
-        .subGraph('one-liner', oneLineMessageDefinitionGraph)
-    .graph.build();
+        .subGraph('message-literal', literalMessageGraph, 'await')
+        .subGraph('identifier', identifierGraph, 'await')
+    .graph.state('await')
+        .subGraph('end', eolGraph)
+        .subGraph('await', awaitGraph)
+.graph.build();
 }

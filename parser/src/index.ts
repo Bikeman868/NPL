@@ -68,7 +68,7 @@ for (let fileName of fileNames) {
     // The parser requires parsable text
     const buffer = new ParsableString(sourceFileText);
     const context = new Context(buffer, nplLanguageSyntax);
-    context.debugLogging = (context: IContext) => false; //context.position.line > 401;
+    context.debugLogging = (context: IContext) => false;//context.position.line > 8;
     context.traceLogging = (context: IContext) => false;
 
     // Tokenise the source file
@@ -78,6 +78,7 @@ for (let fileName of fileNames) {
     if (context.syntaxErrors.length > 0) {
         const printer = new SyntaxErrorPrinter();
         printer.includeConsoleColors = true;
+        printer.includeStateStack = true;
         printer.print(sourceFileText, context.syntaxErrors);
     } else {
         // Pretty print the code

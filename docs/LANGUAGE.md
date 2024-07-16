@@ -568,9 +568,10 @@ process invoiceCalculator {
                 region cart.region
                 country cart.country
             }
-        }
-        await TaxResponse tax
+        } await TaxResponse tax
+
         const subTotal = message.items.sum(item => item.price * item.quantity)
+
         emit Invoice {
             message {
                 ...cart
@@ -582,6 +583,13 @@ process invoiceCalculator {
     }
 }
 ```
+
+Note that the `await` keyword is part of the syntax of `emit` statement, and you can not put `await` on a line by itself,
+it is not a standalone statement. This is similar to how you can't have `else` without an `if`.
+
+Note that `await` does not suspend the execution of the current process until you reference the message that you are waiting
+for. This means that you can emit multiple messages with `await` clauses one after the other, and all the messages will be
+sent in parallel unless you reference the response from the first emit prior to sending the second one.
 
 This assumes that somewhere in the system there is a process that accept `TaxRequest` messages and returns `TaxResponse`
 messages. The `invoiceCalculator` process doesn't know, or need to know how this mechansism works.
@@ -600,11 +608,11 @@ process invoiceCalculator {
                 region cart.region
                 country cart.country
             }
-        }
-        await { 
+        } await { 
             TaxResponse tax
             Exception ex
         }
+        
         if tax {
             const subTotal = cart.items.sum(item => item.price * item.quantity)
             emit Invoice {

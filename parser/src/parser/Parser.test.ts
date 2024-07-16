@@ -15,8 +15,12 @@ namespace App {
     }
 
     network Hello {
-        ingress egress default {
+        ingress default {
             process Responder
+        }
+
+        egress default {
+            empty
         }
 
         process Responder {
@@ -36,12 +40,12 @@ namespace App {
                 count 1 
                 interval 0
             }
-            ingress Hello
+            ingress * hello
         }
 
         connection Console console {
             config mode console.lines
-            egress Hello
+            egress * hello
         }
     }
 }`;
@@ -95,9 +99,11 @@ describe('Parser', () => {
         expect(keywords[i++].text).toBe('message');
         expect(keywords[i++].text).toBe('network');
         expect(keywords[i++].text).toBe('ingress');
-        expect(keywords[i++].text).toBe('egress');
         expect(keywords[i++].text).toBe('default');
         expect(keywords[i++].text).toBe('process');
+        expect(keywords[i++].text).toBe('egress');
+        expect(keywords[i++].text).toBe('default');
+        expect(keywords[i++].text).toBe('empty');
         expect(keywords[i++].text).toBe('process');
         expect(keywords[i++].text).toBe('accept');
         expect(keywords[i++].text).toBe('*');
@@ -108,9 +114,11 @@ describe('Parser', () => {
         expect(keywords[i++].text).toBe('connection');
         expect(keywords[i++].text).toBe('config');
         expect(keywords[i++].text).toBe('ingress');
+        expect(keywords[i++].text).toBe('*');
         expect(keywords[i++].text).toBe('connection');
         expect(keywords[i++].text).toBe('config');
         expect(keywords[i++].text).toBe('egress');
+        expect(keywords[i++].text).toBe('*');
     });
 
     it('should parse empty namespace', () => {
@@ -162,7 +170,7 @@ describe('Parser', () => {
                 {
                     line: 1,
                     column: 11,
-                    message: 'Expecting namespace identifier',
+                    message: 'Expecting fully qualified identifier',
                 },
             ],
             syntaxCheck('namespace { }'),
@@ -173,7 +181,7 @@ describe('Parser', () => {
                 {
                     line: 1,
                     column: 10,
-                    message: 'Expecting namespace identifier',
+                    message: 'Expecting fully qualified identifier',
                 },
             ],
             syntaxCheck('namespace{}'),
@@ -184,7 +192,7 @@ describe('Parser', () => {
                 {
                     line: 1,
                     column: 11,
-                    message: 'Expecting namespace identifier',
+                    message: 'Expecting fully qualified identifier',
                 },
             ],
             syntaxCheck('namespace \n{ }'),

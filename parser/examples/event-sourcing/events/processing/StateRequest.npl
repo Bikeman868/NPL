@@ -9,68 +9,71 @@ namespace app.events {
     network eventSource {
         process eventSource {
             accept StateRequest stateRequest {
+                
+                emit GetGraph {
+                } await {
+                    Graph graph
+                    NotFound graphNotFound
+                }
+
                 emit GetLastSnapshot {
                     message {
                         entityKey stateRequest.entityKey
                         timestamp stateRequest.pointInTime
                     }
-                }
-                
-                emit GetGraph
-
-                await { 
+                } await { 
                     Snapshot snapshot
-                    NotFound notFound
+                    NotFound snapshotNotFound
                 }
 
-                await Graph graph
-
-                var stateCode graph.startingStateCode
-                var timestamp Date.zero
-                
-                if snapshot {
-                    set stateCode snapshot.stateCode
-                    set timestamp snapshot.timestamp
-                }
-
-                emit GetEventHistory {
-                    message {
-                        entityKey stateRequest.entityKey
-                        startTimestamp timestamp
-                        endTimestamp stateRequest.pointInTime
+                if graph {
+                    var stateCode graph.startingStateCode
+                    var timestamp Date.zero
+                    
+                    if snapshot {
+                        set stateCode snapshot.stateCode
+                        set timestamp snapshot.timestamp
                     }
-                }
 
-                await EventHistory eventHistory
+                    emit GetEventHistory {
+                        message {
+                            entityKey stateRequest.entityKey
+                            startTimestamp timestamp
+                            endTimestamp stateRequest.pointInTime
+                        }
+                    } await EventHistory eventHistory
 
-                for event of eventHistory.events {
-                    const state graph.states[stateCode]
-                    for transition of state.transitions {
-                        if transition.eventCode == event.eventCode {
-                            set stateCode transition.nextStateCode
-                            break
+                    for event of eventHistory.events {
+                        const state graph.states[stateCode]
+                        for transition of state.transitions {
+                            if transition.eventCode == event.eventCode {
+                                set stateCode transition.nextStateCode
+                                break
+                            }
                         }
                     }
-                }
 
-                if eventHistory.events.length() > 5 {
-                    const snapshot Snapshot {
+                    if eventHistory.events.length() > 5 {
+                        const snapshot Snapshot {
+                            message {
+                                entityKey stateRequest.entityKey
+                                timestamp timestamp
+                                stateCode stateCode
+                            }
+                        }
+                        emit PersistSnapshot {
+                            message snapshot snapshot
+                        }
+                    }
+
+                    const stateName graph.states[stateCode].stateName
+                    emit StateResponse {
                         message {
                             entityKey stateRequest.entityKey
                             timestamp timestamp
                             stateCode stateCode
+                            stateName stateName
                         }
-                    }
-                    emit PersistSnapshot message snapshot snapshot
-                }
-
-                const stateName graph.states[stateCode].stateName
-                emit StateResponse {
-                    message {
-                        entityKey stateRequest.entityKey
-                        timestamp timestamp
-                        stateCode stateCode
-                        stateName stateName
                     }
                 }
             }

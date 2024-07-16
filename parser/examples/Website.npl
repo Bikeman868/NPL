@@ -4,12 +4,18 @@ namespace app {
     application website {
         connection HttpListener httpListener {
             config port 80
-            ingress egress http.router
+            ingress httpListener.HttpRequest http.request // Send all HTTP requests to the http.request network entry point
+            egress {
+                // Unless explicitly routed, capture HttpResponse messages from the html and json networks
+                httpListener.HttpResponse html
+                httpListener.HttpResponse json
+            }
         }
     }
 
     network http {
-        ingress egress router pipe Router
+        // Send all messages routed to the network's request entry point to the router pipe
+        ingress request pipe router
 
         pipe router {
             route httpListener.HttpRequest {
@@ -50,10 +56,22 @@ namespace app {
 
 namespace app {
     network api {
+        // Send all messages routed to this network's request entry point to the request pipe for further routing
+        ingress request pipe request
+
+        // Capture any emitted httpListener.HttpResponse messages emitted by processes in this network,
+        // and route them to the response egress
+        egress response httpListener.HttpResponse
+
+        pipe request
     }
 }
 
 namespace app {
     network html {
+        ingress request pipe request
+        egress response httpListener.HttpResponse
+
+        pipe request
     }
 }

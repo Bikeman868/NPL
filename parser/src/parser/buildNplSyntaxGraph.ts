@@ -22,7 +22,7 @@ import {
     pipeGraphBuilder,
     processAcceptGraphBuilder,
     pipeRouteGraphBuilder,
-    processAwaitGraphBuilder,
+    awaitGraphBuilder,
     processGraphBuilder,
     processRouteGraphBuilder,
     routingStatementGraphBuilder,
@@ -43,12 +43,15 @@ import {
     subExpressionGraphBuilder,
     unaryOperatorGraphBuilder,
     messageJsonGraphBuilder,
+    messageTypeSelectorGraphBuilder,
+    captureGraphBuilder,
 } from './index.js';
 
 import { defineDataTypeGraph } from './syntaxGraphs/dataTypeGraph.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 import { defineApplicationConnectionGraph } from './syntaxGraphs/applicationConnectionGraph.js';
 import { defineApplicationGraph } from './syntaxGraphs/applicationGraph.js';
+import { defineCaptureGraph } from './syntaxGraphs/captureGraph.js'; 
 import { defineConfigFieldGraph } from './syntaxGraphs/configFieldGraph.js';
 import { defineConfigGraph } from './syntaxGraphs/configGraph.js';
 import { defineConstGraph } from './syntaxGraphs/constGraph.js';
@@ -69,7 +72,7 @@ import { defineNplGraph } from './syntaxGraphs/nplGraph.js';
 import { definePipeGraph } from './syntaxGraphs/pipeGraph.js';
 import { definePipeRouteGraph } from './syntaxGraphs/pipeRouteGraph.js';
 import { defineProcessAcceptGraph } from './syntaxGraphs/processAcceptGraph.js';
-import { defineProcessAwaitGraph } from './syntaxGraphs/processAwaitGraph.js';
+import { defineAwaitGraph } from './syntaxGraphs/awaitGraph.js';
 import { defineProcessGraph } from './syntaxGraphs/processGraph.js';
 import { defineProcessRouteGraph } from './syntaxGraphs/processRouteGraph.js';
 import { defineRoutingStatementGraph } from './syntaxGraphs/routingStatementGraph.js';
@@ -89,12 +92,14 @@ import { defineLiteralMapGraph } from './syntaxGraphs/literalMapGraph.js';
 import { defineSubExpressionGraph } from './syntaxGraphs/subExpressionGraph.js';
 import { defineUnaryOperatorGraph } from './syntaxGraphs/unaryOperatorGraph.js';
 import { defineMessageJsonGraph } from './syntaxGraphs/messageJsonGraph.js';
+import { defineMessageTypeSelectorGraph } from './syntaxGraphs/messageTypeSelectorGraph.js';
 
 export function buildNplSyntaxGraph(): SyntaxGraph {
     defineApplicationConnectionGraph(applicationConnectionGraphBuilder);
     defineApplicationGraph(applicationGraphBuilder);
     defineAssignmentExpressionGraph(assignmentExpressionGraphBuilder);
     defineBinaryOperatorGraph(binaryOperatorGraphBuilder);
+    defineCaptureGraph(captureGraphBuilder);
     defineConditionalExpressionGraph(conditionalExpressionGraphBuilder);
     defineConfigFieldGraph(configFieldGraphBuilder);
     defineConfigGraph(configGraphBuilder);
@@ -118,13 +123,14 @@ export function buildNplSyntaxGraph(): SyntaxGraph {
     defineLiteralMessageGraph(literalMessageGraphBuilder);
     defineMessageMessageGraph(messageMessageGraphBuilder);
     defineMessageRouteGraph(messageRouteGraphBuilder);
+    defineMessageTypeSelectorGraph(messageTypeSelectorGraphBuilder);
     defineNamespaceGraph(namespaceGraphBuilder);
     defineNetworkGraph(networkGraphBuilder);
     defineNplGraph(nplGraphBuilder);
     definePipeGraph(pipeGraphBuilder);
     definePipeRouteGraph(pipeRouteGraphBuilder);
     defineProcessAcceptGraph(processAcceptGraphBuilder);
-    defineProcessAwaitGraph(processAwaitGraphBuilder);
+    defineAwaitGraph(awaitGraphBuilder);
     defineProcessGraph(processGraphBuilder);
     defineProcessRouteGraph(processRouteGraphBuilder);
     defineRoutingStatementGraph(routingStatementGraphBuilder);

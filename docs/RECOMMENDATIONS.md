@@ -55,8 +55,6 @@ namespace app {
     network Main {
         process InvoiceProcessor {
             accept dto.Message1 message1 {
-                await { Message3 message3 }
-                
                 emit Message2 {
                     message {
                         ...message1
@@ -74,7 +72,7 @@ namespace app {
                             tenantConfig messag3.tenantConfig
                         }
                     }
-                }
+                } await { Message3 message3 }
             }
         }
     }
@@ -182,9 +180,10 @@ namespace app {
                     message { 
                         query "some GraphQL query"
                     }
-                }
-                await GraphQlResponse queryResponse
-                // Do something with queryResponse
+                } await GraphQlResponse queryResponse
+
+                // When you try to do something with queryResponse, then the
+                // process will be suspended until a GraphQlResponse is received
             }
         }
     }

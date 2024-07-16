@@ -7,43 +7,37 @@ import {
 import {
     eolGraph,
     messageTypeSelectorGraph,
-    parseRouteKeyword,
+    parseCaptureKeyword,
     routingStatementGraph,
 } from '../index.js';
 
+// prettier-ignore
 /* Examples
 
-    route empty network network1<EOL>
+    capture * clear<EOL>
 
-    route * {
+    capture empty {
         clear
-        prepend process process1
+        append process ns1.process1
     }<EOL>
 
-    route LogMessage {
-        if message.level == LogLevel.debug {
-            clear
-        }
-        elseif message.className == 'MyBuggyCLass' {
-            append network logging.traceOutput
-        }
-    }<EOL>
+    capture MyMessage<EOL>
+
 */
-
-// prettier-ignore
-export function definePipeRouteGraph(builder: GraphBuilder) {
+export function defineCaptureGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(parseRouteKeyword, skipSeparators, 'message-type')
+        .transition(parseCaptureKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
         .subGraph('message-type', messageTypeSelectorGraph, 'identifier')
     .graph.state('identifier')
         .transition(parseOpenScope, skipSeparators, 'statements')
-        .subGraph('empty-definition', eolGraph)
+        .subGraph('clear-capture', eolGraph)
+        .subGraph('single-route', routingStatementGraph)
     .graph.state('statements')
         .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'statements')
-        .subGraph('routing-statement', routingStatementGraph, 'statements')
+        .subGraph('multi-route', routingStatementGraph, 'statements')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

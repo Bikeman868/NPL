@@ -1,20 +1,18 @@
 {
-    "name": "npl-parser",
-    "version": "1.0.7",
-    "description": "A parser library for the Network Programming Language",
+    "name": "npl-javascript-runtime",
+    "version": "1.0.0",
+    "description": "The runtime library for NPL applications that run on NodeJS",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
     "type": "module",
-    "files": ["dist"],
     "imports": {
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
-        "#utils/*": "./dist/utils/*",
-        "#parser/*": "./dist/parser/*"
+        "#utils/*": "./dist/utils/*"
     },
     "exports": {
-        ".": "./dist/parser.js"
+        ".": "./dist/runtime.js"
     },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
@@ -29,6 +27,8 @@
         "compile": "tsc",
         "build": "npm run clean && npm run generate && npm run compile",
         "test": "vitest"
+    },
+    "dependencies": {
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.22.5",

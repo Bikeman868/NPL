@@ -13,7 +13,7 @@ namespace app.persistence {
                                  stateCode, stateNname, transitions
                                from graphStates'
                     }
-                }
+                } await npl.persistence.QueryResult getStatesResult
                 
                 emit npl.persistence.Query {
                     message {
@@ -22,39 +22,25 @@ namespace app.persistence {
                         version 'MySQL'
                         query 'select startingStateCode from graph'
                     }
-                }
+                } await npl.persistence.QueryResult getGraphResult
+
+                var startingStateCode getGraphResult.rows[0]['startingStateCode']
 
                 var states {}
-                var startingStateCode ''
-                const expectedResults [
-                    'getGraphStates'
-                    'getGraph'
-                ]
-
-                for result of expectedResults {
-
-                    await npl.persistence.QueryResult queryResult
-
-                    if queryResult.name == 'getGraphStates' {
-                        for row of queryResult.rows {
-                            const stateCode row['stateCode']
-                            const state app.stateGraph.State { 
-                                    message {
-                                        stateCode row['stateCode']
-                                        stateNname row['stateNname']
-                                        transitions JSON.parse(
-                                            row['transitions']
-                                        )
-                                    }
-                                }
-                            set states {
-                                ...states
-                                stateCode state
+                for row of getStatesResult.rows {
+                    const stateCode row['stateCode']
+                    const state app.stateGraph.State { 
+                            message {
+                                stateCode row['stateCode']
+                                stateNname row['stateNname']
+                                transitions JSON.parse(
+                                    row['transitions']
+                                )
                             }
                         }
-                    }
-                    elseif queryResult.name == 'getGraph' {
-                        set startingStateCode queryResult.rows[0]['startingStateCode']
+                    set states {
+                        ...states
+                        stateCode state
                     }
                 }
                 

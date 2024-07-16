@@ -142,31 +142,39 @@ namespace app {
 
     network network1 ingress default process process1
 
-    network network1 ingress egress default pipe pipe1
+    network network1 ingress default pipe pipe1
 
-    network network1 egress ingress default network network1
+    network network1 egress default *
 
-    network network1 egress ingress entrypoint1 network network2
+    network network1 egress default empty
 
-    network network1 egress ingress entrypoint1 network network2.entrypoint1
+    network network1 egress default TextMessage
 
-    network network1 egress ingress default { process process1 }
+    network network1 ingress entrypoint1 network network2
 
-    network network1 egress ingress default { 
+    network network1 ingress entrypoint1 network network2.entrypoint1
+
+    network network1 ingress default { 
         process process1
         pipe pipe1
         network network2.entrypoint1
     }
 
-    network network1 {
-        ingress default process process1
-        egress default process process1
-        ingress namedEntrypoint process process2
-        egress namedEntrypoint process process2
+    network network1 egress default { 
+        *
+        empty
+        TextMessage
     }
 
     network network1 {
-        egress ingress default { 
+        ingress default process process1
+        egress default MessageType
+        ingress namedEntrypoint process process2
+        egress namedEntrypoint MessageType
+    }
+
+    network network1 {
+        ingress default { 
             process process1
             pipe pipe1
             network network2.entrypoint1
@@ -174,13 +182,21 @@ namespace app {
     }
 
     network network1 {
-        egress ingress default process process1
+        egress default { 
+            *
+            empty
+            TextMessage
+        }
+    }
+
+    network network1 {
+        ingress default process process1
         process process1
         pipe pipe1
     }
 
     network network1 {
-        egress ingress default process process1
+        ingress default process process1
         config {
             // Network wide configurable values
         }
@@ -194,7 +210,7 @@ namespace app {
 
     network network1 {
         egress entrypoint1 {
-            process process1
+            MyCustomMessage
         }
         ingress entrypoint1 {
             pipe pipe1
@@ -263,7 +279,9 @@ namespace namespace1 {
                 const newDate request.date.addDays(
                     days
                 )
-                emit InternalResponse message date newDate
+                emit InternalResponse {
+                    message date newDate
+                }
             }
         }
     }
@@ -276,13 +294,14 @@ namespace namespace1 {
         process process1 {
             accept empty {
                 emit empty
-                emit empty route prepend network ns1.network1
+                emit empty await TextMessage textMessage
                 emit MessageType
-                emit MessageType message field1 value1
-                emit MessageType json '{"field1": "value1"}'
                 emit MessageType {}
+                emit MessageType {} await TextMessage textMessage
                 emit MessageType {
                 }
+                emit MessageType {
+                } await TextMessage textMessage
                 emit messageClone {
                     message field value
                     context message contextField value
@@ -342,7 +361,9 @@ namespace namespace1 {
                     emit empty
                 }
                 elseif false {
-                    emit empty context origin source 'from me'
+                    emit empty {
+                        context origin source 'from me'
+                    }
                 }
                 var flag true
                 while flag {
@@ -417,10 +438,16 @@ namespace namespace1 {
                 append pipe pipe1
                 append network network1
                 append network network1.entryPoint1
-                append { process process1 }
                 append { 
-                    process process1 
-                    process process2
+                    process process1 {
+                        capture empty append process process1
+                    }
+                    process process2 {
+                        capture * {
+                            clear
+                            append process process1
+                        }
+                    }
                     pipe pipe1
                 }
                 prepend pipe pipe1
@@ -616,18 +643,18 @@ namespace namespace1 {
     }
     application app {
         connection npl.io.Console console {
-            ingress egress network1
+            ingress egress * network1
         }
     }
     application app {
         connection ConnectionType connection1 {
-            ingress network1
+            ingress * network1
         }
         connection ConnectionType connection1 {
-            egress network1
+            egress TestMessage network1
         }
         connection ns1.ns2.ConnectionType connection1 {
-            egress ingress network1
+            egress ingress empty network1
         }
     }
     application app {
@@ -635,7 +662,7 @@ namespace namespace1 {
             config { 
                 mode npl.io.ConsoleMode.lines
             }
-            egress network1
+            egress * network1
         }
     }
 }

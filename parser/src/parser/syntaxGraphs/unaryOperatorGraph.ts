@@ -1,3 +1,4 @@
+import { parseNotOperator, parseSpreadOperator } from '#parser/index.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildSymbolParser, skipSeparators } from '../stateMachine/SyntaxParser.js';
 
@@ -5,7 +6,7 @@ import { buildSymbolParser, skipSeparators } from '../stateMachine/SyntaxParser.
 export function defineUnaryOperatorGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .transition(buildSymbolParser('!', 'Operator'), skipSeparators)
-        .transition(buildSymbolParser('...', 'Operator'), skipSeparators)
+        .transition(parseNotOperator, skipSeparators)
+        .transition(parseSpreadOperator, skipSeparators)
     .graph.build();
 }

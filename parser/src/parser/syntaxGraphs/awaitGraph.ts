@@ -1,19 +1,11 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
     skipSeparators,
-    parseQualifiedIdentifier,
     parseOpenScope,
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { eolGraph, parseAnyMessageTypeKeyword, parseAwaitKeyword, parseEmptyKeyword } from '../index.js';
-
-// prettier-ignore
-const messageTypeGraph = new GraphBuilder('await-message-type')
-    .graph.startTransition(parseEmptyKeyword, skipSeparators)
-    .graph.startTransition(parseAnyMessageTypeKeyword, skipSeparators)
-    .graph.startTransition(parseQualifiedIdentifier, skipSeparators)
-    .graph.build();
+import { eolGraph, messageTypeSelectorGraph, parseAwaitKeyword } from '../index.js';
 
 /* Examples
 
@@ -29,20 +21,20 @@ const messageTypeGraph = new GraphBuilder('await-message-type')
 */
 
 // prettier-ignore
-export function defineProcessAwaitGraph(builder: GraphBuilder) {
+export function defineAwaitGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
         .transition(parseAwaitKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
         .transition(parseOpenScope, skipSeparators, 'multiple-message-types')
-        .subGraph('single-message-type', messageTypeGraph, 'single-identifier')
+        .subGraph('single-message-type', messageTypeSelectorGraph, 'single-identifier')
     .graph.state('single-identifier')
         .subGraph('single-no-identifier', eolGraph)
         .transition(parseIdentifier, skipSeparators, 'end')
     .graph.state('multiple-message-types')
         .transition(parseCloseScope)
         .subGraph('blank-line', eolGraph, 'multiple-message-types')
-        .subGraph('multiple-message-type', messageTypeGraph, 'multiple-identifier')
+        .subGraph('multiple-message-type', messageTypeSelectorGraph, 'multiple-identifier')
     .graph.state('multiple-identifier')
         .transition(parseIdentifier, skipSeparators, 'multiple-end')
         .subGraph('multiple-no-identifier', eolGraph, 'multiple-message-types')

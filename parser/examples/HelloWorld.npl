@@ -17,7 +17,8 @@ namespace app {
 // The hello network responds to all ingress messages by emitting an app.TextMessage containing the text 'Hello, world'
 namespace app {
     network hello {
-        ingress egress default process responder 
+        ingress default process responder
+        egress default TextMessage
 
         process responder {
             // Accept all message types for processing
@@ -46,7 +47,8 @@ namespace app {
 namespace app {
     network consoleOutput {
         // Route all messages in and out of this network through the converter process
-        ingress egress default process converter
+        ingress default process converter
+        egress default npl.io.TextMessage
 
         process converter {
             accept TextMessage textMessage {
@@ -64,7 +66,7 @@ namespace app {
                         text 'Test message'
                     }
                 }
-                expect npl.TextMessage {
+                expect npl.io.TextMessage {
                     message { 
                         text 'Test message'
                     }
@@ -78,7 +80,7 @@ namespace app {
 namespace app {
     network main {
         // Define a helloWorkd entry point that is handled by the helloWorld pipe
-        ingress egress helloWorld pipe helloWorld
+        ingress helloWorld pipe helloWorld
 
         // In a more complex application, this pipe defiinition should be in a separate source file
         pipe helloWorld {
@@ -90,7 +92,7 @@ namespace app {
                 // Capture any TextMessage messages output during the processing of this message
                 // and send them to the default entry point on the consoleOutput network
                 capture TextMessage {
-                    prepend { network consoleOutput }
+                    prepend network consoleOutput
                 }
 
                 // Route the message to the hello network for processing
@@ -113,18 +115,22 @@ namespace app {
             }
 
             // Send messages from the Emitter to the helloWorld entry point on the main network
-            ingress main.helloWorld
+            ingress * main.helloWorld
         }
 
-        // npl.io.Console lets you send text to the console output
+        // npl.io.Console lets you send text to the console output and receive text that is
+        // typed by the user
         connection npl.io.Console console {
             config { 
                 // Configure the console to output a line of text for each message received
                 mode npl.io.ConsoleMode.lines
             }
 
-            // Collect output from the main network's helloWorld entry point for the console connection
-            egress main.helloWorld
+            // Collect TextMessage messages from the consoleOutput network default entry point
+            // and send them to the console connection. We could also put * instead of npl.io.TextMessage
+            // because all messages coming out of the consoleOutput network are of type
+            // npl.io.TextMessage
+            egress npl.io.TextMessage consoleOutput
         }
     }
 }

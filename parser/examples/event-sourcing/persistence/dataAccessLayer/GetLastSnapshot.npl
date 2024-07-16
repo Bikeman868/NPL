@@ -24,10 +24,8 @@ namespace app.persistence {
                             timestamp getLastSnapshot.timestamp
                         }
                     }
-                }
+                } await npl.persistence.QueryResult queryResult
                 
-                await npl.persistence.QueryResult queryResult
-
                 const row queryResult.rows[0]
                 if row {
                     emit app.events.Snapshot {

@@ -47,7 +47,7 @@ import {
 export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
-        .subGraph('message-literal', literalMessageGraph)
+        .subGraph('message-literal', literalMessageGraph, 'end')
         .subGraph('term', expressionTermGraph, 'operator')
     .graph.state('operator')
         .subGraph('end', eolGraph)
@@ -57,5 +57,7 @@ export function defineAssignmentExpressionGraph(builder: GraphBuilder) {
         .subGraph('map-literal', literalMapGraph, 'operator')
     .graph.state('second-term')
         .subGraph('second-term', expressionTermGraph, 'operator')
+    .graph.state('end')
+        .subGraph('literal-end', eolGraph)
     .graph.build();
 }

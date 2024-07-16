@@ -1,22 +1,18 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import {
-    buildCloseScopeParser,
     skipSeparators,
-    parseQualifiedIdentifier,
     parseOpenScope,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
 import {
+    captureGraph,
     conditionalExpressionGraph,
     constGraph,
     destinationGraph,
     eolGraph,
-    parseAnyMessageTypeKeyword,
-    parseCaptureKeyword,
     parseClearKeyword,
     parseConditionalKeyword,
     parseElseKeyword,
-    parseEmptyKeyword,
     parseForKeyword,
     parseRouteEndKeyword,
     routingStatementGraph,
@@ -25,39 +21,6 @@ import {
 } from '../index.js';
 
 const statemenScopeBlockGraphBuilder: GraphBuilder = new GraphBuilder('route-scope-block');
-const captureGraphBuilder = new GraphBuilder('route-message-capture');
-
-// prettier-ignore
-/* Examples
-
-    capture * clear<EOL>
-
-    capture empty {
-        clear
-        append process ns1.process1
-    }<EOL>
-
-    capture MyMessage<EOL>
-
-*/
-captureGraphBuilder
-    .graph.start
-        .transition(parseCaptureKeyword, skipSeparators, 'message-type')
-    .graph.state('message-type')
-        .transition(parseEmptyKeyword, skipSeparators, 'identifier')
-        .transition(parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
-        .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
-    .graph.state('identifier')
-        .transition(parseOpenScope, skipSeparators, 'statements')
-        .subGraph('clear-capture', eolGraph)
-        .subGraph('single-route', routingStatementGraph)
-    .graph.state('statements')
-        .transition(parseCloseScope, skipSeparators, 'end')
-        .subGraph('blank-line', eolGraph, 'statements')
-        .subGraph('multi-route', routingStatementGraph, 'statements')
-    .graph.state('end')
-        .subGraph('end', eolGraph)
-    .graph.build();
 
 // prettier-ignore
 /** Examples
@@ -93,7 +56,9 @@ statemenScopeBlockGraphBuilder
 
     capture MessageType {
         clear
-        prepend network ns1.network1
+        prepend network ns1.network1 {
+            capture empty clear
+        }
     }>EOL>
 
     if message.level == LogLevel.debug {
@@ -113,15 +78,15 @@ export function defineRoutingStatementGraph(builder: GraphBuilder) {
         .transition(parseConditionalKeyword, skipSeparators, 'conditional')
         .transition(parseElseKeyword, skipSeparators, 'else')
         .transition(parseForKeyword, skipSeparators, 'for')
-        .subGraph('capture', captureGraphBuilder.build())
+        .subGraph('capture', captureGraph)
         .subGraph('const', constGraph)
         .subGraph('var', varGraph)
         .subGraph('set', setGraph)
     .graph.state('route')
         .transition(parseOpenScope, skipSeparators, 'destinations')
-        .subGraph('single-destination', destinationGraph, 'end')
+        .subGraph('single-destination', destinationGraph)
     .graph.state('destinations')
-        .transition(buildCloseScopeParser(), skipSeparators, 'end')
+        .transition(parseCloseScope, skipSeparators, 'end')
         .subGraph('blank-line', eolGraph, 'destinations')
         .subGraph('destination', destinationGraph, 'destinations')
     .graph.state('conditional')

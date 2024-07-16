@@ -1,0 +1,19 @@
+using namespace1
+using namespace2.namespace3
+
+namespace app {
+    network myNetwork {
+        pipe dataAccess {
+            route * {
+                append { 
+                    process myProcess {
+                        capture GraphQlRequest {
+                            clear
+                            prepend network graphQl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

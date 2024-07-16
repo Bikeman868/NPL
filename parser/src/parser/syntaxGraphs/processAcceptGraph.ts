@@ -12,15 +12,13 @@ import {
     emitGraph,
     eolGraph,
     functionCallGraph,
+    messageTypeSelectorGraph,
     parseAcceptKeyword,
-    parseAnyMessageTypeKeyword,
     parseBreakKeyword,
     parseConditionalKeyword,
     parseElseKeyword,
-    parseEmptyKeyword,
     parseForKeyword,
     parseForOfInKeyword,
-    processAwaitGraph,
     processRouteGraph,
     setGraph,
     varGraph,
@@ -65,7 +63,6 @@ statementGraphBuilder
         .transition(parseBreakKeyword, skipSeparators)
         .subGraph('blank-line', eolGraph)
         .subGraph('emit', emitGraph)
-        .subGraph('await', processAwaitGraph)
         .subGraph('const', constGraph)
         .subGraph('var', varGraph)
         .subGraph('set', setGraph)
@@ -141,7 +138,12 @@ statemenScopeBlockGraphBuilder
     }<EOL>
 
     accept namespace.MessageType message {
-        await SomeMessage
+        emit MyMessage {
+        } await {
+            SomeMessage someMessage
+            Error error
+            NotFound notFound
+        }
     }<EOL>
 */
 export function defineProcessAcceptGraph(builder: GraphBuilder) {
@@ -149,9 +151,7 @@ export function defineProcessAcceptGraph(builder: GraphBuilder) {
     .graph.start
         .transition(parseAcceptKeyword, skipSeparators, 'message-type')
     .graph.state('message-type')
-        .transition(parseEmptyKeyword, skipSeparators, 'identifier')
-        .transition(parseAnyMessageTypeKeyword, skipSeparators, 'identifier')
-        .transition(parseQualifiedIdentifier, skipSeparators, 'identifier')
+        .subGraph('message-type', messageTypeSelectorGraph, 'identifier')
     .graph.state('identifier')
         .transition(parseIdentifier, skipSeparators, 'has-identifier')
         .transition(parseOpenScope, skipSeparators, 'statements')

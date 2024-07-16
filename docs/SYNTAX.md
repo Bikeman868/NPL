@@ -128,7 +128,7 @@ The following veriations are all valid for an empty scope block:
 ``
 
 Note that you can never put multiple statements on one line. NPL does not use a terminator like semi-colon to separate
-statements. Statements are separated by newline characters. 
+statements. Statements are separated by line breaks. 
 
 ## Syntax patterns
 
@@ -145,29 +145,12 @@ message MyMessageType {
 }
 
 process process1 {
-    accept MessageType1 message1
-    accept app.interface.MessageType2 message2
 }
 ```
 
 Note that the opening `{` of the <scope-block> must be on the same line as the <keyword>
 
 Note that the `{}` is optional if you only have one statement
-
-Note that you can not omit multiple nested pairs of `{}` on the same line, so that instead of typing
-
-```npl
-emit MyMessage {
-    route {
-        append process process process1
-    }
-}
-```
-
-You can abbrebiate it to
-```npl
-emit MyMessage route append process process1
-```
 
 ### Scope config
 
@@ -177,13 +160,15 @@ values that are configurable within that scope. See the section on configuration
 For example:
 ```npl
 namespace app {
-    config {
-        timeout 10
-    }
-
-    process myProcess {
+    network myNetwork {
         config {
-            directory './data'
+            timeout 10
+        }
+
+        process myProcess {
+            config {
+                directory './data'
+            }
         }
     }
 }
@@ -196,10 +181,13 @@ with this yaml file:
 
 ```yaml
 ---
-app
-    timeout: 20
-    myProcess:
-        directory '~/data'
+app:
+    network:
+        myNetwork:
+            timeout: 20
+            process:
+                myProcess:
+                    directory '~/data'
 ---
 ```
 
@@ -213,26 +201,44 @@ In general <message-type> <scope-block> will create a new message. For example t
 then construct an instance of that message type, we can write:
 
 ```npl
-message MyMessage {
-    string field1
-}
+namespace app {
+    message MyMessage {
+        string field1
+    }
 
-const myMessage MyMessage {
-    message {
-        field1 "some value"
+    const myMessage MyMessage {
+        message {
+            field1 "some value"
+        }
+    }
+
+    network myNetwork {
+        process myProcess {
+            accept empty trigger {
+                emit myMessage
+            }
+        }
     }
 }
-
-emit myMessage
 ```
 
 Becasue of the scope block rules, this can be abbreviated to a single line when there is only one field as follows:
 
 ```npl
-message MyMessage string field1
+namespace app {
+    message MyMessage string field1
 
-const myMessage MyMessage { 
-    message field1 "some value"
+    const myMessage MyMessage {
+        message field1 "some value"
+    }
+
+    network myNetwork {
+        process myProcess {
+            accept empty trigger {
+                emit myMessage
+            }
+        }
+    }
 }
 ```
 
@@ -241,11 +247,13 @@ using a message reference in place of the message type. For example:
 
 
 ```npl
+// Define the MyMessage message type
 message MyMessage {
     string field1
     string field2
 }
 
+// Construct a message of type MyMessage
 const message1 MyMessage {
     message {
         field1 "field1 value"
@@ -253,6 +261,7 @@ const message1 MyMessage {
     }
 }
 
+// Make a copy of message1 with some of the fields having different values
 const message2 message1 {
     message {
         field1 "new field1 value"
@@ -342,9 +351,9 @@ namespace app {
             url 'https://myservice.com/api'
         }
 
-        connection npl.connection.HttpListener httpListener {
+        connection npl.http.HttpListener httpListener {
             config port 80
-            ingress egress http.Router
+            ingress * http.Router
         }
     }
 }
@@ -405,7 +414,7 @@ namespace app {
         map<string string> tags
     }
 
-    message Message3 string theOnly field
+    message Message3 string theOnlyField
 
     message Message5
 }
@@ -481,7 +490,7 @@ namespace app {
         ingress default {
         }
 
-        egress ingress entryPoint1 {
+        egress entryPoint1 {
         }
 
         pipe pipe1
@@ -492,54 +501,93 @@ namespace app {
 }
 ```
 
-## Network entry point
+## Network ingress
 
-Network entry points are defined within the scope block of a `network`. They comprise the keyword `ingress`, `egress`
-or both in either order, followed by the name of the entry point, or the reserved word `default`. This is followed by a 
-scope block containing a list of the networks, processes and pipes that accept or emit messages though this entry point.
+Network ingresses are defined within the scope block of a `network`. They comprise the keyword `ingress` followed by the 
+name of the ingress, or the reserved word `default`. This is followed by a scope block containing a list of the 
+networks, processes and pipes that process messages received through this ingress.
 
 If you only have one element in the list, the scope block is allowed to be all on one line, but if you have multiple
 elements, then each element must be on a separate line with the closing `}` on a line by itself.
 
-These are examples of valid network entry point syntax:
+These are examples of valid network ingress syntax:
 
 ```npl
 namespace app {
     network network1 {
         ingress incomming
 
-        egress outgoing
+        ingress default process process1
 
-        egress ingress default process process1
+        ingress default pipe pipe1
 
-        egress logging { 
-            process process1 
-            process process2
-            pipe pipe1 
+        ingress input1 network network2.entrypoint1
+
+        ingress input1 network network3
+
+        ingress input1 {
+            network network3
+            pipe pipe2
+            pipe pipe3
         }
-
-        ingress egress input1 network network2.entrypoint1
-
-        ingress splitEntrypoint netwoek network3
-        egress splitEntrypoint network network4
     }
 }
 ```
 
-For entry points that are `ingress`, messages received by the entry point will be sent to the first process
-or pipe in the list that knows how to process it. For entry points that are `egress`, all messages emitted
-by all processes and pipes in the list will be emitted by the entry point.
+Messages received by the network ingress will be sent to all of the pipes, processes and networks in the list. Any
+pipes or processes that don't accept the particular type of message will ignore it.
 
-When an entry point list includes networks, each network will receive a copy of each incomming message if
-the entry point is an `ingress` and will forward all emitted messages from these networks if the entry point
-is an `egress`.
+You can not have two ingresses with the same name on the same network.
 
-You can not have two `ingress` entry points with the same name on the same network. You also can not have
-two `egress` entry points with the same name on the same network, but you can have separate `ingress` and
-`egress` definitions for the same entry point name.
+Note that the ingress with the `default` reserved word in place of the name is referenced whenever the name of the
+network is not qualified by the ingress name. For example `network network1.entryPoint1` refers to the `entryPoint1` 
+ingress on the `network1` network, and `network network1` refers to the default ingress for `network1`.
 
-Note that the entry point with the `default` reserved word in place of the entry point name is referenced
-whenever the name of the network is not qualified by the entry point name. For example 
+## Network egress
+
+Network egresses are defined within the scope block of a `network`. They comprise the keyword `egress` followed by the
+name of the egress, or the reserved word `default`. This is followed by a scope block containing a list of the message
+types to capture within the network.
+
+If you only have one message type in the list, the scope block is allowed to be all on one line, but if you have multiple
+message types, then each element must be on a separate line with the closing `}` on a line by itself.
+
+Note that message types can be the fully qualified name of a message definition, the keyword `empty` or `*` to capture
+all messages.
+
+The network egress will only capture messages that are not otherwise routed. In other words if you `emit` messages with an
+explicit route defined, or you `emit` a message that is on the capture list for the incomming message that you are processing
+then either of these will take precedence over the network egress.
+
+These are examples of valid network egress syntax:
+
+```npl
+namespace app {
+    network network1 {
+        egress outgoing
+
+        egress default MyMessageType
+
+        egress logging { 
+            ErrorMessage
+            SuccessMessage
+        }
+
+        egress output1 empty
+
+        egress splitEntrypoint *
+    }
+}
+```
+
+To process the messages that are captured by the network `egress`, you can connect the `egress` to an
+application `connection` or to the ingress of another networtk.
+
+You can not have two egresses with the same name on the same network, but you can have separate `ingress` and
+`egress` definitions with the same name.
+
+Note that the egress with the `default` reserved word in place of the egress name is referenced
+whenever the name of the network is not qualified by the egress name. For example 
 `network network1.entryPoint1` refers to `entryPoint1` on the `network1` network, and `network network1` 
 refers to the default entry point for `network1`.
 
@@ -592,19 +640,22 @@ Connections are generic and reusable accross multiple applications. Although the
 
 To configure different connections for different situations (for example local vs production) you can create
 a source file for each situation, where each source file contains an `application` statement that is
-specific to that situation. You can also add `config` statements to your application and override the
-values by providing a yaml file when you run the program.
+specific to that situation. This works well if you want to for example store data in flat files for local
+development, but use BigTable for deployments.
+
+You can also use the same `application` definition, add `config` statements to your application,
+and override the config values by providing a yaml file when you run the program.
 
 As well as configuring your connection, you also need to route messages to/from the connection to a network
-entry point within your application.
+ingress/egress within your application.
 
 To configure the messages incomming from the connection to the application, use `ingress` followed 
-by the qualified identifier of the network or network entry point.
+by the qualified identifier of the network or network `ingress`.
 
 To configure the messages outgoing from the application to the connection, use `egress` followed 
-by the qualified identifier of the network or network entry point.
+by the qualified identifier of the network or network `egress`.
 
-If the qualified identifier refers to a network, then the default entry point will be used.
+If the qualified identifier refers to a network, then the default ingress/egress will be used.
 
 You can also combine `ingress` and `egress` in the same statement.
 
@@ -619,17 +670,62 @@ namespace app {
 
         connection npl.io.HttpListener httpListener {
             config port 80
-            ingress egress http.router
+            ingress egress * http.router
         }
 
         connection npl.scheduling.Emitter emitter { 
-            ingress network1
+            ingress empty network1
         }
 
-        connection npl.io.ConsoleLogger consoleLogger egress network2.entryPoint1
+        connection npl.io.ConsoleLogger consoleLogger egress LogMessage mainNetwork.logging
     }
 }
 ```
+
+Note that the `egress` statement for a `network` specifies a collection of message types that will be output
+from that `egress` if they are emitted from within the network. The connection `egress` statement also specifies a
+message type to output from the application to the `connection`. The reason for specifying the message type in both
+places is so that you can have a network egress connected to multiple connections for different message types.
+
+For example:
+
+```npl
+namespace app {
+    network main {
+        egress default {
+            ErrorMessage
+            SuccessMessage
+        }
+    }
+
+    application app {
+        connection npl.io.ConsoleLogger errorLogger {
+            egress ErrorMessage main
+            config {
+                color 'red'
+            }
+        }
+        connection npl.io.ConsoleLogger successLogger {
+            egress SuccessMessage main
+            config {
+                color 'green'
+            }
+        }
+    }
+}
+```
+
+In this contrived example, the `main` network's default egress outputs `ErrorMessage` and `SuccessMessage` messages. These
+are connected to different instances of the `npl.io.ConsoleLogger` connection so that error messages are output
+in red and success messages are output in green.
+
+Note that some networks are defined within your application, and you have control over the network `ingress` and `egress`
+defnitions, but networks can also be contained in shared, reusable modules where you don't have this control.
+
+The reason that the connection `ingress` has a message type, is that some connection types might produce several different
+kinds of message, and you might want these routed to different network ingresses. If you want to send all messages regardless
+of type to the same netwok `ingress`, then use `*` as the message type. If you want some routing that is based on some
+application logic, then route the messages to a `pipe` and write the routing logic there.
 
 ## Config
 
@@ -698,7 +794,7 @@ namespace app {
                 interval 1000
                 count 10
             }
-            ingress network1
+            ingress empty network1
         }
     }
 }
@@ -735,13 +831,17 @@ namespace app {
             }
 
             accept * {
-                emit DebugMessage message text 'Hello, world'
+                emit DebugMessage {
+                    message text 'Hello, world'
+                }
             }
 
             test 'should emit console text' {
                 emit empty
                 expect console.Text {
-                    message { text 'Hello, world' }
+                    message { 
+                        text 'Hello, world'
+                    }
                 }
             }
         }
@@ -804,13 +904,17 @@ number, date or a string for maps, and must be a number for arrays.
 
 For example:
 ```npl
-pipe myPipe {
-    route Query {
-        if message.language == 'GraphQL' {
-            prepend process graphQlProcess
-        }
-        else {
-            prepend process sqlProcess
+namespace app {
+    network main {
+        pipe myPipe {
+            route Query {
+                if message.language == 'GraphQL' {
+                    prepend process graphQlProcess
+                }
+                else {
+                    prepend process sqlProcess
+                }
+            }
         }
     }
 }
@@ -827,10 +931,16 @@ must be on the same line as the `route` reserved word.
 
 For example:
 ```npl
-process myProcess {
-    accept Query query {
-        emit query language 'SQL' // Emit a clone of `query` with language field changed to `SQL`
-        route query clear // Clear the route for the incomming message to supress any further processing
+namespace app {
+    network main {
+        process myProcess {
+            accept Query query {
+                emit query {
+                    message language 'SQL' // Emit a clone of `query` with language field changed to `SQL`
+                }
+                route query clear // Clear the route for the incomming message to supress any further processing
+            }
+        }
     }
 }
 ```
@@ -884,20 +994,24 @@ identifier, or using an identifier that refers to a message instance, followed b
 
 For example the `emit` keyword emits a message from a process. This keyword must be followed by an expression that is a message.
 If you already have an identifier that refers to a message, you can put that identifier after the `emit` keyword to emit that
-message, or you can write an expression that consuructs a new message instance.
+message, or you can write an expression that constructs a new message instance.
 
 To construct a message entirely from scratch, use the message type identifier followed by a scope block as follows:
 
 ```npl
-message MyMessageType {
-    string name
-}
+namespace app {
+    network main {
+        message MyMessageType {
+            string name
+        }
 
-process myProcess {
-    accept * {
-        emit MyMessageType {
-            message {
-                name 'This is my name'
+        process myProcess {
+            accept * {
+                emit MyMessageType {
+                    message {
+                        name 'This is my name'
+                    }
+                }
             }
         }
     }
@@ -907,15 +1021,19 @@ process myProcess {
 To construct a message as a modified copy of an existing message instance, use the message reference followed by a scope block as follows:
 
 ```npl
-message MyMessageType {
-    string name
-}
+namespace app {
+    network main {
+        message MyMessageType {
+            string name
+        }
 
-process myProcess {
-    accept MyMessageType myMessage {
-        emit myMessage {
-            message {
-                name 'Updated name'
+        process myProcess {
+            accept MyMessageType myMessage {
+                emit myMessage {
+                    message {
+                        name 'Updated name'
+                    }
+                }
             }
         }
     }
@@ -925,18 +1043,22 @@ process myProcess {
 You can also construct messages and assign them to `var` or `const` identifiers, for example:
 
 ```npl
-message MyMessageType {
-    string name
-}
+namespace app {
+    network main {
+        message MyMessageType {
+            string name
+        }
 
-process myProcess {
-    accept * {
-        const response MyMessageType {
-            message {
-                name 'This is my name'
+        process myProcess {
+            accept * {
+                const response MyMessageType {
+                    message {
+                        name 'This is my name'
+                    }
+                }
+                emit response
             }
         }
-        emit response
     }
 }
 ```
@@ -946,31 +1068,36 @@ When messages are constructed, you can also specify a route and a context for th
 can be specified with the keywords `message`, `network` and `origin`. This is an example of a fully defined message:
 
 ```npl
-const response MyMessageType {
-    message {
-        name 'This is my name'
-        id 'ABC87987275'
-    }
-    route {
-        clear
-        append network dataAccessLayer
-    }
-    context {
-        message {
-            field1 value1
-            field2 value2
-        }
-        origin {
-            field1 value1
-            field2 value2
-        }
-        network {
-            field1 value1
-            field2 value2
+namespace app {
+    network main {
+        process myProcess {
+            const response MyMessageType {
+                message {
+                    name 'This is my name'
+                    id 'ABC87987275'
+                }
+                route {
+                    clear
+                    append network dataAccessLayer
+                }
+                context {
+                    message {
+                        field1 value1
+                        field2 value2
+                    }
+                    origin {
+                        field1 value1
+                        field2 value2
+                    }
+                    network {
+                        field1 value1
+                        field2 value2
+                    }
+                }
+            }
         }
     }
 }
-
 ```
 
 ### Literal values
@@ -999,9 +1126,10 @@ Each expression must be on a separate line.
 a separate line, and the key must be separated from the value by at least one space. If the key is an expression
 then it must be enclosed in `()`.
 
-Note that strings with single and double quotes support string interpolation where `${<expression>}` is replaced by the
-result of the evaluating the expression, and `%NAME%` is replaced by the value of an environment variable. Strings 
-delimited with back ticks are not interpolated, but used verbatim, including newlines and whitespace.
+Note that strings with back quotes support string interpolation where `${<expression>}` is replaced by the
+result of the evaluating the expression, and `%NAME%` is replaced by the value of an environment variable. Back quoted
+strings also trim any spaces after the newline character. Strings delimited with single or double quotes are not 
+interpolated, but used verbatim, including newlines and whitespace.
 
 For example:
 
@@ -1024,11 +1152,11 @@ namespace app {
                         aNumber 34.6
                         aBoolean true
                         aDate "2023-08-16T09:00Z"
-                        aList {
+                        aList [
                             "Element 0"
                             'Element 1'
                             "Element 2"
-                        }
+                        ]
                         aMap {
                             "some key" 12
                             ("hello" + "world") 96.2
@@ -1052,7 +1180,7 @@ in necessary for NPL to be useful. For example functions that split and join str
 The syntax for function calls in many languages is to enclose a comma separated list in `()` brackets. I considered doing this
 for NPL, and the `,` symbol is not designated for any other purpose, but this would make the function call statement have a different
 look and feel from the rest of the language (which uses line breaks to separate items). Finally, I decided to use the `()` to denote
-a function call, but separate the parameters with line breaks. A concequence of this desicion is that function calls loog a 
+a function call, but separate the parameters with line breaks. A concequence of this desicion is that function calls look a 
 bit odd when embedded into an expression, and I recommend separating the function call into a statement that assigns the
 result of the function call to a `const` or `var`.
 
@@ -1079,7 +1207,7 @@ if isInvoice {
 }
 ```
 
-In function calls you need a line break after each parameter value. When there are no parameters you can use `()` as follows:
+In function calls you need a line break after each parameter value. When there are no parameters you can use `()`. for example:
 
 ```npl
 const now = Date.now()
@@ -1091,9 +1219,9 @@ Similar to TypeScript, the `...` operator will efficiently copy an existing data
 one. This is necessary because NPL is a functional language and all data is immutable. In NPL you can declare local stack-based 
 variables and mutate their values, but you can not modify the body of a message, map or list after construction.
 
-Note that the spread operator can be very efficient even for large structures, because everything is immutable. It's never
+Note that the spread operator can be very efficient even for large structures. Everything is immutable, and it's never
 necessary to do a deep copy on immutable data structures. If I make a new list that comprises all the elements of two existing
-lists, my new list just has to reference the two existing lists, and no actual copying takes place.
+lists, my new list just has to reference the two existing lists, and no actual copying needs to take place.
 
 For example, to extend an existing list:
 
@@ -1201,8 +1329,8 @@ Inside the accept scope block you can use the following reserved words. These ar
 
 - `const` to define a local immutable value to store intermediate results from expressions.
 - `var` to define a local mutable value to store intermediate results from expressions.
+` 'set` to change the value assigned to a `var`.
 - `emit` to emit a message from the process.
-- `await` to suspend processing until a response to your `emit` is received.
 - `route` to change the route associated with a message instance.
 - `if`, `elseif` and `else` to add conditional processing logic. The conditional scope block is syntactically identical to the scope block of the `accept`.
 - `while` and `for` to repeat processing logic. The loop's scope block is syntactically identical to the scope block of the `accept`.
@@ -1211,8 +1339,14 @@ The following is an example of a process that can process any kind of message:
 
 ```npl
 process dateAppender {
-    accept * someMessage{
-        var dateText someMessage.text + ' ' + date().toString()
+    accept empty {
+        emit Response { 
+            message text 'Empty message received'
+        }
+    }
+
+    accept * anyOtherMessage {
+        var dateText anyOtherMessage.text + ' ' + date().toString()
         emit Response { 
             message text dateText
         }
@@ -1223,7 +1357,7 @@ process dateAppender {
 ## Emit
 
 Emit statements start with the reserved word `emit` followed by at least one space, then an expression that
-evaluates to a message.
+evaluates to a message followed by an optional `await` statement.
 
 Emit statements can only exist within the scope blocks of `accept` or `test` statements.
 
@@ -1272,49 +1406,59 @@ where copying the pointer is cheap but serializing it over a wire would be expen
 These are examples of valid `emit` statements:
 
 ```npl
-emit empty
+namespace app { 
+    network network1 {
 
-emit empty {
-    context {
-        origin process 'MyProcess'
-    }
-}
+        process myProcess {
+            accept * {
+                emit empty
 
-emit MyMessage {
-    message field1 'New value'
-}
+                emit empty {
+                    context {
+                        origin process 'MyProcess'
+                    }
+                }
 
-emit MyMessage {
-    message {
-        field1 10
-        field2 20
-    }
-}
+                emit MyMessage {
+                    message field1 'New value'
+                }
 
-accept Message1 message1 {
-    await Message3 message3
+                emit MyMessage {
+                    message {
+                        field1 10
+                        field2 20
+                    }
+                }
+            }
 
-    emit message3 {
-        message {
-            ...message1 // Copies all fields from accepted message
-            taxPercent message3.taxRate * 100
-            maxCount config.maxCount
+            accept CalculateTaxRequest request {
+                emit GetTenantConfig {
+                    message tenantId request.tenantId
+                } await TenantConfig tenantConfig
+
+                emit TaxResponse {
+                    message {
+                        ...request // Copies all fields from accepted message
+                        taxPercent tenantConfig.taxRate * 100
+                        maxCount config.maxCount
+                    }
+                    context {
+                        message {
+                            dateEmitted Date.now()
+                            tenant tenantConfig.tenantName
+                        }
+                        origin {
+                            processName "My process"
+                        }
+                        network {
+                            tenantConfig tenantConfig
+                        }
+                    }
+                }
+            }
         }
-        context {
-            message {
-                dateEmitted Date.now()
-                tenant message3.tenantName
-            }
-            origin {
-                processName "My process"
-            }
-            network {
-                tenantConfig messag3.tenantConfig
-            }
-        }
     }
-}
-```
+}```
 
 ## If
 
@@ -1392,7 +1536,9 @@ This is an example of a valid `while` statement
 ```npl
 var x 10
 while x > 0 {
-    emit MyMessage message index x
+    emit MyMessage {
+        message index x
+    }
     set x x-1
 }
 ```
@@ -1442,11 +1588,13 @@ two route statements are functionally equivalent:
 ```npl
 namespace app {
     network myNetwork {
-        route * {
-            append {
-                process process1
-                process process2
-                process process3
+        pipe myPipe {
+            route * {
+                append {
+                    process process1
+                    process process2
+                    process process3
+                }
             }
         }
     }
@@ -1454,10 +1602,12 @@ namespace app {
 
 namespace app {
     network myNetwork {
-        route * {
-            append process process1
-            append process process2
-            append process process3
+        pipe myPipe {
+            route * {
+                append process process1
+                append process process2
+                append process process3
+            }
         }
     }
 }
@@ -1482,11 +1632,13 @@ two route statements are functionally equivalent:
 ```npl
 namespace app {
     network myNetwork {
-        route * {
-            prepend {
-                process process1
-                process process2
-                process process3
+        pipe myPipe {
+            route * {
+                prepend {
+                    process process1
+                    process process2
+                    process process3
+                }
             }
         }
     }
@@ -1494,10 +1646,12 @@ namespace app {
 
 namespace app {
     network myNetwork {
-        route * {
-            prepend process process1
-            prepend process process2
-            prepend process process3
+        pipe myPipe {
+            route * {
+                prepend process process1
+                prepend process process2
+                prepend process process3
+            }
         }
     }
 }
@@ -1520,14 +1674,14 @@ then the statement can be all on one line.
 
 Routing destinations are defined within the scope block of a `prepend`, `append` or `remove` statement, and 
 define a place where the message will be sent to. Each destination starts with the keyword `process`, `pipe` 
-or `network` followed by at least one space, and an identifier. As expected, if you use the `process` reserved 
+or `network` followed by at least one space, and a qualified identifier. As expected, if you use the `process` reserved 
 word, then the identifier must refer to a `process` identifier etc.
 
 For a process or pipe, the identifier must ne the name of a process or pipe within the same network. You cannot
 route messages directly to something internal to another network.
 
-For a network, the identifier can reference a network or a network entry point. If the identifier is the name
-of a network, then the `default` entry point is assumed. The compiler tries to resolve the network identifier
+For a network, the identifier can reference a network or a network `ingress`. If the identifier is the name
+of a network, then the `default` ingress is assumed. The compiler tries to resolve the network identifier
 in the current namespace first, then searches nameapaces referenced in any `using` statements in reverse order,
 then accends the namespace hierarchy to broader and broader scope until the network name is found.
 
@@ -1539,9 +1693,11 @@ using namespace2.namespace3
 
 namespace namespace4 {
     network myNetwork {
-        route * {
-            append {
-                network anotherNetwork.entryPoint1
+        pipe myPipe {
+            route * {
+                append {
+                    network anotherNetwork.entryPoint1
+                }
             }
         }
     }
@@ -1562,9 +1718,11 @@ using namespace2.namespace3
 
 namespace namespace4 {
     network myNetwork {
-        route * {
-            append { 
-                network namespace1.anotherNetwork.entryPoint1
+        pipe myPipe {
+            route * {
+                append { 
+                    network namespace1.anotherNetwork.entryPoint1
+                }
             }
         }
     }
@@ -1621,11 +1779,15 @@ reserved word can change this.
 To add to the global capture list for a message, use the `capture` keyword like this:
 
 ```npl
-pipe dataAccess {
-    route * {
-        capture GraphQlRequest {
-            clear
-            prepend network graphQl
+namespace app {
+    network myNetwork {
+        pipe dataAccess {
+            route * {
+                capture GraphQlRequest {
+                    clear
+                    prepend network graphQl
+                }
+            }
         }
     }
 }
@@ -1633,7 +1795,9 @@ pipe dataAccess {
 
 This code means that for all messages routed to the `datAccess` pipe, add an entry to the global capture
 list of the message saying that any `GraphQlRequest` messages that are emitted during its
-processing should be sent only to the `graphQl` network's default entry point.
+processing should be sent only to the `graphQl` network's default entry point. This will override any
+network `egress` that captures `GraphQlRequest` messages, but will not override routing information added
+to the message during its construction. 
 
 To unpack this a little, `route * {}` sets up a routing rule in the pipe for all other message 
 types not explicitly routed, where the contents of the scope block defines how to modify the 
@@ -1661,7 +1825,6 @@ pipe dataAccess {
 
 Note that you can also `capture *` to define emit capturing for all other message types. This
 capture statement will be used for all other types of message that are not explicitly captured.
-
 
 ### Destination capture
 
@@ -1744,8 +1907,9 @@ of `message2` with one of the fields copied from `message1`.
 ```npl
 process process1 {
     accept Message1 message1 {
-        await Message2 message2
-        emit message2 message field3 message1.field3
+        emit message2 { 
+            message field3 message1.field3
+        } await Message2 message2
     }
 }
 ```
@@ -1787,11 +1951,11 @@ namespace app {
                             'tenantId' invoice.tenantId
                         }
                     }
-                }
-                await { 
+                } await { 
                     data.GraphQlResponse response
                     Error error
                 }
+
                 if response {
                     emit invoice {
                         taxRate response['tenant']['taxRate']

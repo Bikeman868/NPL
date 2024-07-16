@@ -15,7 +15,21 @@
             "args":["check", "C:/Git/Martin/NPL/parser/examples", "-detailed", "-lines", "5"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "preLaunchTask": "compileCli"
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "Runtime",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/javascript-runtime/src/index.ts",
+            "args":[],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "preLaunchTask": "compileRuntime"
         }
     ]
 }

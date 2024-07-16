@@ -27,6 +27,7 @@ export const singleQuote = "'";
 export const doubleQuote = '"';
 export const backQuote = '`';
 export const trippleDot = '...';
+export const exclamation = '!';
 
 export const lowercase: Charset = [
     'a',

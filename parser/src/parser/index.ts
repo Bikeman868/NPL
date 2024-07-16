@@ -4,7 +4,7 @@ import {
     closeCurlyBracket,
     closeRoundBracket,
     closeSquareBracket,
-    comma,
+    exclamation,
     openCurlyBracket,
     openRoundBracket,
     openSquareBracket,
@@ -25,6 +25,7 @@ export const parseCaptureKeyword = buildKeywordParser(['capture'], 'Keyword');
 export const parseClearKeyword = buildKeywordParser(['clear'], 'Keyword');
 export const parseConditionalKeyword = buildKeywordParser(['if', 'elseif', 'while'], 'Keyword');
 export const parseConstKeyword = buildKeywordParser(['const'], 'Keyword');
+export const parseDefaultKeyword = buildKeywordParser(['default'], 'Keyword');
 export const parseDestinationKeyword = buildKeywordParser(['network', 'process', 'pipe'], 'Keyword');
 export const parseEgressKeyword = buildKeywordParser(['egress'], 'Keyword');
 export const parseElseKeyword = buildKeywordParser(['else'], 'Keyword');
@@ -35,6 +36,7 @@ export const parseExpectKeyword = buildKeywordParser(['expect'], 'Keyword');
 export const parseForKeyword = buildKeywordParser(['for'], 'Keyword');
 export const parseForOfInKeyword = buildKeywordParser(['of', 'in'], 'Keyword');
 export const parseIngressKeyword = buildKeywordParser(['ingress'], 'Keyword');
+export const parseNetworkKeyword = buildKeywordParser(['network'], 'Keyword');
 export const parsePipeKeyword = buildKeywordParser(['pipe'], 'Keyword');
 export const parseRouteKeyword = buildKeywordParser(['route'], 'Keyword');
 export const parseRouteEndKeyword = buildKeywordParser(['append', 'prepend', 'remove'], 'Keyword');
@@ -60,10 +62,15 @@ export const parseEndMapLiteralSymbol = buildSymbolParser(closeCurlyBracket, 'En
 export const parseSpreadOperatorSymbol = buildSymbolParser(trippleDot, 'Operator');
 export const parseEndMessageSymbol = buildSymbolParser(closeCurlyBracket, 'EndMessageLiteral');
 
+export const parseSpreadOperator = buildSymbolParser(trippleDot, 'Operator');
+export const parseNotOperator = buildSymbolParser(exclamation, 'Operator');
+
 export const applicationConnectionGraphBuilder = new GraphBuilder('applicationConnection');
 export const applicationGraphBuilder = new GraphBuilder('application');
 export const assignmentExpressionGraphBuilder = new GraphBuilder('assignmentExpression');
+export const awaitGraphBuilder = new GraphBuilder('await');
 export const binaryOperatorGraphBuilder = new GraphBuilder('binaryOperator');
+export const captureGraphBuilder = new GraphBuilder('capture');
 export const conditionalExpressionGraphBuilder = new GraphBuilder('conditionalExpression');
 export const configGraphBuilder = new GraphBuilder('config');
 export const configFieldGraphBuilder = new GraphBuilder('configField');
@@ -87,13 +94,13 @@ export const messageInitGraphBuilder = new GraphBuilder('messageInit');
 export const messageJsonGraphBuilder = new GraphBuilder('messageJson');
 export const messageMessageGraphBuilder = new GraphBuilder('messageMessage');
 export const messageRouteGraphBuilder = new GraphBuilder('messageRoute');
+export const messageTypeSelectorGraphBuilder = new GraphBuilder('messageTypeSelector');
 export const namespaceGraphBuilder = new GraphBuilder('namespace');
 export const networkGraphBuilder = new GraphBuilder('network');
 export const nplGraphBuilder = new GraphBuilder('npl');
 export const pipeGraphBuilder = new GraphBuilder('pipe');
 export const pipeRouteGraphBuilder = new GraphBuilder('pipeRoute');
 export const processAcceptGraphBuilder = new GraphBuilder('processAccept');
-export const processAwaitGraphBuilder = new GraphBuilder('processAwait');
 export const processGraphBuilder = new GraphBuilder('process');
 export const processRouteGraphBuilder = new GraphBuilder('processRoute');
 export const routingStatementGraphBuilder = new GraphBuilder('routingStatement');
@@ -107,7 +114,9 @@ export const varGraphBuilder = new GraphBuilder('var');
 export const applicationConnectionGraph = applicationConnectionGraphBuilder.build();
 export const applicationGraph = applicationGraphBuilder.build();
 export const assignmentExpressionGraph = assignmentExpressionGraphBuilder.build();
+export const awaitGraph = awaitGraphBuilder.build();
 export const binaryOperatorGraph = binaryOperatorGraphBuilder.build();
+export const captureGraph = captureGraphBuilder.build();
 export const conditionalExpressionGraph = conditionalExpressionGraphBuilder.build();
 export const configGraph = configGraphBuilder.build();
 export const configFieldGraph = configFieldGraphBuilder.build();
@@ -131,13 +140,13 @@ export const messageInitGraph = messageInitGraphBuilder.build();
 export const messageJsonGraph = messageJsonGraphBuilder.build();
 export const messageMessageGraph = messageMessageGraphBuilder.build();
 export const messageRouteGraph = messageRouteGraphBuilder.build();
+export const messageTypeSelectorGraph = messageTypeSelectorGraphBuilder.build();
 export const namespaceGraph = namespaceGraphBuilder.build();
 export const networkGraph = networkGraphBuilder.build();
 export const nplGraph = nplGraphBuilder.build();
 export const pipeGraph = pipeGraphBuilder.build();
 export const pipeRouteGraph = pipeRouteGraphBuilder.build();
 export const processAcceptGraph = processAcceptGraphBuilder.build();
-export const processAwaitGraph = processAwaitGraphBuilder.build();
 export const processGraph = processGraphBuilder.build();
 export const processRouteGraph = processRouteGraphBuilder.build();
 export const routingStatementGraph = routingStatementGraphBuilder.build();

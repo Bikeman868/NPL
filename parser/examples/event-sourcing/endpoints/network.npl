@@ -3,7 +3,12 @@ namespace app.endpoints {
     using app.interface
 
     network http {
-        ingress egress default process httpRequest
+        ingress default process httpRequest
+        egress default npl.http.Response
+
+        egress data {
+            StateRequest
+        }
 
         process httpRequest {
             accept npl.http.Request request {
@@ -23,8 +28,8 @@ namespace app.endpoints {
                                 entityKey entitykey
                                 pointInTime Date.now()
                             }
-                        }
-                        await StateResponse entityState
+                        } await StateResponse entityState
+                        
                         emit npl.http.Response {
                             message {
                                 status 200
@@ -33,8 +38,12 @@ namespace app.endpoints {
                         }
                     }
                     elseif request.method == 'POST' {
-                        emit InputEvent json request.body
-                        emit npl.http.Response message status 200
+                        emit InputEvent {
+                            json request.body
+                        }
+                        emit npl.http.Response {
+                            message status 200
+                        }
                     }
                     else {
                         emit npl.http.Response {

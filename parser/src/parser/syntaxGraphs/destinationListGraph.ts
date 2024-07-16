@@ -5,11 +5,19 @@ import { destinationGraph, eolGraph } from '../index.js';
 /* Examples
     process process1<EOL>
 
-    { process process 1 }<EOL>
+    process process1 { 
+        capture MessageType append pipe pipe2
+    }<EOL>
 
     { 
         process process1 
         network namespace.network1.entrypoint2
+        process process2 {
+            capture MessageType {
+                clear
+                append process2
+            }
+        }
     }<EOL>
 
 */
@@ -18,18 +26,11 @@ export function defineDestinationListGraph(builder: GraphBuilder) {
     builder.clear()
     .graph.start
         .transition(parseOpenScope, skipSeparators, 'scoped')
-        .subGraph('single', destinationGraph, 'end')
+        .subGraph('single', destinationGraph)
     .graph.state('scoped')
-        .subGraph('scoped-single', destinationGraph, 'scoped-single')
-        .subGraph('destination-list', eolGraph, 'list')
-    .graph.state('scoped-single')
         .transition(parseCloseScope, skipSeparators, 'end')
-    .graph.state('list')
-        .transition(parseCloseScope, skipSeparators, 'end')
-        .subGraph('blank-line', eolGraph, 'list')
-        .subGraph('destination', destinationGraph, 'destination-eol')
-    .graph.state('destination-eol')
-        .subGraph('destination-eol', eolGraph, 'list')
+        .subGraph('blank-line', eolGraph, 'scoped')
+        .subGraph('destination', destinationGraph, 'scoped')
     .graph.state('end')
         .subGraph('end', eolGraph)
     .graph.build();

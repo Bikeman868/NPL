@@ -1,9 +1,12 @@
 // The app.persistence.database network encapsulates all database operations
 namespace app.persistence {
     network database {
-        ingress egress default pipe routing
+        ingress default pipe routing
+        
         ingress cacheMiss pipe cacheMiss
+
         ingress reloadCache process reloadCache
+        egress reloadCache InvalidateCache
 
         pipe routing {
             config {
