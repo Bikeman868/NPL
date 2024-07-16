@@ -25,7 +25,7 @@
         "clean:dist": "rimraf dist",
         "clean:buildinfo.linux": "rm -f *.tsbuildinfo",
         "clean:buildinfo.win": "del -F *.tsbuildinfo",
-        "clean": "npm run clean:dist && npm run clean:buildinfo.win",
+        "clean": "npm run clean:dist && npm install && npm run clean:buildinfo.win",
         "compile": "tsc",
         "build": "npm run clean && npm run generate && npm run compile",
         "test": "vitest"

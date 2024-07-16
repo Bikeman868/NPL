@@ -1,6 +1,6 @@
 {
     "name": "npl-cli",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A CLI for the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
@@ -24,11 +24,11 @@
         "clean:buildinfo.win": "del -F *.tsbuildinfo",
         "clean": "npm run clean:dist && npm run clean:buildinfo.win",
         "compile": "tsc",
-        "build": "npm run clean && npm run generate && npm run compile",
+        "build": "npm run clean && npm install && npm run generate && npm run compile",
         "test": "vitest"
     },
     "dependencies": {
-        "npl-parser": "^1.0.6"
+        "npl-parser": "^1.0.7"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.22.5",
