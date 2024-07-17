@@ -18,7 +18,7 @@ function addCommand(command: ICommand) {
 addCommand(helpCommand);
 addCommand(new CheckCommand());
 
-// TODO: Other CLI commands: compile, debug, run, format
+// TODO: Other CLI commands: compile, debug, run, format, deploy
 
 const commandName = process.argv[2] || 'help';
 const command: ICommand = commands.get(commandName) || helpCommand;
