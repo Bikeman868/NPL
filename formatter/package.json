@@ -1,17 +1,21 @@
 {
-    "name": "npl-javascript-transpiler",
+    "name": "npl-formatter",
     "version": "1.0.0",
-    "description": "Transpiles NPL source code into JavaScript that can be executed on NodeJS through the npl JavaScript runtime",
+    "description": "A formatter library for the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
     "type": "module",
+    "files": ["dist"],
     "imports": {
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
-        "#utils/*": "./dist/utils/*"
+        "#utils/*": "./dist/utils/*",
+        "#formatter/*": "./dist/formatter/*"
     },
-    "exports": "./dist/index.js",
+    "exports": {
+        ".": "./dist/formatter.js"
+    },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export const buildInfo = { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
         "generate:buildinfo.win": "echo export const buildInfo = { version: \"1.0\", date: \"%date%\" } > ./src/buildInfo.ts",
@@ -21,13 +25,13 @@
         "clean:dist": "rimraf dist",
         "clean:buildinfo.linux": "rm -f *.tsbuildinfo",
         "clean:buildinfo.win": "del -F *.tsbuildinfo",
-        "clean": "npm run clean:dist && npm run clean:buildinfo.win",
+        "clean": "npm run clean:dist && npm install && npm run clean:buildinfo.win",
         "compile": "tsc",
-        "build": "npm run clean && npm install && npm run generate && npm run compile",
+        "build": "npm run clean && npm run generate && npm run compile",
         "test": "vitest"
     },
     "dependencies": {
-        "npl-parser": "^1.0.6"
+        "npl-parser": "^1.0.7"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.22.5",

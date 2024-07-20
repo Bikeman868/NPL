@@ -15,6 +15,12 @@
             "script": "compile",
             "group": "build",
             "path": "./javascript-runtime"
+        }, {
+            "label": "compileFormatter",
+            "type":"npm",
+            "script": "compile",
+            "group": "build",
+            "path": "./formatter"
         },
     ]
 }

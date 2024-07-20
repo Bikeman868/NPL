@@ -1,5 +1,6 @@
 import { CommandContext } from '#interfaces/CommandContext.js';
 import { ICommand } from '#interfaces/ICommand.js';
+import { buildInfo } from '../../buildInfo.js';
 
 export class HelpCommand implements ICommand {
     private commands: Map<string, ICommand>;
@@ -9,7 +10,7 @@ export class HelpCommand implements ICommand {
     }
 
     execute(context: CommandContext): undefined {
-        context.output.writeHeading('How to use NPL CLI', 1);
+        context.output.writeHeading('NPL CLI v' + buildInfo.version + ' (' + buildInfo.date + ')', 1);
         context.output.writeBodyLine('Run the NPL CLI from the command line using the following syntax:');
         context.output.writeBodyLine('');
         context.output.writeBodyLine('\tnpl <command> <param> ... <param> -<opt> ... -<opt>');

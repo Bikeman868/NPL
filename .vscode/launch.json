@@ -30,6 +30,19 @@
                 "${workspaceFolder}/**/*.js"
             ],
             "preLaunchTask": "compileRuntime"
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "Formatter",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/formatter/src/index.ts",
+            "args":[],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "preLaunchTask": "compileFormatter"
         }
     ]
 }

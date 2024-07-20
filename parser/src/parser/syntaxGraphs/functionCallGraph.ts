@@ -1,4 +1,4 @@
-import { comma } from '#interfaces/charsets.js';
+import { comma } from '#parser/charsets.js';
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { buildSymbolParser, skipSeparators } from '../stateMachine/SyntaxParser.js';
 import {

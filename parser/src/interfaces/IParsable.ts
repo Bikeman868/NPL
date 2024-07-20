@@ -1,5 +1,5 @@
-import { Position } from './Position.js';
-import { Charset } from './charsets.js';
+import { Position } from '#interfaces/Position.js';
+import { Charset } from '#parser/charsets.js';
 
 /**
  * Defines a stream of input text that can be parsed

@@ -1,7 +1,8 @@
-import { SyntaxParser, WhitespaceSkipper } from './SyntaxParser.js';
 import { State } from '#interfaces/State.js';
 import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
+import { SyntaxParser } from '#interfaces/SyntaxParser.js';
+import { WhitespaceSkipper } from 'parser.js';
 
 export class GraphBuilder {
     private _graph: SyntaxGraph;

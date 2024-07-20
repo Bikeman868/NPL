@@ -1,5 +1,3 @@
-import { generateKey } from 'crypto';
-
 export type Charset = Iterable<string> & {
     includes: (searchElement: string) => boolean;
 };

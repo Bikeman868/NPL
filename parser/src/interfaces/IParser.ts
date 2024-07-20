@@ -1,5 +1,5 @@
-import { IContext } from './IContext.js';
-import { IToken } from './IToken.js';
+import { IContext } from '#interfaces/IContext.js';
+import { IToken } from '#interfaces/IToken.js';
 
 /**
  * Defines the methods that the parser provides to applications that need to

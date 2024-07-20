@@ -1,4 +1,4 @@
-import { StateTransition } from './StateTransition.js';
+import { StateTransition } from '#interfaces/StateTransition.js';
 
 /**
  * Represents a state in a state transition diagram

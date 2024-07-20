@@ -1,4 +1,4 @@
-import { closeCurlyBracket, openCurlyBracket } from '#interfaces/charsets.js';
+import { closeCurlyBracket, openCurlyBracket } from '#parser/charsets.js';
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
 import { skipSeparators, parseIdentifier, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
 import { applicationConnectionGraph, configGraph, eolGraph, parseApplicationKeyword } from '../index.js';

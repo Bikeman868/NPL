@@ -9,7 +9,7 @@ import {
     closeCurlyBracket,
     lineCommentDelimiter,
     separator,
-} from '#interfaces/charsets.js';
+} from '#parser/charsets.js';
 
 export class ParsableString implements IParsable {
     private _buffer: string;

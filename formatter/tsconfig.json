@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "baseUrl": "src",
+        "rootDir": "src",
+        "outDir": "dist",
+        "paths": {
+            "#exceptions/*": ["./exceptions/*"],
+            "#interfaces/*": ["./interfaces/*"],
+            "#utils/*": ["./utils/*"],
+            "#formatter/*": ["./formatter/*"]
+        }
+    },
+    "include": ["./src/**/*.ts"]
+}

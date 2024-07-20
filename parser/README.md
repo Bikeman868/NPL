@@ -80,7 +80,7 @@ At the time of writing, Vitest does not properly support monorepos.
 ```shell
 npm install
 npm run build
-node dist HelloWorld.npl
+node dist examples/HelloWorld.npl
 ```
 
 ### Subsequent builds
@@ -89,7 +89,7 @@ If you did not delete any source files, then you can just recompile the code wit
 
 ```shell
 npm run compile
-node dist HelloWorld.npl
+node dist examples/HelloWorld.npl
 ```
 
 See `package.json` for other run commands.

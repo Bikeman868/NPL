@@ -15,8 +15,8 @@
         ".": "./dist/runtime.js"
     },
     "scripts": {
-        "generate:buildinfo.linux": "echo 'export default { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
-        "generate:buildinfo.win": "echo export default { version: \"Windows\", date: \"Windows\" } > ./src/buildInfo.ts",
+        "generate:buildinfo.linux": "echo 'export const buildInfo = { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
+        "generate:buildinfo.win": "echo export const buildInfo = { version: \"1.0\", date: \"%date%\" } > ./src/buildInfo.ts",
         "generate": "npm run generate:buildinfo.win",
         "format:prettier": "prettier .",
         "format": "npm run format:prettier -- --write",

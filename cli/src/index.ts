@@ -7,6 +7,7 @@ import { CheckCommand } from '#commands/check/CheckCommand.js';
 import { Option } from '#interfaces/Option.js';
 import { CompileCommand } from '#commands/compile/CompileCommand.js';
 import { RunCommand } from '#commands/run/RunCommand.js';
+import { FormatCommand } from '#commands/format/FormatCommand.js';
 
 const commands: Map<string, ICommand> = new Map();
 const helpCommand = new HelpCommand(commands);
@@ -17,8 +18,9 @@ function addCommand(command: ICommand) {
 
 addCommand(helpCommand);
 addCommand(new CheckCommand());
+addCommand(new FormatCommand());
 
-// TODO: Other CLI commands: compile, debug, run, format, deploy
+// TODO: Other CLI commands: compile, debug, run, deploy
 
 const commandName = process.argv[2] || 'help';
 const command: ICommand = commands.get(commandName) || helpCommand;

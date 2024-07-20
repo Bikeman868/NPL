@@ -1,8 +1,8 @@
 import { IContext } from '#interfaces/IContext.js';
 import { IToken } from '#interfaces/IToken.js';
 import { Token } from './Token.js';
-import { ParseResult } from './ParseResult.js';
-import { whitespace, blockCommentStart, blockCommentEnd, separator } from '#interfaces/charsets.js';
+import { ParseResult } from '../interfaces/ParseResult.js';
+import { whitespace, blockCommentStart, blockCommentEnd, separator } from '#parser/charsets.js';
 import { parseNextToken } from './stateMachine/graphFunctions.js';
 
 export function parseToken(context: IContext): IToken | undefined {

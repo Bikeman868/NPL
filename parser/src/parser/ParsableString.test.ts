@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ParsableString } from './ParsableString.js';
-import { alpha, identifier, newline, symbol, whitespace } from '#interfaces/charsets.js';
+import { alpha, identifier, newline, symbol, whitespace } from '#parser/charsets.js';
 
 describe('ParsableString', () => {
     it('should skip leading whitespace', () => {

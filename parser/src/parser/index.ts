@@ -9,7 +9,7 @@ import {
     openRoundBracket,
     openSquareBracket,
     trippleDot,
-} from '#interfaces/charsets.js';
+} from '#parser/charsets.js';
 
 /* 
     This source file defines all of the syntax graphs used by the parser

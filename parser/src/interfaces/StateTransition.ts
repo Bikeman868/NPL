@@ -1,4 +1,5 @@
-import { SyntaxParser, WhitespaceSkipper } from '../parser/stateMachine/SyntaxParser.js';
+import { SyntaxParser } from '#interfaces/SyntaxParser.js';
+import { WhitespaceSkipper } from '#interfaces/WhitespaceSkipper.js';
 
 /**
  * Represents a transition between two states

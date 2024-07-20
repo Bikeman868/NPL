@@ -1,7 +1,7 @@
 import { IContext } from '#interfaces/IContext.js';
-import { ParseResult } from '../ParseResult.js';
+import { ParseResult } from '../../interfaces/ParseResult.js';
 import { State } from '#interfaces/State.js';
-import { whitespace } from '#interfaces/charsets.js';
+import { whitespace } from '#parser/charsets.js';
 import { StateTransition } from '#interfaces/StateTransition.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 
