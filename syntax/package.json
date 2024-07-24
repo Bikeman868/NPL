@@ -1,21 +1,22 @@
 {
-    "name": "npl-formatter",
+    "name": "npl-syntax",
     "version": "1.0.0",
-    "description": "A formatter library for the Network Programming Language",
+    "description": "A shared library that defines the syntax Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
     "type": "module",
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "imports": {
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
-        "#formatter/*": "./dist/formatter/*",
-        "#printers/*": "./dist/printers/*"
+        "#parser/*": "./dist/parser/*"
     },
     "exports": {
-        ".": "./dist/formatter.js"
+        ".": "./dist/syntax.js"
     },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export const buildInfo = { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
@@ -30,9 +31,6 @@
         "compile": "tsc",
         "build": "npm run clean && npm run generate && npm run compile",
         "test": "vitest"
-    },
-    "dependencies": {
-        "npl-syntax": "^1.0.0"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.22.5",

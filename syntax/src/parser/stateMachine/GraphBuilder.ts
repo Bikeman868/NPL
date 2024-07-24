@@ -2,7 +2,7 @@ import { State } from '#interfaces/State.js';
 import { SubGraphTransition } from '#interfaces/SubGraphTransition.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 import { SyntaxParser } from '#interfaces/SyntaxParser.js';
-import { WhitespaceSkipper } from 'parser.js';
+import { WhitespaceSkipper } from 'syntax.js';
 
 export class GraphBuilder {
     private _graph: SyntaxGraph;

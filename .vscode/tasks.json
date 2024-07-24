@@ -21,6 +21,12 @@
             "script": "compile",
             "group": "build",
             "path": "./formatter"
+        }, {
+            "label": "compileSemantics",
+            "type":"npm",
+            "script": "compile",
+            "group": "build",
+            "path": "./semantics"
         },
     ]
 }

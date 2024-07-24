@@ -1,7 +1,7 @@
 {
-    "name": "npl-parser",
-    "version": "1.0.8",
-    "description": "A parser library for the Network Programming Language",
+    "name": "npl-semantics",
+    "version": "1.0.0",
+    "description": "A shared library that defines the semantics of the Network Programming Language",
     "author": "Martin Halliday",
     "keywords": [],
     "license": "ISC",
@@ -13,10 +13,11 @@
         "#exceptions/*": "./dist/exceptions/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
-        "#parser/*": "./dist/parser/*"
+        "#analysis/*": "./dist/analysis/*",
+        "#model/*": "./dist/model/*"
     },
     "exports": {
-        ".": "./dist/parser.js"
+        ".": "./dist/semantics.js"
     },
     "scripts": {
         "generate:buildinfo.linux": "echo 'export const buildInfo = { version: \"'$npm_package_version'\", date: new Date('$(date +%s)'000) }' > ./src/buildInfo.ts",
@@ -38,5 +39,8 @@
         "prettier": "^2.8.8",
         "typescript": "^5.0.4",
         "vitest": "^0.34.1"
+    },
+    "dependencies": {
+        "npl-syntax": "^1.0.0"
     }
 }

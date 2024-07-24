@@ -1,4 +1,4 @@
-# NPL Parser
+# NPL Syntax
 
 This is a shared library for parsing NPL source files. It is used by many development tools including:
 
@@ -9,18 +9,26 @@ This is a shared library for parsing NPL source files. It is used by many develo
 -   Monitoring tools
 -   Runtime visualization of execution flow tools
 
-This library includes a very basic printer that will parse a the source file and pretty print the tokens. You can run it after compiling with `node dist <filename>.npl`. This repo contains a couple of sample NPL single source file applications that you can test with.
+This library includes a very basic printer that will parse a the source file and pretty print the tokens. You can run it after compiling with `node dist <filename>.npl`. This repo contains a couple of sample NPL single source file applications in the `examples` folder that you can test with.
 
 Documentation on the NPL language, framework and supporting tools can be found in [the GitHub repo](https://github.com/Bikeman868/NPL).
 
-## Using the parser
+## Exports
+
+Exports from this package are defined in `./syntax/src/syntax.ts` and comprise:
+* `nplLanguageSyntax` is an instance of `SyntaxGraph` and defines the syntax of the NPL language as a heirachy of state machines
+* A set of interfaces that are required in other parts of the NPL frameork: `IParser` `IParsable` `IContext` and `IToken`
+* Implementations of the interfaces that you can instantiate, or you can use your own implementation of the interfaces: `Parser` `Parsable` `Context` and `IToken`
+* A function called `parse` that takes a string containing NPL source code and returns a list of `IToken`.
+
+## Using the syntax parser
 
 The parser is in `./src/parser/Parser.ts` and implements `./src/interfaces/IParser.ts`.
 
 Add a dependency on the parser package with:
 
 ```shell
-npm install npl-parser
+npm install npl-syntax
 ```
 
 If you just want to tokenize some source code:
@@ -31,27 +39,29 @@ import {
     Context,
     Parser,
     nplLanguageSyntax
-} from 'npl-parser';
+} from 'npl-syntax';
 
 // ParsableString implements IParsableString for an in-memory string containing the entire source code to parse.
 // You don't have to use the ParsableString class, you can write your own implementation of IParsableString
 const buffer = new ParsableString(sourceCode);
 
 // The parser itself is completely stateless. The current state is stored in IContext alowing parsing to be performed
-// incrementally. You can implement IContext yourself, and you could even extend the NPL syntax here.
+// incrementally. You can implement IContext yourself, and you could even change the NPL syntax here provided it was
+// symantically equivalent.
 const context = new Context(buffer, nplLanguageSyntax);
 
 // You will want to construct a parser. The parser is stateless and thread safe
 const parser = new Parser();
 
 // You can parse the entire source file in one go, and return an array of tokens like this. There are other methods
-// of the parser class that allow for partial parsing and incremental parsing
+// of the parser class that allow for partial parsing and incremental parsing. After parsing the context will contain
+// any syntax errors
 const tokens = parser.parse(context);
 ```
 
 If you want default behaviors, this can be abbreviated to:
 ```typescript
-import { parse } from 'npl-parser';
+import { parse } from 'npl-syntax';
 
 const tokens = parse(sourceCode);
 ```
@@ -72,7 +82,7 @@ If errors are encountered during the parsing operation, you can examine them in 
 
 You will need to install NodeJS 16+.
 
-Open the `parser` directory in VSCode otherwise you will not be able to run unit tests by clicking in the margins.
+Open the `syntax` directory in VSCode otherwise you will not be able to run unit tests by clicking in the margins.
 At the time of writing, Vitest does not properly support monorepos.
 
 ### First time build
@@ -80,7 +90,7 @@ At the time of writing, Vitest does not properly support monorepos.
 ```shell
 npm install
 npm run build
-node dist examples/HelloWorld.npl
+node dist ../examples/HelloWorld.npl
 ```
 
 ### Subsequent builds
@@ -89,7 +99,7 @@ If you did not delete any source files, then you can just recompile the code wit
 
 ```shell
 npm run compile
-node dist examples/HelloWorld.npl
+node dist ../examples/HelloWorld.npl
 ```
 
 See `package.json` for other run commands.
@@ -107,7 +117,7 @@ You can also run or debug tests by clicking in the margin if you install the Vit
 For this to work, make sure to install NodeJS in the OS that VSCode is running in, i.e. don't use WSL
 and install Node into a Linux environment, this won't work for VSCode plugins that execute JavaScript.
 
-I also found that Vitest doesn't like monorepos. You can work around this by opening the './parser'
+I also found that Vitest doesn't like monorepos. You can work around this by opening the './syntax'
 directory in VSCode rather than opening the monorepo root.
 
 ### Checking in

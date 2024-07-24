@@ -11,14 +11,14 @@ The formatter is in `./src/formatter/Formatter.ts` and implements `./src/interfa
 Add a dependency on the formatter package with:
 
 ```shell
-npm install npl-parser
+npm install npl-syntax
 npm install npl-formatter
 ```
 
 To format some source code simply:
 
 ```typescript
-import { parse } from 'npl-parser';
+import { parse } from 'npl-syntax';
 import { Formatter } from 'npl-formatter';
 
 const tokens = parse(sourceCode);
@@ -37,10 +37,10 @@ You might want to consider using the `npm link` command to symbolically link the
 formatter folder. To do this:
 
 ```shell
-cd ./parser
+cd ./syntax
 npm link
 cd ../formatter
-npm link npl-parser
+npm link npl-syntax
 ```
 
 After doing this, any changes to the parser will be used immediately in the formatter without having to 
@@ -53,7 +53,7 @@ publish using the published versions of dependent packages.
 ```shell
 npm install
 npm run build
-node dist ../parser/examples/HelloWorld.npl
+node dist ../examples/HelloWorld.npl
 ```
 
 ### Subsequent builds
@@ -62,7 +62,7 @@ If you did not delete any source files, then you can just recompile the code wit
 
 ```shell
 npm run compile
-node dist ../parser/examples/HelloWorld.npl
+node dist ../examples/HelloWorld.npl
 ```
 
 See `package.json` for other run commands.

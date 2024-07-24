@@ -13,7 +13,7 @@ export function parse(sourceText: string): IToken[] {
     return new Parser().parse(context);
 }
 
-export { buildInfo } from 'buildInfo.js'
+export { buildInfo } from './buildInfo.js'
 
 export { type IContext } from '#interfaces/IContext.js';
 export { type IParsable } from '#interfaces/IParsable.js';

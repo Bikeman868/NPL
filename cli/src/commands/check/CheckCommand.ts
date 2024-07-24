@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { CommandContext } from '#interfaces/CommandContext.js';
 import { ICommand } from '#interfaces/ICommand.js';
-import { ParsableString, Context, Parser, nplLanguageSyntax } from 'npl-parser';
+import { ParsableString, Context, Parser, nplLanguageSyntax } from 'npl-syntax';
 import { SyntaxErrorPrinter } from './SyntaxErrorPrinter.js';
 
 export class CheckCommand implements ICommand {

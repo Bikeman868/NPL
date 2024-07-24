@@ -43,6 +43,19 @@
                 "${workspaceFolder}/**/*.js"
             ],
             "preLaunchTask": "compileFormatter"
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "Semantics",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/semantics/src/index.ts",
+            "args":[],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "preLaunchTask": "compileSemantics"
         }
     ]
 }

@@ -1,5 +1,6 @@
-import { type IToken } from 'npl-parser'
+import { type ITokenEnumerator } from '../../../semantics/src/interfaces/ITokenStream.js'
+import { type IContext } from '#interfaces/IContext.js'
 
 export interface IFormatter {
-    format(tokens: IToken[]): string
+    format(context: IContext): void
 }

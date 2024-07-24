@@ -8,9 +8,9 @@
             "#exceptions/*": ["./exceptions/*"],
             "#interfaces/*": ["./interfaces/*"],
             "#utils/*": ["./utils/*"],
-            "#formatter/*": ["./formatter/*"],
-            "#printers/*": ["./printers/*"]
+            "#analysis/*": ["./analysis/*"],
+            "#model/*": ["./model/*"]
         }
     },
-    "include": ["./src/**/*.ts", "../semantics/src/interfaces/ITokenStream.ts"]
+    "include": ["./src/**/*.ts"]
 }
