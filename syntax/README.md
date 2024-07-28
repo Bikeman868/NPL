@@ -16,10 +16,11 @@ Documentation on the NPL language, framework and supporting tools can be found i
 ## Exports
 
 Exports from this package are defined in `./syntax/src/syntax.ts` and comprise:
-* `nplLanguageSyntax` is an instance of `SyntaxGraph` and defines the syntax of the NPL language as a heirachy of state machines
-* A set of interfaces that are required in other parts of the NPL frameork: `IParser` `IParsable` `IContext` and `IToken`
-* Implementations of the interfaces that you can instantiate, or you can use your own implementation of the interfaces: `Parser` `Parsable` `Context` and `IToken`
-* A function called `parse` that takes a string containing NPL source code and returns a list of `IToken`.
+
+-   `nplLanguageSyntax` is an instance of `SyntaxGraph` and defines the syntax of the NPL language as a heirachy of state machines
+-   A set of interfaces that are required in other parts of the NPL frameork: `IParser` `IParsable` `IContext` and `IToken`
+-   Implementations of the interfaces that you can instantiate, or you can use your own implementation of the interfaces: `Parser` `Parsable` `Context` and `IToken`
+-   A function called `parse` that takes a string containing NPL source code and returns a list of `IToken`.
 
 ## Using the syntax parser
 
@@ -34,12 +35,7 @@ npm install npl-syntax
 If you just want to tokenize some source code:
 
 ```typescript
-import {
-    ParsableString,
-    Context,
-    Parser,
-    nplLanguageSyntax
-} from 'npl-syntax';
+import { ParsableString, Context, Parser, nplLanguageSyntax } from 'npl-syntax';
 
 // ParsableString implements IParsableString for an in-memory string containing the entire source code to parse.
 // You don't have to use the ParsableString class, you can write your own implementation of IParsableString
@@ -60,6 +56,7 @@ const tokens = parser.parse(context);
 ```
 
 If you want default behaviors, this can be abbreviated to:
+
 ```typescript
 import { parse } from 'npl-syntax';
 

@@ -1,22 +1,18 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
+import { skipSeparators, parseOpenScope, parseIdentifier, parseCloseScope } from '../stateMachine/SyntaxParser.js';
 import {
-    skipSeparators,
-    parseOpenScope,
-    parseIdentifier,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
-import { 
-    configGraph, 
-    constGraph, 
-    destinationListGraph, 
-    eolGraph, 
-    messageDefinitionGraph, 
-    messageTypeSelectorGraph, 
-    parseDefaultKeyword, 
-    parseEgressKeyword, 
-    parseIngressKeyword, 
-    parseNetworkKeyword, 
-    pipeGraph, 
+    configGraph,
+    constGraph,
+    destinationListGraph,
+    eolGraph,
+    enumGraph,
+    messageDefinitionGraph,
+    messageTypeSelectorGraph,
+    parseDefaultKeyword,
+    parseEgressKeyword,
+    parseIngressKeyword,
+    parseNetworkKeyword,
+    pipeGraph,
     processGraph,
 } from '../index.js';
 
@@ -132,6 +128,7 @@ export function defineNetworkGraph(builder: GraphBuilder) {
         .subGraph('blank-line', eolGraph, 'statement-block')
         .subGraph('ingress', ingressGraph, 'statement-block')
         .subGraph('egress', egressGraph, 'statement-block')
+        .subGraph('enum', enumGraph, 'statement-block')
         .subGraph('process', processGraph, 'statement-block')
         .subGraph('pipe', pipeGraph, 'statement-block')
         .subGraph('config', configGraph, 'statement-block')

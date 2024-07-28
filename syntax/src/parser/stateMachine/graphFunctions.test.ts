@@ -16,8 +16,8 @@ function buildContext(sourceCode: string, graph: SyntaxGraph): IContext {
 }
 
 function expectPath(context: IContext, path: string[]) {
-    expect(context.pathLength).toBe(path.length);
-    for (let i = 0; i < path.length; i++) expect(context.getPathElement(i)).toBe(path[i]);
+    expect(context.pathLength, context.pathDescription).toBe(path.length);
+    for (let i = 0; i < path.length; i++) expect(context.getPathElement(i), `Path element ${i}`).toBe(path[i]);
 }
 
 function expectToken(context: IContext, token: ParseResult | undefined, text: string, tokenType: TokenType) {
@@ -47,13 +47,15 @@ describe('Graph', () => {
         const context = buildContext(sourceCode, nplGraph);
 
         checkNext(context, 'using', 'Keyword', ['using', 'namespace']);
-        checkNext(context, 'namespace1', 'QualifiedIdentifier', []);
+        checkNext(context, 'namespace1', 'QualifiedIdentifier', ['using', 'eol']);
+        checkNext(context, '\n', 'LineBreak', []);
         checkNext(context, 'namespace', 'Keyword', ['namespace', 'name']);
         checkNext(context, 'namespace2', 'QualifiedIdentifier', ['namespace', 'definition']);
         checkNext(context, '{', 'StartScope', ['namespace', 'statement']);
         checkNext(context, '\n', 'LineBreak', ['namespace', 'statement']);
         checkNext(context, 'using', 'Keyword', ['namespace', 'using', 'namespace']);
-        checkNext(context, 'namespace3', 'QualifiedIdentifier', ['namespace', 'statement']);
+        checkNext(context, 'namespace3', 'QualifiedIdentifier', ['namespace', 'using', 'eol']);
+        checkNext(context, '\n', 'LineBreak', ['namespace', 'statement']);
         checkNext(context, '}', 'EndScope', ['namespace', 'end']);
         checkNext(context, '\n', 'LineBreak', []);
 

@@ -1,4 +1,4 @@
-import { ITokenStream } from "#interfaces/ITokenStream.js";
+import { ITokenStream } from '#interfaces/ITokenStream.js';
 
 export interface IModelBuilder<T> {
     build(): T;

@@ -32,5 +32,9 @@ export function parseToken(context: IContext): IToken | undefined {
     }, indent);
 
     if (context.isDryRun) context.restorePosition();
-    return result ? new Token(result.text, result.tokenType, length) : undefined;
+    return result ? new Token(
+        result.text, 
+        result.tokenType, 
+        context.position,
+        length) : undefined;
 }

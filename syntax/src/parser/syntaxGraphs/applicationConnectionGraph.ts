@@ -6,12 +6,12 @@ import {
     parseIdentifier,
     parseCloseScope,
 } from '../stateMachine/SyntaxParser.js';
-import { 
-    parseIngressKeyword, 
-    parseEgressKeyword, 
-    configGraph, 
-    eolGraph, 
-    parseConnectionKeyword, 
+import {
+    parseIngressKeyword,
+    parseEgressKeyword,
+    configGraph,
+    eolGraph,
+    parseConnectionKeyword,
     messageTypeSelectorGraph,
 } from '../index.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';

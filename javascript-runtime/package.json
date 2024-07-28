@@ -7,7 +7,7 @@
     "license": "ISC",
     "type": "module",
     "imports": {
-        "#exceptions/*": "./dist/exceptions/*",
+        "#errors/*": "./dist/errors/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*"
     },

@@ -1,4 +1,4 @@
 export type UsingModel = {
-    namespace: string,
-    comments: string[],
-}
+    namespace: string;
+    comments: string[];
+};

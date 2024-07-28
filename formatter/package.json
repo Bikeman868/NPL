@@ -8,7 +8,7 @@
     "type": "module",
     "files": ["dist"],
     "imports": {
-        "#exceptions/*": "./dist/exceptions/*",
+        "#errors/*": "./dist/errors/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
         "#formatter/*": "./dist/formatter/*",

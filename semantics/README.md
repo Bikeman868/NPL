@@ -14,9 +14,42 @@ Documentation on the NPL language, framework and supporting tools can be found i
 ## Exports
 
 Exports from this package are defined in `./semantics/src/semantics.ts` and comprise:
-*
-*
 
+-   Interfaces that you can implement in your own code
+-   Errors that are thrown by the package
+-   A static analysis model of an NPL application
+-   Implementations of ITokenStream
+-   Builders for each type in the static analysis model
+-   An implementation of IModelBuilderContext called ModelBuilderContext
+
+## Using the package
+
+To install the package into your application:
+
+```shell
+npm install npl-semantics
+```
+
+To analyse an array of `tokens` parsed from a source file and build a model of the application:
+
+```typescript
+import {
+    IModelBuilderContext,
+    ITokenStream,
+    SourceFileModel,
+    ModelBuilderContext,
+    ArrayTokenStream,
+} from npl-semantics
+
+const builderContext: IModelBuilderContext = new ModelBuilderContext();
+const tokenStream: ITokenStream = new ArrayTokenStream(tokens, true);
+const sourceFile: SourceFileModel = builderContext.buildSourceFileModel(tokenStream);
+```
+
+You can customize this process in the following ways:
+
+-   The `ArrayTokenStream` constructor takes a boolean that indicates whether comments should be preserved or not. If you are writing a compiler or static analysis tool, you probably don't need the comments, but if you are writng a reformatting tool, you definitely do.
+-   `IModelBuilderContext` defines a `config` property that controls merging. For example if the source code contains multiple definitions for the same network you can choose to combine all of the elements of the network into one big network model, or leave them separate, as they were in the source code.
 
 ## Local Development
 

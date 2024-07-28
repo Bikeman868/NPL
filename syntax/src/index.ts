@@ -68,7 +68,7 @@ for (let fileName of fileNames) {
     // The parser requires parsable text
     const buffer = new ParsableString(sourceFileText);
     const context = new Context(buffer, nplLanguageSyntax);
-    context.debugLogging = (context: IContext) => false;//context.position.line > 8;
+    context.debugLogging = (context: IContext) => false; //context.position.line > 8;
     context.traceLogging = (context: IContext) => false;
 
     // Tokenise the source file

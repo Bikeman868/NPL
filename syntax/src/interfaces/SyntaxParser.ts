@@ -1,4 +1,4 @@
-import { IContext } from "#interfaces/IContext.js";
+import { IContext } from '#interfaces/IContext.js';
 import { ParseResult } from '#interfaces/ParseResult.js';
 
 /**

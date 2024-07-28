@@ -479,9 +479,10 @@ namespace namespace1 {
 // === Enums ===
 
 namespace namespace1 {
-    enum option option1 option2 option3
+    enum option option1 /* option 1 */ option2 option3
     enum option {
-        option1
+        option1 // Option 1
+        // Option 2
         option2
         option3
     }
@@ -643,7 +644,8 @@ namespace namespace1 {
     }
     application app {
         connection npl.io.Console console {
-            ingress egress * network1
+            ingress * network1
+            egress * network1
         }
     }
     application app {
@@ -654,7 +656,8 @@ namespace namespace1 {
             egress TestMessage network1
         }
         connection ns1.ns2.ConnectionType connection1 {
-            egress ingress empty network1
+            ingress empty network1
+            egress empty network1
         }
     }
     application app {

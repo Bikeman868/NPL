@@ -1,5 +1,10 @@
 import { GraphBuilder } from '#parser/stateMachine/GraphBuilder.js';
-import { parseCloseScope, parseOpenScope, parseQualifiedIdentifier, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import {
+    parseCloseScope,
+    parseOpenScope,
+    parseQualifiedIdentifier,
+    skipSeparators,
+} from '../stateMachine/SyntaxParser.js';
 import { captureGraph, eolGraph, parseDestinationKeyword } from '../index.js';
 
 // prettier-ignore

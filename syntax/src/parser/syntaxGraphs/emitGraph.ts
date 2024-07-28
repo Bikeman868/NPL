@@ -1,11 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
 import { skipSeparators, parseQualifiedIdentifier } from '../stateMachine/SyntaxParser.js';
-import {
-    eolGraph,
-    literalMessageGraph,
-    parseEmitKeyword,
-    awaitGraph,
-} from '../index.js';
+import { eolGraph, literalMessageGraph, parseEmitKeyword, awaitGraph } from '../index.js';
 
 // prettier-ignore
 /* 

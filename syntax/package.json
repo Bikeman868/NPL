@@ -10,7 +10,7 @@
         "dist"
     ],
     "imports": {
-        "#exceptions/*": "./dist/exceptions/*",
+        "#errors/*": "./dist/errors/*",
         "#interfaces/*": "./dist/interfaces/*",
         "#utils/*": "./dist/utils/*",
         "#parser/*": "./dist/parser/*"

@@ -1,9 +1,5 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    skipSeparators,
-    parseOpenScope,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
+import { skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
 import {
     captureGraph,
     conditionalExpressionGraph,

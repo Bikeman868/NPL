@@ -1,5 +1,13 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import { parseBoolean, parseDate, parseIdentifier, parseNumber, parseQualifiedIdentifier, parseString, skipSeparators } from '../stateMachine/SyntaxParser.js';
+import {
+    parseBoolean,
+    parseDate,
+    parseIdentifier,
+    parseNumber,
+    parseQualifiedIdentifier,
+    parseString,
+    skipSeparators,
+} from '../stateMachine/SyntaxParser.js';
 import {
     assignmentExpressionGraph,
     eolGraph,

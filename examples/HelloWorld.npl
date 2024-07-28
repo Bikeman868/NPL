@@ -3,7 +3,7 @@
     modifying this app and see what happens
 */
 
-using npl.scheduling // Allows us abbreviate `npl.scheduling.Emitter` to just `Emitter`
+using npl.scheduling // Allows us to abbreviate `npl.scheduling.Emitter` to just `Emitter`
 
 // Define an application specific message that is used only within the application
 // and is fully decoupled from any console specific functionality, making the hello world
@@ -14,8 +14,8 @@ namespace app {
     }
 }
 
-// The hello network responds to all ingress messages by emitting an app.TextMessage containing the text 'Hello, world'
 namespace app {
+    // The hello network responds to all ingress messages by emitting an app.TextMessage containing the text 'Hello, world'
     network hello {
         ingress default process responder
         egress default TextMessage

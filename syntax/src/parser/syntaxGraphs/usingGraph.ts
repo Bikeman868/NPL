@@ -20,4 +20,3 @@ export function defineUsingGraph(builder: GraphBuilder) {
         .subGraph('eol', eolGraph)
     .graph.build();
 }
-

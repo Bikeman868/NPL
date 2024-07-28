@@ -51,7 +51,7 @@ import { defineDataTypeGraph } from './syntaxGraphs/dataTypeGraph.js';
 import { SyntaxGraph } from '#interfaces/SyntaxGraph.js';
 import { defineApplicationConnectionGraph } from './syntaxGraphs/applicationConnectionGraph.js';
 import { defineApplicationGraph } from './syntaxGraphs/applicationGraph.js';
-import { defineCaptureGraph } from './syntaxGraphs/captureGraph.js'; 
+import { defineCaptureGraph } from './syntaxGraphs/captureGraph.js';
 import { defineConfigFieldGraph } from './syntaxGraphs/configFieldGraph.js';
 import { defineConfigGraph } from './syntaxGraphs/configGraph.js';
 import { defineConstGraph } from './syntaxGraphs/constGraph.js';

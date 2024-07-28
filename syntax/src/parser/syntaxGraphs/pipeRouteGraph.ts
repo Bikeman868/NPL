@@ -1,15 +1,6 @@
 import { GraphBuilder } from '../stateMachine/GraphBuilder.js';
-import {
-    skipSeparators,
-    parseOpenScope,
-    parseCloseScope,
-} from '../stateMachine/SyntaxParser.js';
-import {
-    eolGraph,
-    messageTypeSelectorGraph,
-    parseRouteKeyword,
-    routingStatementGraph,
-} from '../index.js';
+import { skipSeparators, parseOpenScope, parseCloseScope } from '../stateMachine/SyntaxParser.js';
+import { eolGraph, messageTypeSelectorGraph, parseRouteKeyword, routingStatementGraph } from '../index.js';
 
 /* Examples
 
