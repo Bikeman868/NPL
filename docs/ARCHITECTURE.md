@@ -7,10 +7,20 @@ This document describes how NPL works for those that like to get under the hood.
 ## Applications
 
 An NPL application comprises:
-- A number of Networks defined by the application code. Each Network can be made up of other Networks etc to whatever depth is needed to implement the features of the application.
-- A number of Networks imported from shared Packages. These Networks can contain a hierarchy of other Networks, and can reference Networks defined in other shared Packages.
-- References to build-in Connections, or Connections that are defined in shared Packages.
-- An Application definition that configures Connections, and routes Messages between the Connections and the Networks.
+- An Application definition that defines how your application connects to the outside world. You can have multiple application definitions for the same program if you have different scenarios in which these connections vary, for example development, staging and production environments. Note that as well as having multiple application definitions, each application can also be configured at run-time through a configuration file and/or environment variables.
+- A number of Networks defined by the application code. Each Network can be made up of other Networks etc to whatever depth is needed to implement the features of the application. Networks are functional areas of the code. Processing within a network occurs on the same machine. Networks within an application may run on different machines depending on the runtime configuration.
+- A number of Networks imported from shared Packages.
+- References to the NPL runtime system. The runtime contains many generic and reusable components, and also defines mechanisms for connecting your application to the outside world that can be configured in your application definition.
+
+Terminology:
+- **Program** is a directory and sub-directorty structure that contains NPL source code files and configuration files.
+- **Application** is a definition of how to wire up the **Program** to the outside world (persistent storage, data streaming, service APIs etc) by configuring **Connections**.
+- **Connection** provides a way for the **Program** to communicate with other systems. NPL provides **Connection** implementations for all popular databases, streaming platforms, file system, network protocols and the console.
+- **Node** a machine that can execute instructions using data in memory. Nodes are typically virtual machines hosted in the cloud or local development computers.
+- **Network** defines a region within your **Program** where processing must be performed on the same **Node**. Processing that crosses **Network** boundaries may or may not execute on the same **Node** depending on your vertical scaling configuration.
+- **Message** defines a shape for data that is communicated between components of the **Program**. Programs typically define many **Messages** that are specific to the **Program** functionallity. The NPL **Runtime** also defines some generic **Messages**.
+- **Process** pure functional logic that accepts **Messages** as input and emits new **Messages** as output.
+- **Pipe** routing logic that defines how **Messages** flow between **Networks** and **Processes** within the **Program**.
 
 This is depicted below:
 
@@ -20,11 +30,11 @@ In this depiction, the Application definition is a red rounded rectangle. It is 
 
 Connections contain no application specific functionallity, and can be shared by many applications. Connections contain definitions of Messages that they emit, and Messages that they can process. Connections can be configured by the application.
 
-To run an NPL program, you provide the name of a source file that contains an Application definition. You can have many application definitions for the same application, for example to run with different configurations in different environments. You can also build integration tests as Application definitions, where the Connections provide a sandbox for the integration test. NPL is purely functional, making integration testing very straightforward.
+To run an NPL program, you provide the name of an Application definition within your program. You can have many application definitions for the same program, for example to run with different configurations in different environments. You can also build integration tests as Application definitions, where the Connections provide a sandbox for the integration test. NPL is purely functional, making integration testing very straightforward.
 
 The blue rounded rectangles are Networks. Networks are interconnected by Pipes. Pipes route Messages and are resillient, elastic and asyncrhronous.
 
-Vertical scaling can be confgiured at the network level. Pipes that route messages between Networks will be in-memory for Networks running on the same Kubernetes Pod, and will use system networking between Networks that are running on different Kubernetes Pods. When networks span compute clusters, standard message streaming solutions can be configured including Pulsar and Kafka.
+Vertical scaling can be confgiured at the network level. Pipes that route messages between Networks will be in-memory for Networks running on the same Node, and will use system networking between Networks that are running on different Nodes. When networks span compute clusters, standard message streaming solutions can be configured including Pulsar and Kafka.
 
 ## Networks
 
@@ -44,12 +54,12 @@ It is important for flexibility, single responsibiluty and reusability, that pro
 
 Note that processes are supposed to be very simple, performing just one relatively simple task. For example a process might accept a Message describing an update, and translate it into a SQL statement. In this case the Pipes will route update request Messages to this Process for translation into SQL statement messages, and the Application definition will route the SQL messages to the database Connection. Any response Messages emitted from the database Connection will automatically be routed back to the originator, but Pipes involved in the routing could dynamically inject additional Processes into the route to perform additional transformations.
 
-In this example, if you wanted to log the SQL statements that are being executed, you can just add a logging process, and configure the message pipe to duplicate the message to the logging process. In this case none of the existing processes require any changes. This is an important aspect of the design of NPL. Each process solves just one straightforward problem and solves that problem completely. If we have new problems to solve (such as logging SQL queries) this requires a new process, but does not change how we are solving any other problem, therefore no existing processes need any modification. In an NPL application, you only need to change process code when you want to change how the problem solved by this process is being solved. In most other programming languages a small change somewhere in the code frequently cascades into requiring changes in dozens of other places throughout the code. NPL is designed to avoid this problem.
+In this example, if you wanted to log the SQL statements that are being executed, you can just add a logging process, and configure the message pipe to duplicate the message to the logging process. In this case none of the existing processes require any changes. This is an important aspect of the design of NPL. Each process solves just one straightforward problem and solves that problem completely without any awareness of any other process in the program. If we have new problems to solve (such as logging SQL queries) this requires a new process, but does not change how we are solving any other problem, therefore no existing processes need any modification. In an NPL application, you only need to change process code when you want to change how the problem solved by this process is being solved. In most other programming languages a small change somewhere in the code frequently cascades into requiring changes in dozens of other places throughout the code. NPL is designed to avoid this problem.
 
 ## Messages
 
 Messages contain:
-- Immutable data. The data is defined by the application code. Message data can not be modified, but Messages can be cloned, data from one Message can be used to initialize a new Message, and a Message can contain other Messages.
+- Immutable data. The data is defined by the program code. Message data can not be modified, but Messages can be cloned, data from one Message can be used to initialize a new Message, and a Message can contain other Messages.
 - Scoped contexts. Each scope is a collections of name/value pairs. Some scopes are mutable and some are immutable. Some scopes are automatically copied to Messages that are emitted in response to Message processing, and other scopes are specific to the Message. Some scopes are transported across Network boundaries and others are not. This is discussed in greater detail elsewhere.
 - A Route that defines the path that the message will take through the Networks and Processes. The Route is dynamic, and can be modified by Pipes. Pipes can't contain application logic, but do contain all of the message routing logic.
 

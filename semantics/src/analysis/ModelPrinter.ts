@@ -1,3 +1,5 @@
+import { AcceptModel } from '#model/AcceptModel.js';
+import { AcceptStatementModel } from '#model/AcceptStatementModel.js';
 import { ApplicationModel } from '#model/ApplicationModel.js';
 import { ConfigModel } from '#model/ConfigModel.js';
 import { ConnectionEgressModel } from '#model/ConnectionEgressModel.js';
@@ -11,8 +13,12 @@ import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
 import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
 import { NetworkModel } from '#model/NetworkModel.js';
 import { PipeModel } from '#model/PipeModel.js';
+import { PipeRouteModel } from '#model/PipeRouteModel.js';
 import { ProcessModel } from '#model/ProcessModel.js';
+import { RoutingStatementModel } from '#model/RoutingStatementModel.js';
 import { SourceFileModel } from '#model/SourceFileModel.js';
+import { TestModel } from '#model/TestModel.js';
+import { TestStatementModel } from '#model/TestStatementModel.js';
 import { UsingModel } from '#model/UsingModel.js';
 import { IToken, TokenType } from 'npl-syntax';
 
@@ -228,12 +234,22 @@ export class ModelPrinter {
     printPipe(model: PipeModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`pipe ${model.identifier} {`, indent);
+        for (const config of model.configs) this.printConfig(config, indent + 1);
+        for (const constant of model.constants) this.printConstant(constant, indent + 1);
+        for (const enumeration of model.enums) this.printEnum(enumeration, indent + 1);
+        for (const route of model.routes) this.printPipeRoute(route, indent + 1);
         this.printLine('}', indent);
     }
 
     printProcess(model: ProcessModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`process ${model.identifier} {`, indent);
+        for (const config of model.configs) this.printConfig(config, indent + 1);
+        for (const constant of model.constants) this.printConstant(constant, indent + 1);
+        for (const messageType of model.messageTypes) this.printMessageType(messageType, indent + 1);
+        for (const enumeration of model.enums) this.printEnum(enumeration, indent + 1);
+        for (const accept of model.accepts) this.printAccept(accept, indent + 1);
+        for (const test of model.tests) this.printTest(test, indent + 1);
         this.printLine('}', indent);
     }
 
@@ -252,5 +268,29 @@ export class ModelPrinter {
             }
             this.printLine('}', indent);
         }
+    }
+
+    printAccept(model: AcceptModel, indent: number) {
+        
+    }
+
+    printTest(model: TestModel, indent: number) {
+        
+    }
+
+    printAcceptStatement(model: AcceptStatementModel, indent: number) {
+
+    }
+
+    printPipeRoute(model: PipeRouteModel, indent: number) {
+        
+    }
+
+    printRoutingStatement(model: RoutingStatementModel, indent: number) {
+
+    }
+
+    printTestStatement(model: TestStatementModel, indent: number) {
+
     }
 }

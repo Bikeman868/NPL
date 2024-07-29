@@ -262,6 +262,10 @@ export class ModelFactory implements IModelFactory {
         return {
             identifier: '',
             comments: [],
+            configs: [],
+            constants: [],
+            enums: [],
+            routes: [],
         };
     }
 
@@ -269,6 +273,12 @@ export class ModelFactory implements IModelFactory {
         return {
             identifier: '',
             comments: [],
+            configs: [],
+            constants: [],
+            enums: [],
+            messageTypes: [],
+            accepts: [],
+            tests: [],
         };
     }
 
