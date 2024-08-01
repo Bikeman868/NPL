@@ -32,6 +32,7 @@ import { ProcessModel } from '#model/ProcessModel.js';
 import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
 import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
 import { MessageDestinationModel } from '#model/MessageDestinationModel.js';
+import { AcceptModel } from '#model/AcceptModel.js';
 
 export class ModelFactory implements IModelFactory {
     public config = {
@@ -40,6 +41,12 @@ export class ModelFactory implements IModelFactory {
         mergeNamespaces: true,
         mergeNetworks: true,
     };
+
+    buildAcceptModel(tokens: ITokenStream): AcceptModel {
+        const builder = new AcceptModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
 
     buildApplicationModel(tokens: ITokenStream): ApplicationModel {
         const builder = new ApplicationModelBuilder(this);
