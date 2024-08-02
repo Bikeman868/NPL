@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { MessageDestinationModel } from '#model/MessageDestinationModel.js';
 
-export function printMessageDestination(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printMessageDestination(this: ModelPrinter, model: MessageDestinationModel, indent: number) {}

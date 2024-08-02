@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { ForStatementModel } from '#model/ForStatementModel.js';
 
-export function printForStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printForStatement(this: ModelPrinter, model: ForStatementModel, indent: number) {}

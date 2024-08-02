@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { MessageFieldDefinitionModel } from '#model/MessageFieldDefinitionModel.js';
 
-export function printMessageFieldDefinition(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printMessageFieldDefinition(this: ModelPrinter, model: MessageFieldDefinitionModel, indent: number) {}

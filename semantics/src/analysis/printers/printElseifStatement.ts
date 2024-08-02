@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { ElseifStatementModel } from '#model/ElseifStatementModel.js';
 
-export function printElseifStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printElseifStatement(this: ModelPrinter, model: ElseifStatementModel, indent: number) {}

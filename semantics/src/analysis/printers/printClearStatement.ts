@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { ClearStatementModel } from '#model/ClearStatementModel.js';
 
-export function printClearStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printClearStatement(this: ModelPrinter, model: ClearStatementModel, indent: number) {}

@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { EmitStatementModel } from '#model/EmitStatementModel.js';
 
-export function printEmitStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printEmitStatement(this: ModelPrinter, model: EmitStatementModel, indent: number) {}

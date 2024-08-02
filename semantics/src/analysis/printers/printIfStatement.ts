@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { IfStatementModel } from '#model/IfStatementModel.js';
 
-export function printIfStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printIfStatement(this: ModelPrinter, model: IfStatementModel, indent: number) {}

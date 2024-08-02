@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { ConfigFieldModel } from '#model/ConfigFieldModel.js';
 
-export function printConfigField(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printConfigField(this: ModelPrinter, model: ConfigFieldModel, indent: number) {}

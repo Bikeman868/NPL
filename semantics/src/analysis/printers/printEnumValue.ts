@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { EnumValueModel } from '#model/EnumValueModel.js';
 
-export function printEnumValue(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printEnumValue(this: ModelPrinter, model: EnumValueModel, indent: number) {}

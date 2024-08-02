@@ -1,4 +1,4 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { PrependStatementModel } from '#model/PrependStatementModel.js';
 
-export function printPrependStatement(this: ModelPrinter, model: NamespaceModel, indent: number) {}
+export function printPrependStatement(this: ModelPrinter, model: PrependStatementModel, indent: number) {}
