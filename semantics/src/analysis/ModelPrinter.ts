@@ -27,15 +27,18 @@ import { IToken, TokenType } from 'npl-syntax';
 // code, but it depends on this package, making development awkward. This class lets us
 // quickly print any model to check for correct behavior
 export class ModelPrinter {
-    private printLine(line: string, indent: number): void {
+
+    // Utility functions
+
+    protected printLine(line: string, indent: number): void {
         console.log('  '.repeat(indent) + line);
     }
 
-    private printBlankLine() {
+    protected printBlankLine() {
         console.log();
     }
 
-    printComment(comment: string, indent: number) {
+    protected printComment(comment: string, indent: number) {
         if (comment.indexOf('\n') >= 0) {
             this.printLine('/*', indent);
             for (const line of comment.split('\n')) this.printLine(line.trim(), indent + 1);
@@ -45,7 +48,7 @@ export class ModelPrinter {
         }
     }
 
-    printComments(model: { comments: string[] }, indent: number, alwaysPrintBlankLine: boolean = false): boolean {
+    protected printComments(model: { comments: string[] }, indent: number, alwaysPrintBlankLine: boolean = false): boolean {
         if (!model || !model.comments.length) {
             if (alwaysPrintBlankLine) this.printBlankLine();
             return false;
@@ -58,36 +61,96 @@ export class ModelPrinter {
         return true;
     }
 
-    printLineBreakIfComments(model: { comments: string[] }): void {
+    protected printLineBreakIfComments(model: { comments: string[] }): void {
         if (model.comments.length) this.printBlankLine();
     }
 
-    private readonly expressionTokenTypesToPrintText: TokenType[] = [
-        'StringLiteral',
-        'Identifier',
-        'QualifiedIdentifier',
-        'BooleanLiteral',
-        'Keyword',
-        'Type',
-        'StartMessageLiteral',
-    ];
-
-    private formatExpression(expression: IToken[]): string {
+    protected formatExpression(expression: IToken[]): string {
+        const typesToPrintText: TokenType[] = [
+            'StringLiteral',
+            'Identifier',
+            'QualifiedIdentifier',
+            'BooleanLiteral',
+            'Keyword',
+            'Type',
+            'StartMessageLiteral',
+        ]
+        
         let result = '';
         for (const token of expression) {
-            if (token.tokenType in this.expressionTokenTypesToPrintText)
+            if (token.tokenType in typesToPrintText)
                 result += `${token.tokenType} (${token.text}) `;
             else result += `${token.tokenType} `;
         }
         return result;
     }
 
-    printConstant(model: ConstModel, indent: number) {
-        this.printComments(model, indent, false);
-        this.printLine(`const ${model.identifier} ${this.formatExpression(model.expression)}`, indent);
-    }
+    // Model printing
 
-    printNamespace(model: NamespaceModel, indent: number) {
+    public printConstant = printConstant;
+    public printAccept = printAccept;
+    public printAcceptStatement = printAcceptStatement;
+    public printAppendStatement = printAppendStatement;
+    public printApplication = printApplication;
+    public printCaptureStatement = printCaptureStatement;
+    public printClearStatement = printClearStatement;
+    public printConfigField = printConfigField;
+    public printConfig = printConfig;
+    public printConnectionEgress = printConnectionEgress;
+    public printConnectionIngress = printConnectionIngress;
+    public printConnection = printConnection;
+    public printElseifStatement = printElseifStatement;
+    public printElseStatement = printElseStatement;
+    public printEmitStatement = printEmitStatement;
+    public printEnum = printEnum;
+    public printEnumValue = printEnumValue;
+    public printExpectStatement = printExpectStatement;
+    public printForStatement = printForStatement;
+    public printIfStatement = printIfStatement;
+    public printMessageDestination = printMessageDestination;
+    public printMessageFieldDefinition = printMessageFieldDefinition;
+    public printMessageType = printMessageType;
+    public printNamespace = printNamespace;
+    public printNetworkEgress = printNetworkEgress;
+    public printNetworkIngress = printNetworkIngress;
+    public printNetwork = printNetwork;
+    public printPipe = printPipe;
+    public printPipeRoute = printPipeRoute;
+    public printPrependStatement = printPrependStatement;
+    public printProcess = printProcess;
+    public printRemoveStatement = printRemoveStatement;
+    public printRouteStatement = printRouteStatement;
+    public printRoutingStatement = printRoutingStatement;
+    public printSetStatement = printSetStatement;
+    public printSourceFile = printSourceFile;
+    public printTest = printTest;
+    public printTestStatement = printTestStatement;
+    public printUsing = printUsing;
+    public printVarStatement = printVarStatement;
+    public printWhileStatement = printWhileStatement;
+}
+
+function printAppendStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printCaptureStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printClearStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printConfigField(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printElseifStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printElseStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printEmitStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printEnumValue(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printExpectStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printForStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printIfStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printMessageDestination(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printMessageFieldDefinition(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printPrependStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printRemoveStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printRouteStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printSetStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printVarStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+function printWhileStatement(this: ModelPrinter, model: NamespaceModel, indent: number){}
+
+function printNamespace(this: ModelPrinter, model: NamespaceModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`namespace ${model.identifier} {`, indent);
         for (const using of model.usings) this.printUsing(using, indent + 1);
@@ -99,17 +162,17 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printSourceFile(model: SourceFileModel, indent: number) {
+    function printSourceFile(this: ModelPrinter, model: SourceFileModel, indent: number) {
         for (const using of model.usings) this.printUsing(using, indent);
         for (const namespace of model.namespaces) this.printNamespace(namespace, indent);
     }
 
-    printUsing(model: UsingModel, indent: number) {
+    function printUsing(this: ModelPrinter, model: UsingModel, indent: number) {
         this.printComments(model, indent);
         this.printLine(`using ${model.namespace}`, indent);
     }
 
-    printApplication(model: ApplicationModel, indent: number) {
+    function printApplication(this: ModelPrinter, model: ApplicationModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`application ${model.identifier} {`, indent);
         for (const config of model.configs) this.printConfig(config, indent + 1);
@@ -117,7 +180,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printConfig(model: ConfigModel, indent: number) {
+    function printConfig(this: ModelPrinter, model: ConfigModel, indent: number) {
         this.printComments(model, indent);
         this.printLine(`config {`, indent);
         for (const field of model.fields) {
@@ -129,7 +192,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printConnection(model: ConnectionModel, indent: number) {
+    function printConnection(this: ModelPrinter, model: ConnectionModel, indent: number) {
         this.printComments(model, indent);
         this.printLine(`connection ${model.typeIdentifier} ${model.identifier} {`, indent);
         for (const config of model.configs) this.printConfig(config, indent + 1);
@@ -138,7 +201,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printConnectionIngress(model: ConnectionIngressModel, indent: number) {
+    function printConnectionIngress(this: ModelPrinter, model: ConnectionIngressModel, indent: number) {
         this.printComments(model, indent);
         if (model.networkEndpoints.length == 1) {
             this.printLine(`ingress ${model.messageType} ${model.networkEndpoints[0]}`, indent);
@@ -151,7 +214,7 @@ export class ModelPrinter {
         }
     }
 
-    printConnectionEgress(model: ConnectionEgressModel, indent: number) {
+    function printConnectionEgress(this: ModelPrinter, model: ConnectionEgressModel, indent: number) {
         this.printComments(model, indent);
         if (model.networkEndpoints.length == 1) {
             this.printLine(`egress ${model.messageType} ${model.networkEndpoints[0]}`, indent);
@@ -164,7 +227,7 @@ export class ModelPrinter {
         }
     }
 
-    printMessageType(model: MessageTypeModel, indent: number) {
+    function printMessageType(this: ModelPrinter, model: MessageTypeModel, indent: number) {
         this.printComments(model, indent, true);
         if (model.fields.length == 1 && model.fields[0].comments.length == 0) {
             const field = model.fields[0];
@@ -188,7 +251,7 @@ export class ModelPrinter {
         }
     }
 
-    printNetwork(model: NetworkModel, indent: number) {
+    function printNetwork(this: ModelPrinter, model: NetworkModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`network ${model.identifier} {`, indent);
         for (const config of model.configs) this.printConfig(config, indent + 1);
@@ -202,7 +265,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printNetworkIngress(model: NetworkIngressModel, indent: number) {
+    function printNetworkIngress(this: ModelPrinter, model: NetworkIngressModel, indent: number) {
         this.printComments(model, indent, false);
         if (model.destinations.length == 0) {
             this.printLine(`ingress ${model.endpointName}`, indent);
@@ -217,7 +280,7 @@ export class ModelPrinter {
         }
     }
 
-    printNetworkEgress(model: NetworkEgressModel, indent: number) {
+    function printNetworkEgress(this: ModelPrinter, model: NetworkEgressModel, indent: number) {
         this.printComments(model, indent, false);
         if (model.messageTypes.length == 0) {
             this.printLine(`egress ${model.endpointName}`, indent);
@@ -230,7 +293,7 @@ export class ModelPrinter {
         }
     }
 
-    printPipe(model: PipeModel, indent: number) {
+    function printPipe(this: ModelPrinter, model: PipeModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`pipe ${model.identifier} {`, indent);
         for (const config of model.configs) this.printConfig(config, indent + 1);
@@ -240,7 +303,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printProcess(model: ProcessModel, indent: number) {
+    function printProcess(this: ModelPrinter, model: ProcessModel, indent: number) {
         this.printComments(model, indent, true);
         this.printLine(`process ${model.identifier} {`, indent);
         for (const config of model.configs) this.printConfig(config, indent + 1);
@@ -252,7 +315,7 @@ export class ModelPrinter {
         this.printLine('}', indent);
     }
 
-    printEnum(model: EnumModel, indent: number) {
+    function printEnum(this: ModelPrinter, model: EnumModel, indent: number) {
         this.printComments(model, indent, true);
         if (model.values.length < 6 && model.values.reduce((sum, value) => sum + value.comments.length, 0) == 0) {
             const values = model.values.reduce((text, value) => text + ' ' + value.identifier, '');
@@ -269,15 +332,22 @@ export class ModelPrinter {
         }
     }
 
-    printAccept(model: AcceptModel, indent: number) {}
+    function printAccept(this: ModelPrinter, model: AcceptModel, indent: number) {}
 
-    printTest(model: TestModel, indent: number) {}
+    function printTest(this: ModelPrinter, model: TestModel, indent: number) {}
 
-    printAcceptStatement(model: AcceptStatementModel, indent: number) {}
+    function printAcceptStatement(this: ModelPrinter, model: AcceptStatementModel, indent: number) {}
 
-    printPipeRoute(model: PipeRouteModel, indent: number) {}
+    function printPipeRoute(this: ModelPrinter, model: PipeRouteModel, indent: number) {}
 
-    printRoutingStatement(model: RoutingStatementModel, indent: number) {}
+    function printRoutingStatement(this: ModelPrinter, model: RoutingStatementModel, indent: number) {}
 
-    printTestStatement(model: TestStatementModel, indent: number) {}
+    function printTestStatement(this: ModelPrinter, model: TestStatementModel, indent: number) {}
+
+
+
+function printConstant(this: ModelPrinter, model: ConstModel, indent: number) {
+    this.printComments(model, indent, false);
+    this.printLine(`const ${model.identifier} ${this.formatExpression(model.expression)}`, indent);
 }
+

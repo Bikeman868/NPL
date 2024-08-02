@@ -71,6 +71,8 @@ import { TestStatementModelBuilder } from './builders/TestStatementModelBuilder.
 import { SetStatementModelBuilder } from './builders/SetStatementModelBuilder.js';
 import { VarStatementModelBuilder } from './builders/VarStatementModelBuilder.js';
 import { WhileStatementModelBuilder } from './builders/WhileStatementModelBuilder.js';
+import { PipeRouteModel } from '#model/PipeRouteModel.js';
+import { PipeRouteModelBuilder } from './builders/PipeRouteModelBuilder.js';
 
 export class ModelFactory implements IModelFactory {
     public config = {
@@ -196,6 +198,12 @@ export class ModelFactory implements IModelFactory {
 
     buildPipeModel(tokens: ITokenStream): PipeModel {
         const builder = new PipeModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildPipeRouteModel(tokens: ITokenStream): PipeRouteModel {
+        const builder = new PipeRouteModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -472,6 +480,14 @@ export class ModelFactory implements IModelFactory {
             enums: [],
             routes: [],
         };
+    }
+
+    emptyPipeRouteModel(): PipeRouteModel {
+        return{
+            messageType: '',
+            comments: [],
+            statements: [],
+        }
     }
 
     emptyPrependStatementModel(): PrependStatementModel {

@@ -27,6 +27,7 @@ import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
 import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
 import { NetworkModel } from '#model/NetworkModel.js';
 import { PipeModel } from '#model/PipeModel.js';
+import { PipeRouteModel } from '#model/PipeRouteModel.js';
 import { PrependStatementModel } from '#model/PrependStatementModel.js';
 import { ProcessModel } from '#model/ProcessModel.js';
 import { RemoveStatementModel } from '#model/RemoveStatementModel.js';
@@ -68,6 +69,7 @@ export interface IModelFactory {
     buildNamespaceModel(tokens: ITokenStream): NamespaceModel;
     buildNetworkModel(tokens: ITokenStream): NetworkModel;
     buildPipeModel(tokens: ITokenStream): PipeModel;
+    buildPipeRouteModel(tokens: ITokenStream): PipeRouteModel;
     buildProcessModel(tokens: ITokenStream): ProcessModel;
     buildRemoveStatementModel(tokens: ITokenStream): RemoveStatementModel;
     buildRouteStatementModel(tokens: ITokenStream): RouteStatementModel;
@@ -108,6 +110,7 @@ export interface IModelFactory {
     emptyNetworkIngressModel(): NetworkIngressModel;
     emptyNetworkModel(): NetworkModel;
     emptyPipeModel(): PipeModel;
+    emptyPipeRouteModel(): PipeRouteModel;
     emptyPrependStatementModel(): PrependStatementModel;
     emptyProcessModel(): ProcessModel;
     emptyRemoveStatementModel(): RemoveStatementModel;

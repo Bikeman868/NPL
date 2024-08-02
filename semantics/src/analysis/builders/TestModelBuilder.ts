@@ -19,5 +19,6 @@ export class TestModelBuilder implements IModelBuilder<TestModel> {
 
     addTokens(tokens: ITokenStream): void {
         skipScopeBlock(tokens);
+        tokens.attachCommentsTo(this.model);
     }
 }

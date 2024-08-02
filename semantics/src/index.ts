@@ -43,3 +43,4 @@ if (context.syntaxErrors.length) {
     const printer = new ModelPrinter();
     printer.printSourceFile(sourceFile, 0);
 }
+

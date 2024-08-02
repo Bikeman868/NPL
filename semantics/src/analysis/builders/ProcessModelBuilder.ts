@@ -20,5 +20,6 @@ export class ProcessModelBuilder implements IModelBuilder<ProcessModel> {
     addTokens(tokens: ITokenStream): void {
         this.model.identifier = extractIdentifier(tokens);
         skipScopeBlock(tokens);
+        tokens.attachCommentsTo(this.model);
     }
 }
