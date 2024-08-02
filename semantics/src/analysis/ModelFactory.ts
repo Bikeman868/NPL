@@ -483,11 +483,11 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyPipeRouteModel(): PipeRouteModel {
-        return{
+        return {
             messageType: '',
             comments: [],
             statements: [],
-        }
+        };
     }
 
     emptyPrependStatementModel(): PrependStatementModel {
