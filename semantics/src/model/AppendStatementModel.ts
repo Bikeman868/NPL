@@ -1,3 +1,1 @@
-export type AppendStatementModel = {
-    
-}
+export type AppendStatementModel = {};

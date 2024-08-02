@@ -1,3 +1,1 @@
-export type PrependStatementModel = {
-    
-}
+export type PrependStatementModel = {};

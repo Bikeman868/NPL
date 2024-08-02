@@ -1,4 +1,4 @@
-import { RoutingStatementModel } from "./RoutingStatementModel.js";
+import { RoutingStatementModel } from './RoutingStatementModel.js';
 
 export type PipeRouteModel = {
     messageType: string;

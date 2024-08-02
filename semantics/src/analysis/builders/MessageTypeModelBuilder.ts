@@ -40,12 +40,12 @@ export class MessageTypeModelBuilder implements IModelBuilder<MessageTypeModel> 
     }
 
     buildFieldType(tokens: ITokenStream, token: IToken, field: MessageFieldDefinitionModel): IToken {
-        while(token.tokenType == 'Type' || token.tokenType == 'StartGeneric' || token.tokenType == 'EndGeneric') {
+        while (token.tokenType == 'Type' || token.tokenType == 'StartGeneric' || token.tokenType == 'EndGeneric') {
             field.type.push(token);
             token = tokens.next();
         }
         if (field.type.length == 0) throw new SemanticError('Expecting field type', tokens, token);
-        
+
         return token;
     }
 

@@ -1,3 +1,1 @@
-export type EmitStatementModel = {
-    
-}
+export type EmitStatementModel = {};

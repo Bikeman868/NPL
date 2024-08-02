@@ -96,23 +96,24 @@ export function buildExpression(
     },
 ): void {
     let depth = 0;
-    while(true) {
+    while (true) {
         const token = tokens.next();
         if (token.tokenType == 'LineBreak') {
             if (depth == 0) {
                 tokens.attachCommentsTo(model);
                 return;
             }
-        }
-        else if (
+        } else if (
             token.tokenType == 'StartScope' ||
             token.tokenType == 'StartMessageLiteral' ||
-            token.tokenType == 'StartMapLiteral')
+            token.tokenType == 'StartMapLiteral'
+        )
             depth++;
         else if (
             token.tokenType == 'EndScope' ||
             token.tokenType == 'EndMessageLiteral' ||
-            token.tokenType == 'EndMapLiteral')
+            token.tokenType == 'EndMapLiteral'
+        )
             depth--;
         model.expression.push(token);
     }

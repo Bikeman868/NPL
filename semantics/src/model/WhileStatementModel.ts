@@ -1,3 +1,1 @@
-export type WhileStatementModel = {
-    
-}
+export type WhileStatementModel = {};

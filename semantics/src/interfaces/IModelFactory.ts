@@ -82,7 +82,7 @@ export interface IModelFactory {
 
     emptyAcceptModel(): AcceptModel;
     emptyAcceptStatementModel(): AcceptStatementModel;
-    emptyAppendStatementModel() : AppendStatementModel;
+    emptyAppendStatementModel(): AppendStatementModel;
     emptyApplicationModel(): ApplicationModel;
     emptyCaptureStatementModel(): CaptureStatementModel;
     emptyClearStatementModel(): ClearStatementModel;

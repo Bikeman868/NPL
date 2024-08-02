@@ -1,3 +1,1 @@
-export type RemoveStatementModel = {
-    
-}
+export type RemoveStatementModel = {};

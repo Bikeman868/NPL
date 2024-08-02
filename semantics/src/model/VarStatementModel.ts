@@ -1,3 +1,1 @@
-export type VarStatementModel = {
-    
-}
+export type VarStatementModel = {};

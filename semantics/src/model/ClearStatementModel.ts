@@ -1,3 +1,1 @@
-export type ClearStatementModel = {
-    
-}
+export type ClearStatementModel = {};

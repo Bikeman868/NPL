@@ -1,3 +1,1 @@
-export type ElseStatementModel = {
-    
-}
+export type ElseStatementModel = {};

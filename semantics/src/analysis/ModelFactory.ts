@@ -33,6 +33,44 @@ import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
 import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
 import { MessageDestinationModel } from '#model/MessageDestinationModel.js';
 import { AcceptModel } from '#model/AcceptModel.js';
+import { AcceptModelBuilder } from './builders/AcceptModelBuilder.js';
+import { AcceptStatementModel } from '#model/AcceptStatementModel.js';
+import { AcceptStatementModelBuilder } from './builders/AcceptStatementModelBuilder.js';
+import { CaptureStatementModel } from '#model/CaptureStatementModel.js';
+import { AppendStatementModel } from '#model/AppendStatementModel.js';
+import { ClearStatementModel } from '#model/ClearStatementModel.js';
+import { ElseifStatementModel } from '#model/ElseifStatementModel.js';
+import { ElseStatementModel } from '#model/ElseStatementModel.js';
+import { EmitStatementModel } from '#model/EmitStatementModel.js';
+import { ExpectStatementModel } from '#model/ExpectStatementModel.js';
+import { ForStatementModel } from '#model/ForStatementModel.js';
+import { IfStatementModel } from '#model/IfStatementModel.js';
+import { PrependStatementModel } from '#model/PrependStatementModel.js';
+import { RemoveStatementModel } from '#model/RemoveStatementModel.js';
+import { RouteStatementModel } from '#model/RouteStatementModel.js';
+import { RoutingStatementModel } from '#model/RoutingStatementModel.js';
+import { SetStatementModel } from '#model/SetStatementModel.js';
+import { TestModel } from '#model/TestModel.js';
+import { TestStatementModel } from '#model/TestStatementModel.js';
+import { VarStatementModel } from '#model/VarStatementModel.js';
+import { WhileStatementModel } from '#model/WhileStatementModel.js';
+import { AppendStatementModelBuilder } from './builders/AppendStatementModelBuilder.js';
+import { CaptureStatementModelBuilder } from './builders/CaptureStatementModelBuilder.js';
+import { ClearStatementModelBuilder } from './builders/ClearStatementModelBuilder.js';
+import { ElseifStatementModelBuilder } from './builders/ElseifStatementModelBuilder.js';
+import { ElseStatementModelBuilder } from './builders/ElseStatementModelBuilder.js';
+import { EmitStatementModelBuilder } from './builders/EmitStatementModelBuilder.js';
+import { ExpectStatementModelBuilder } from './builders/ExpectStatementModelBuilder.js';
+import { ForStatementModelBuilder } from './builders/ForStatementModelBuilder.js';
+import { IfStatementModelBuilder } from './builders/IfStatementModelBuilder.js';
+import { RemoveStatementModelBuilder } from './builders/RemoveStatementModelBuilder.js';
+import { RouteStatementModelBuilder } from './builders/RouteStatementModelBuilder.js';
+import { RoutingStatementModelBuilder } from './builders/RoutingStatementModelBuilder.js';
+import { TestModelBuilder } from './builders/TestModelBuilder.js';
+import { TestStatementModelBuilder } from './builders/TestStatementModelBuilder.js';
+import { SetStatementModelBuilder } from './builders/SetStatementModelBuilder.js';
+import { VarStatementModelBuilder } from './builders/VarStatementModelBuilder.js';
+import { WhileStatementModelBuilder } from './builders/WhileStatementModelBuilder.js';
 
 export class ModelFactory implements IModelFactory {
     public config = {
@@ -48,8 +86,32 @@ export class ModelFactory implements IModelFactory {
         return builder.build();
     }
 
+    buildAcceptStatementModel(tokens: ITokenStream): AcceptStatementModel {
+        const builder = new AcceptStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildAppendStatementModel(tokens: ITokenStream): AppendStatementModel {
+        const builder = new AppendStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
     buildApplicationModel(tokens: ITokenStream): ApplicationModel {
         const builder = new ApplicationModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildCaptureStatementModel(tokens: ITokenStream): CaptureStatementModel {
+        const builder = new CaptureStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildClearStatementModel(tokens: ITokenStream): ClearStatementModel {
+        const builder = new ClearStatementModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -72,8 +134,44 @@ export class ModelFactory implements IModelFactory {
         return builder.build();
     }
 
+    buildElseifStatementModel(tokens: ITokenStream): ElseifStatementModel {
+        const builder = new ElseifStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildElseStatementModel(tokens: ITokenStream): ElseStatementModel {
+        const builder = new ElseStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildEmitStatementModel(tokens: ITokenStream): EmitStatementModel {
+        const builder = new EmitStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
     buildEnumModel(tokens: ITokenStream): EnumModel {
         const builder = new EnumModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildExpectStatementModel(tokens: ITokenStream): ExpectStatementModel {
+        const builder = new ExpectStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildForStatementModel(tokens: ITokenStream): ForStatementModel {
+        const builder = new ForStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildIfStatementModel(tokens: ITokenStream): IfStatementModel {
+        const builder = new IfStatementModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -108,8 +206,44 @@ export class ModelFactory implements IModelFactory {
         return builder.build();
     }
 
+    buildRemoveStatementModel(tokens: ITokenStream): RemoveStatementModel {
+        const builder = new RemoveStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildRouteStatementModel(tokens: ITokenStream): RouteStatementModel {
+        const builder = new RouteStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildRoutingStatementModel(tokens: ITokenStream): RoutingStatementModel {
+        const builder = new RoutingStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildSetStatementModel(tokens: ITokenStream): SetStatementModel {
+        const builder = new SetStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
     buildSourceFileModel(tokens: ITokenStream): SourceFileModel {
         const builder = new SourceFileModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildTestModel(tokens: ITokenStream): TestModel {
+        const builder = new TestModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildTestStatementModel(tokens: ITokenStream): TestStatementModel {
+        const builder = new TestStatementModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -120,6 +254,39 @@ export class ModelFactory implements IModelFactory {
         return builder.build();
     }
 
+    buildVarStatementModel(tokens: ITokenStream): VarStatementModel {
+        const builder = new VarStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    buildWhileStatementModel(tokens: ITokenStream): WhileStatementModel {
+        const builder = new WhileStatementModelBuilder(this);
+        builder.addTokens(tokens);
+        return builder.build();
+    }
+
+    emptyAcceptModel(): AcceptModel {
+        return {
+            identifier: '',
+            comments: [],
+            messageType: '',
+            statements: [],
+        };
+    }
+
+    emptyAcceptStatementModel(): AcceptStatementModel {
+        return {
+            comments: [],
+            statementType: undefined,
+            statement: undefined,
+        };
+    }
+
+    emptyAppendStatementModel(): AppendStatementModel {
+        return {};
+    }
+
     emptyApplicationModel(): ApplicationModel {
         return {
             identifier: '',
@@ -127,6 +294,14 @@ export class ModelFactory implements IModelFactory {
             configs: [],
             connections: [],
         };
+    }
+
+    emptyCaptureStatementModel(): CaptureStatementModel {
+        return {};
+    }
+
+    emptyClearStatementModel(): ClearStatementModel {
+        return {};
     }
 
     emptyConfigModel(): ConfigModel {
@@ -180,6 +355,17 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
+    emptyElseifStatementModel(): ElseifStatementModel {
+        return {};
+    }
+
+    emptyElseStatementModel(): ElseStatementModel {
+        return {};
+    }
+    emptyEmitStatementModel(): EmitStatementModel {
+        return {};
+    }
+
     emptyEnumModel(): EnumModel {
         return {
             identifier: '',
@@ -195,12 +381,24 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
+    emptyExpectStatementModel(): ExpectStatementModel {
+        return {};
+    }
+
+    emptyForStatementModel(): ForStatementModel {
+        return {};
+    }
+
+    emptyIfStatementModel(): IfStatementModel {
+        return {};
+    }
+
     emptyMessageDestinationModel(): MessageDestinationModel {
         return {
-            kind: 'network',
+            kind: undefined,
             identifier: '',
             comments: [],
-        }
+        };
     }
 
     emptyMessageFieldDefinitionModel(): MessageFieldDefinitionModel {
@@ -208,7 +406,7 @@ export class ModelFactory implements IModelFactory {
             identifier: '',
             comments: [],
             type: [],
-            lifecycle: 'current',
+            lifecycle: undefined,
         };
     }
 
@@ -276,6 +474,10 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
+    emptyPrependStatementModel(): PrependStatementModel {
+        return {};
+    }
+
     emptyProcessModel(): ProcessModel {
         return {
             identifier: '',
@@ -289,6 +491,26 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
+    emptyRemoveStatementModel(): RemoveStatementModel {
+        return {};
+    }
+
+    emptyRouteStatementModel(): RouteStatementModel {
+        return {};
+    }
+
+    emptyRoutingStatementModel(): RoutingStatementModel {
+        return {
+            comments: [],
+            statementType: undefined,
+            statement: undefined,
+        };
+    }
+
+    emptySetStatementModel(): SetStatementModel {
+        return {};
+    }
+
     emptySourceFileModel(): SourceFileModel {
         return {
             comments: [],
@@ -297,11 +519,35 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
+    emptyTestModel(): TestModel {
+        return {
+            name: '',
+            comments: [],
+            statements: [],
+        };
+    }
+
+    emptyTestStatementModel(): TestStatementModel {
+        return {
+            comments: [],
+            statementType: undefined,
+            statement: undefined,
+        };
+    }
+
     emptyUsingModel(): UsingModel {
         return {
             namespace: '',
             comments: [],
         };
+    }
+
+    emptyVarStatementModel(): VarStatementModel {
+        return {};
+    }
+
+    emptyWhileStatementModel(): WhileStatementModel {
+        return {};
     }
 
     mergeIntoApplication(dest: ApplicationModel, src: ApplicationModel): void {

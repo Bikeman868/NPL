@@ -1,4 +1,4 @@
-import { IToken } from "npl-syntax";
+import { IToken } from 'npl-syntax';
 
 export type MessageFieldLifecycle = 'new' | 'current' | 'deprecated';
 
@@ -6,5 +6,5 @@ export type MessageFieldDefinitionModel = {
     identifier: string;
     comments: string[];
     type: IToken[];
-    lifecycle: MessageFieldLifecycle;
+    lifecycle?: MessageFieldLifecycle;
 };

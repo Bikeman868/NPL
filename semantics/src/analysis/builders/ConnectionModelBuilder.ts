@@ -101,7 +101,8 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
         if (
             !(
                 messageTypeToken.tokenType == 'QualifiedIdentifier' ||
-                (messageTypeToken.tokenType == 'Keyword' && (messageTypeToken.text == '*' || messageTypeToken.text == 'empty'))
+                (messageTypeToken.tokenType == 'Keyword' &&
+                    (messageTypeToken.text == '*' || messageTypeToken.text == 'empty'))
             )
         )
             throw new SemanticError('Expecting message type identifier, empty or *', tokens, messageTypeToken);

@@ -77,8 +77,7 @@ export class ModelPrinter {
         for (const token of expression) {
             if (token.tokenType in this.expressionTokenTypesToPrintText)
                 result += `${token.tokenType} (${token.text}) `;
-            else
-                result += `${token.tokenType} `;
+            else result += `${token.tokenType} `;
         }
         return result;
     }
@@ -169,7 +168,7 @@ export class ModelPrinter {
         this.printComments(model, indent, true);
         if (model.fields.length == 1 && model.fields[0].comments.length == 0) {
             const field = model.fields[0];
-            const fieldType = field.type.map(t => t.text).join('');
+            const fieldType = field.type.map((t) => t.text).join('');
             if (field.lifecycle == 'current')
                 this.printLine(`message ${model.identifier} ${fieldType} ${field.identifier}`, indent);
             else
@@ -180,7 +179,7 @@ export class ModelPrinter {
         } else {
             this.printLine(`message ${model.identifier} {`, indent);
             for (const field of model.fields) {
-                const fieldType = field.type.map(t => t.text).join('');
+                const fieldType = field.type.map((t) => t.text).join('');
                 this.printComments(field, indent + 1, false);
                 if (field.lifecycle == 'current') this.printLine(`${fieldType} ${field.identifier}`, indent + 1);
                 else this.printLine(`${field.lifecycle} ${fieldType} ${field.identifier}`, indent + 1);
@@ -256,7 +255,7 @@ export class ModelPrinter {
     printEnum(model: EnumModel, indent: number) {
         this.printComments(model, indent, true);
         if (model.values.length < 6 && model.values.reduce((sum, value) => sum + value.comments.length, 0) == 0) {
-            const values = model.values.reduce((text, value) => text + ' ' + value.identifier, '')
+            const values = model.values.reduce((text, value) => text + ' ' + value.identifier, '');
             this.printLine(`enum ${model.identifier}${values}`, indent);
         } else {
             this.printLine(`enum ${model.identifier} {`, indent);
@@ -264,33 +263,21 @@ export class ModelPrinter {
             for (const value of model.values) {
                 if (priorHasComments) this.printBlankLine();
                 priorHasComments = this.printComments(value, indent + 1, false);
-                this.printLine(`${value.identifier}`, indent + 1)
+                this.printLine(`${value.identifier}`, indent + 1);
             }
             this.printLine('}', indent);
         }
     }
 
-    printAccept(model: AcceptModel, indent: number) {
-        
-    }
+    printAccept(model: AcceptModel, indent: number) {}
 
-    printTest(model: TestModel, indent: number) {
-        
-    }
+    printTest(model: TestModel, indent: number) {}
 
-    printAcceptStatement(model: AcceptStatementModel, indent: number) {
+    printAcceptStatement(model: AcceptStatementModel, indent: number) {}
 
-    }
+    printPipeRoute(model: PipeRouteModel, indent: number) {}
 
-    printPipeRoute(model: PipeRouteModel, indent: number) {
-        
-    }
+    printRoutingStatement(model: RoutingStatementModel, indent: number) {}
 
-    printRoutingStatement(model: RoutingStatementModel, indent: number) {
-
-    }
-
-    printTestStatement(model: TestStatementModel, indent: number) {
-
-    }
+    printTestStatement(model: TestStatementModel, indent: number) {}
 }

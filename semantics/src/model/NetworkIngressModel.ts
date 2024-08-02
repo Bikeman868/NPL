@@ -1,4 +1,4 @@
-import { MessageDestinationModel } from "./MessageDestinationModel.js";
+import { MessageDestinationModel } from './MessageDestinationModel.js';
 
 export type NetworkIngressModel = {
     endpointName: string;

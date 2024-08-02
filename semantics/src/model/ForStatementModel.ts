@@ -1,3 +1,1 @@
-export type ForStatementModel = {
-    
-}
+export type ForStatementModel = {};

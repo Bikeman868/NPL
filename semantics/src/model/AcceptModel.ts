@@ -1,4 +1,4 @@
-import { AcceptStatementModel } from "./AcceptStatementModel.js";
+import { AcceptStatementModel } from './AcceptStatementModel.js';
 
 export type AcceptModel = {
     messageType: string;

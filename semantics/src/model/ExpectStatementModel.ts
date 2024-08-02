@@ -1,3 +1,1 @@
-export type ExpectStatementModel = {
-    
-}
+export type ExpectStatementModel = {};

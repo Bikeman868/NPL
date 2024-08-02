@@ -1,3 +1,1 @@
-export type SetStatementModel = {
-    
-}
+export type SetStatementModel = {};

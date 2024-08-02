@@ -24,7 +24,7 @@ export class EnumModelBuilder implements IModelBuilder<EnumModel> {
 
         let token = tokens.next();
         if (token.tokenType == 'LineBreak') {
-            tokens.attachCommentsTo(this.model)
+            tokens.attachCommentsTo(this.model);
         } else if (token.tokenType == 'StartScope') {
             extractLineBreak(tokens, 'enum {', this.model);
             token = tokens.next();
@@ -33,29 +33,28 @@ export class EnumModelBuilder implements IModelBuilder<EnumModel> {
                     const enumValue: EnumValueModel = {
                         identifier: token.text,
                         comments: [],
-                    }
+                    };
                     extractLineBreak(tokens, 'enum value', enumValue);
                     this.model.values.push(enumValue);
                 }
                 token = tokens.next();
             }
             extractLineBreak(tokens, 'enum }', this.model);
-        }
-        else if (token.tokenType == 'Identifier') {
+        } else if (token.tokenType == 'Identifier') {
             tokens.attachCommentsTo(this.model);
             while (token.tokenType != 'LineBreak') {
                 if (token.tokenType != 'Identifier')
-                    throw new SemanticError('Expecting an enum value identifier', tokens, token)
+                    throw new SemanticError('Expecting an enum value identifier', tokens, token);
                 const enumValue: EnumValueModel = {
                     identifier: token.text,
                     comments: [],
-                }
+                };
                 token = tokens.next();
                 tokens.attachCommentsTo(enumValue);
                 this.model.values.push(enumValue);
             }
         } else {
-            throw new SemanticError('Expecting a list of enum values', tokens, token)
+            throw new SemanticError('Expecting a list of enum values', tokens, token);
         }
     }
 }

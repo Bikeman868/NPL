@@ -57,7 +57,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         if (token.tokenType == 'StartScope') {
             extractLineBreak(tokens, 'network ingress {', model);
             token = tokens.next();
-            while (token.tokenType != "EndScope") {
+            while (token.tokenType != 'EndScope') {
                 model.destinations.push(this.buildDestination(tokens, token));
                 token = tokens.next();
             }
@@ -76,10 +76,8 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         if (token.tokenType != 'Keyword')
             throw new SemanticError('Expecting a destination type keyword', tokens, token);
 
-        if (token.text == 'network' || token.text == 'process' || token.text == 'pipe') 
-            destination.kind = token.text
-        else 
-            throw new SemanticError('Expecting process, pipe or network keyword', tokens, token);
+        if (token.text == 'network' || token.text == 'process' || token.text == 'pipe') destination.kind = token.text;
+        else throw new SemanticError('Expecting process, pipe or network keyword', tokens, token);
 
         destination.identifier = extractQualifiedIdentifier(tokens);
         extractLineBreak(tokens, 'message destination', destination);
@@ -96,7 +94,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         if (token.tokenType == 'StartScope') {
             extractLineBreak(tokens, 'network egress {', model);
             token = tokens.next();
-            while (token.tokenType != "EndScope") {
+            while (token.tokenType != 'EndScope') {
                 model.messageTypes.push(this.buildMessageType(tokens, token));
                 token = tokens.next();
                 while (token.tokenType == 'LineBreak') token = tokens.next();
@@ -104,7 +102,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         } else {
             model.messageTypes.push(this.buildMessageType(tokens, token));
         }
-        
+
         extractLineBreak(tokens, 'network egress', model);
         tokens.attachCommentsTo(this.model);
 
@@ -113,24 +111,20 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
 
     private buildMessageType(tokens: ITokenStream, token: IToken): string {
         if (token.tokenType == 'Keyword') {
-            if (token.text == "*" || token.text == 'empty')
-                return token.text;
+            if (token.text == '*' || token.text == 'empty') return token.text;
         }
 
-        if (token.tokenType == 'QualifiedIdentifier')
-            return token.text;
+        if (token.tokenType == 'QualifiedIdentifier') return token.text;
 
         throw new SemanticError('Expecting a message type identifier', tokens, token);
     }
 
     private buildNetworkEntryPointName(tokens: ITokenStream): string {
         const nameToken = tokens.next();
-        if (nameToken.tokenType == 'Identifier')
-            return nameToken.text;
-        
-        if (nameToken.tokenType == 'Keyword' && nameToken.text == 'default')
-            return 'default';
-        
+        if (nameToken.tokenType == 'Identifier') return nameToken.text;
+
+        if (nameToken.tokenType == 'Keyword' && nameToken.text == 'default') return 'default';
+
         throw new SemanticError('Expecting network entry point name or "default"', tokens, nameToken);
     }
 }

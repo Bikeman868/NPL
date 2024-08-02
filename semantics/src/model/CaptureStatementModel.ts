@@ -1,3 +1,1 @@
-export type CaptureStatementModel = {
-    
-}
+export type CaptureStatementModel = {};
