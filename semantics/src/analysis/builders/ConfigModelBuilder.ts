@@ -4,7 +4,6 @@ import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { ConfigModel } from '#model/declarative/ConfigModel.js';
 import { SemanticError } from '#errors/SemanticError.js';
 import { IToken } from 'npl-syntax';
-import { ConfigFieldModel } from '#model/declarative/ConfigFieldModel.js';
 import { buildExpression, buildScopedStatements } from './utils.js';
 
 export class ConfigModelBuilder implements IModelBuilder<ConfigModel> {

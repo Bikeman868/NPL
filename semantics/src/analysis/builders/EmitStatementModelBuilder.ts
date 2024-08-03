@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { EmitStatementModel } from '#model/EmitStatementModel.js';
+import { EmitStatementModel } from '#model/statement/EmitStatementModel.js';
 
 export class EmitStatementModelBuilder implements IModelBuilder<EmitStatementModel> {
     private factory: IModelFactory;

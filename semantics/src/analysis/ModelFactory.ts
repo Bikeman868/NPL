@@ -34,24 +34,17 @@ import { NetworkEgressModel } from '#model/declarative/NetworkEgressModel.js';
 import { MessageDestinationModel } from '#model/declarative/MessageDestinationModel.js';
 import { AcceptModel } from '#model/declarative/AcceptModel.js';
 import { AcceptModelBuilder } from './builders/AcceptModelBuilder.js';
-import { AcceptStatementModel } from '#model/AcceptStatementModel.js';
-import { AcceptStatementModelBuilder } from './builders/AcceptStatementModelBuilder.js';
 import { CaptureStatementModel } from '#model/statement/CaptureStatementModel.js';
 import { AppendStatementModel } from '#model/statement/AppendStatementModel.js';
 import { ClearStatementModel } from '#model/statement/ClearStatementModel.js';
 import { ElseifStatementModel } from '#model/statement/ElseifStatementModel.js';
-import { ElseStatementModel } from '#model/ElseStatementModel.js';
-import { EmitStatementModel } from '#model/EmitStatementModel.js';
 import { ExpectStatementModel } from '#model/statement/ExpectStatementModel.js';
 import { ForStatementModel } from '#model/statement/ForStatementModel.js';
 import { IfStatementModel } from '#model/statement/IfStatementModel.js';
 import { PrependStatementModel } from '#model/statement/PrependStatementModel.js';
 import { RemoveStatementModel } from '#model/statement/RemoveStatementModel.js';
 import { RouteStatementModel } from '#model/statement/RouteStatementModel.js';
-import { RoutingStatementModel } from '#model/RoutingStatementModel.js';
 import { SetStatementModel } from '#model/statement/SetStatementModel.js';
-import { TestModel } from '#model/declarative/TestModel.js';
-import { TestStatementModel } from '#model/TestStatementModel.js';
 import { VarStatementModel } from '#model/statement/VarStatementModel.js';
 import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
 import { AppendStatementModelBuilder } from './builders/AppendStatementModelBuilder.js';
@@ -65,14 +58,15 @@ import { ForStatementModelBuilder } from './builders/ForStatementModelBuilder.js
 import { IfStatementModelBuilder } from './builders/IfStatementModelBuilder.js';
 import { RemoveStatementModelBuilder } from './builders/RemoveStatementModelBuilder.js';
 import { RouteStatementModelBuilder } from './builders/RouteStatementModelBuilder.js';
-import { RoutingStatementModelBuilder } from './builders/RoutingStatementModelBuilder.js';
 import { TestModelBuilder } from './builders/TestModelBuilder.js';
-import { TestStatementModelBuilder } from './builders/TestStatementModelBuilder.js';
 import { SetStatementModelBuilder } from './builders/SetStatementModelBuilder.js';
 import { VarStatementModelBuilder } from './builders/VarStatementModelBuilder.js';
 import { WhileStatementModelBuilder } from './builders/WhileStatementModelBuilder.js';
 import { PipeRouteModel } from '#model/declarative/PipeRouteModel.js';
 import { PipeRouteModelBuilder } from './builders/PipeRouteModelBuilder.js';
+import { ElseStatementModel } from '#model/statement/ElseStatementModel.js';
+import { EmitStatementModel } from '#model/statement/EmitStatementModel.js';
+import { TestModel } from '#model/declarative/TestModel.js';
 
 export class ModelFactory implements IModelFactory {
     public config = {
@@ -84,12 +78,6 @@ export class ModelFactory implements IModelFactory {
 
     buildAcceptModel(tokens: ITokenStream): AcceptModel {
         const builder = new AcceptModelBuilder(this);
-        builder.addTokens(tokens);
-        return builder.build();
-    }
-
-    buildAcceptStatementModel(tokens: ITokenStream): AcceptStatementModel {
-        const builder = new AcceptStatementModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -226,12 +214,6 @@ export class ModelFactory implements IModelFactory {
         return builder.build();
     }
 
-    buildRoutingStatementModel(tokens: ITokenStream): RoutingStatementModel {
-        const builder = new RoutingStatementModelBuilder(this);
-        builder.addTokens(tokens);
-        return builder.build();
-    }
-
     buildSetStatementModel(tokens: ITokenStream): SetStatementModel {
         const builder = new SetStatementModelBuilder(this);
         builder.addTokens(tokens);
@@ -246,12 +228,6 @@ export class ModelFactory implements IModelFactory {
 
     buildTestModel(tokens: ITokenStream): TestModel {
         const builder = new TestModelBuilder(this);
-        builder.addTokens(tokens);
-        return builder.build();
-    }
-
-    buildTestStatementModel(tokens: ITokenStream): TestStatementModel {
-        const builder = new TestStatementModelBuilder(this);
         builder.addTokens(tokens);
         return builder.build();
     }
@@ -280,14 +256,6 @@ export class ModelFactory implements IModelFactory {
             comments: [],
             messageType: '',
             statements: [],
-        };
-    }
-
-    emptyAcceptStatementModel(): AcceptStatementModel {
-        return {
-            comments: [],
-            statementType: undefined,
-            statement: undefined,
         };
     }
 
@@ -385,10 +353,19 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyElseStatementModel(): ElseStatementModel {
-        return {};
+        return {
+            statementType: 'else',
+            comments: [],
+            statements: [],
+        };
     }
     emptyEmitStatementModel(): EmitStatementModel {
-        return {};
+        return {
+            statementType: 'emit',
+            comments: [],
+            expression: [],
+            await: undefined,
+        };
     }
 
     emptyEnumModel(): EnumModel {
@@ -560,14 +537,6 @@ export class ModelFactory implements IModelFactory {
         };
     }
 
-    emptyRoutingStatementModel(): RoutingStatementModel {
-        return {
-            comments: [],
-            statementType: undefined,
-            statement: undefined,
-        };
-    }
-
     emptySetStatementModel(): SetStatementModel {
         return {
             statementType: 'set',
@@ -590,14 +559,6 @@ export class ModelFactory implements IModelFactory {
             name: '',
             comments: [],
             statements: [],
-        };
-    }
-
-    emptyTestStatementModel(): TestStatementModel {
-        return {
-            comments: [],
-            statementType: undefined,
-            statement: undefined,
         };
     }
 

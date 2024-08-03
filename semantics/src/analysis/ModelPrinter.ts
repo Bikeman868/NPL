@@ -1,6 +1,5 @@
 import { IToken, TokenType } from 'npl-syntax';
 import { printAccept } from './printers/printAccept.js';
-import { printAcceptStatement } from './printers/printAcceptStatement.js';
 import { printAppendStatement } from './printers/printAppendStatement.js';
 import { printApplication } from './printers/printApplication.js';
 import { printCaptureStatement } from './printers/printCaptureStatement.js';
@@ -32,14 +31,13 @@ import { printPrependStatement } from './printers/printPrependStatement.js';
 import { printProcess } from './printers/printProcess.js';
 import { printRemoveStatement } from './printers/printRemoveStatement.js';
 import { printRouteStatement } from './printers/printRouteStatement.js';
-import { printRoutingStatement } from './printers/printRoutingStatement.js';
 import { printSetStatement } from './printers/printSetStatement.js';
 import { printSourceFile } from './printers/printSourceFile.js';
 import { printTest } from './printers/printTest.js';
-import { printTestStatement } from './printers/printTestStatement.js';
 import { printUsing } from './printers/printUsing.js';
 import { printVarStatement } from './printers/printVarStatement.js';
 import { printWhileStatement } from './printers/printWhileStatement.js';
+import { printStatement } from './printers/printStatement.js';
 
 // This class is internal to this package, because it is intended for testing an debugging
 // code within this package. There is an npl-formatter package that can output formatted
@@ -110,7 +108,6 @@ export class ModelPrinter {
 
     public printConstant = printConstant;
     public printAccept = printAccept;
-    public printAcceptStatement = printAcceptStatement;
     public printAppendStatement = printAppendStatement;
     public printApplication = printApplication;
     public printCaptureStatement = printCaptureStatement;
@@ -141,11 +138,10 @@ export class ModelPrinter {
     public printProcess = printProcess;
     public printRemoveStatement = printRemoveStatement;
     public printRouteStatement = printRouteStatement;
-    public printRoutingStatement = printRoutingStatement;
     public printSetStatement = printSetStatement;
     public printSourceFile = printSourceFile;
     public printTest = printTest;
-    public printTestStatement = printTestStatement;
+    public printStatement = printStatement;
     public printUsing = printUsing;
     public printVarStatement = printVarStatement;
     public printWhileStatement = printWhileStatement;

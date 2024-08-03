@@ -9,7 +9,6 @@ export type Statement = {
         | 'emit'
         | 'expect'
         | 'for'
-        | 'for'
         | 'if'
         | 'prepend'
         | 'remove'
