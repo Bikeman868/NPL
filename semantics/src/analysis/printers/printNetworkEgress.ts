@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
+import { NetworkEgressModel } from '#model/declarative/NetworkEgressModel.js';
 
 export function printNetworkEgress(this: ModelPrinter, model: NetworkEgressModel, indent: number) {
     this.printComments(model, indent, false);

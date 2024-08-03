@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { ProcessModel } from '#model/ProcessModel.js';
+import { ProcessModel } from '#model/declarative/ProcessModel.js';
 
 export function printProcess(this: ModelPrinter, model: ProcessModel, indent: number) {
     this.printComments(model, indent, true);

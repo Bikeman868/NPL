@@ -3,7 +3,7 @@ import { Context, nplLanguageSyntax, ParsableString, Parser } from 'npl-syntax';
 import { readFileSync } from 'node:fs';
 import { ArrayTokenStream } from '#analysis/token-streams/ArrayTokenStream.js';
 import { ITokenStream } from 'semantics.js';
-import { SourceFileModel } from '#model/SourceFileModel.js';
+import { SourceFileModel } from '#model/declarative/SourceFileModel.js';
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
 import { IModelFactory } from '#interfaces/IModelFactory.js';
 import { ModelFactory } from '#analysis/ModelFactory.js';

@@ -2,10 +2,10 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { SemanticError } from '#errors/SemanticError.js';
-import { ConnectionModel } from '#model/ConnectionModel.js';
+import { ConnectionModel } from '#model/declarative/ConnectionModel.js';
 import { IToken } from 'npl-syntax';
-import { ConnectionIngressModel } from '#model/ConnectionIngressModel.js';
-import { ConnectionEgressModel } from '#model/ConnectionEgressModel.js';
+import { ConnectionIngressModel } from '#model/declarative/ConnectionIngressModel.js';
+import { ConnectionEgressModel } from '#model/declarative/ConnectionEgressModel.js';
 import { extractIdentifier, extractQualifiedIdentifier } from './utils.js';
 
 export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {

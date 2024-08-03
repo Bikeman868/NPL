@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { PipeRouteModel } from '#model/PipeRouteModel.js';
+import { PipeRouteModel } from '#model/declarative/PipeRouteModel.js';
 
 export function printPipeRoute(this: ModelPrinter, model: PipeRouteModel, indent: number) {
     this.printComments(model, indent, true);

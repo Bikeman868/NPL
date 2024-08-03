@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { ProcessModel } from '#model/ProcessModel.js';
+import { ProcessModel } from '#model/declarative/ProcessModel.js';
 
 export class ProcessModelBuilder implements IModelBuilder<ProcessModel> {
     private factory: IModelFactory;

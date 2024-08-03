@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { MessageTypeModel } from '#model/MessageTypeModel.js';
+import { MessageTypeModel } from '#model/declarative/MessageTypeModel.js';
 
 export function printMessageType(this: ModelPrinter, model: MessageTypeModel, indent: number) {
     this.printComments(model, indent, true);

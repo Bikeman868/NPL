@@ -1,15 +1,15 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { AppendStatementModel } from '#model/AppendStatementModel.js';
-import { CaptureStatementModel } from '#model/CaptureStatementModel.js';
-import { ClearStatementModel } from '#model/ClearStatementModel.js';
-import { ElseifStatementModel } from '#model/ElseifStatementModel.js';
+import { AppendStatementModel } from '#model/statement/AppendStatementModel.js';
+import { CaptureStatementModel } from '#model/statement/CaptureStatementModel.js';
+import { ClearStatementModel } from '#model/statement/ClearStatementModel.js';
+import { ElseifStatementModel } from '#model/statement/ElseifStatementModel.js';
 import { ElseStatementModel } from '#model/ElseStatementModel.js';
-import { ForStatementModel } from '#model/ForStatementModel.js';
-import { IfStatementModel } from '#model/IfStatementModel.js';
-import { PrependStatementModel } from '#model/PrependStatementModel.js';
-import { RemoveStatementModel } from '#model/RemoveStatementModel.js';
+import { ForStatementModel } from '#model/statement/ForStatementModel.js';
+import { IfStatementModel } from '#model/statement/IfStatementModel.js';
+import { PrependStatementModel } from '#model/statement/PrependStatementModel.js';
+import { RemoveStatementModel } from '#model/statement/RemoveStatementModel.js';
 import { RoutingStatementModel } from '#model/RoutingStatementModel.js';
-import { WhileStatementModel } from '#model/WhileStatementModel.js';
+import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
 
 export function printRoutingStatement(this: ModelPrinter, model: RoutingStatementModel, indent: number) {
     this.printComments(model, indent, true);

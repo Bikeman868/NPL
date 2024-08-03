@@ -1,10 +1,10 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { ConfigModel } from '#model/ConfigModel.js';
+import { ConfigModel } from '#model/declarative/ConfigModel.js';
 import { SemanticError } from '#errors/SemanticError.js';
 import { IToken } from 'npl-syntax';
-import { ConfigFieldModel } from '#model/ConfigFieldModel.js';
+import { ConfigFieldModel } from '#model/declarative/ConfigFieldModel.js';
 import { buildExpression, buildScopedStatements } from './utils.js';
 
 export class ConfigModelBuilder implements IModelBuilder<ConfigModel> {

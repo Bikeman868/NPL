@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { ConnectionIngressModel } from '#model/ConnectionIngressModel.js';
+import { ConnectionIngressModel } from '#model/declarative/ConnectionIngressModel.js';
 
 export function printConnectionIngress(this: ModelPrinter, model: ConnectionIngressModel, indent: number) {
     this.printComments(model, indent);

@@ -1,13 +1,13 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { NetworkModel } from '#model/NetworkModel.js';
+import { NetworkModel } from '#model/declarative/NetworkModel.js';
 import { buildScopedStatements, extractIdentifier, extractLineBreak, extractQualifiedIdentifier } from './utils.js';
 import { IToken } from 'npl-syntax';
 import { SemanticError } from '#errors/SemanticError.js';
-import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
-import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
-import { DestinationKind, MessageDestinationModel } from '#model/MessageDestinationModel.js';
+import { NetworkIngressModel } from '#model/declarative/NetworkIngressModel.js';
+import { NetworkEgressModel } from '#model/declarative/NetworkEgressModel.js';
+import { DestinationKind, MessageDestinationModel } from '#model/declarative/MessageDestinationModel.js';
 import { ModelFactory } from 'semantics.js';
 
 export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
@@ -79,7 +79,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         if (token.text == 'network' || token.text == 'process' || token.text == 'pipe') destination.kind = token.text;
         else throw new SemanticError('Expecting process, pipe or network keyword', tokens, token);
 
-        destination.identifier = extractQualifiedIdentifier(tokens);
+        destination.qualifiedIdentifier = extractQualifiedIdentifier(tokens);
         extractLineBreak(tokens, 'message destination', destination);
 
         return destination;

@@ -1,6 +1,6 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { NamespaceModel } from '#model/declarative/NamespaceModel.js';
 import { SemanticError } from '#errors/SemanticError.js';
 import { IToken } from 'npl-syntax';
 import { ITokenStream } from '#interfaces/ITokenStream.js';

@@ -34,22 +34,24 @@ To analyse an array of `tokens` parsed from a source file and build a model of t
 
 ```typescript
 import {
-    IModelBuilderContext,
+    IModelBuilderFactory,
     ITokenStream,
     SourceFileModel,
-    ModelBuilderContext,
+    ModelBuilderFactory,
     ArrayTokenStream,
 } from npl-semantics
 
-const builderContext: IModelBuilderContext = new ModelBuilderContext();
+const builderFactory: IModelBuilderFactory = new ModelBuilderFactory();
 const tokenStream: ITokenStream = new ArrayTokenStream(tokens, true);
-const sourceFile: SourceFileModel = builderContext.buildSourceFileModel(tokenStream);
+const sourceFile: SourceFileModel = builderFactory.buildSourceFileModel(tokenStream);
 ```
 
 You can customize this process in the following ways:
 
 -   The `ArrayTokenStream` constructor takes a boolean that indicates whether comments should be preserved or not. If you are writing a compiler or static analysis tool, you probably don't need the comments, but if you are writng a reformatting tool, you definitely do.
--   `IModelBuilderContext` defines a `config` property that controls merging. For example if the source code contains multiple definitions for the same network you can choose to combine all of the elements of the network into one big network model, or leave them separate, as they were in the source code.
+-   `IModelBuilderFactory` defines a `config` property that controls merging. For example if the source code contains multiple definitions for the same network you can choose to combine all of the elements of the network into one big network model, or leave them separate, as they were in the source code. Applications that reformat the code likely
+    do not want to merge models, whereas applications that perform static analysis will probably find it convenient to
+    merge partial model definitions together.
 
 ## Local Development
 

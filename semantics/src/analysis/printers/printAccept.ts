@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { AcceptModel } from '#model/AcceptModel.js';
+import { AcceptModel } from '#model/declarative/AcceptModel.js';
 
 export function printAccept(this: ModelPrinter, model: AcceptModel, indent: number) {
     this.printComments(model, indent, true);

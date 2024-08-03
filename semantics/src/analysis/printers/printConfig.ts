@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { ConfigModel } from '#model/ConfigModel.js';
+import { ConfigModel } from '#model/declarative/ConfigModel.js';
 
 export function printConfig(this: ModelPrinter, model: ConfigModel, indent: number) {
     this.printComments(model, indent);

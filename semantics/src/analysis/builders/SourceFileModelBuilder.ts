@@ -1,5 +1,5 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
-import { SourceFileModel } from '#model/SourceFileModel.js';
+import { SourceFileModel } from '#model/declarative/SourceFileModel.js';
 import { ITokenStream } from 'semantics.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { SemanticError } from '#errors/SemanticError.js';

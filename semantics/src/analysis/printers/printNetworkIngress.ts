@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
+import { NetworkIngressModel } from '#model/declarative/NetworkIngressModel.js';
 
 export function printNetworkIngress(this: ModelPrinter, model: NetworkIngressModel, indent: number) {
     this.printComments(model, indent, false);

@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { EnumModel } from '#model/EnumModel.js';
+import { EnumModel } from '#model/declarative/EnumModel.js';
 
 export function printEnum(this: ModelPrinter, model: EnumModel, indent: number) {
     this.printComments(model, indent, true);

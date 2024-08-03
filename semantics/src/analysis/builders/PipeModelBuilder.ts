@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { PipeModel } from '#model/PipeModel.js';
+import { PipeModel } from '#model/declarative/PipeModel.js';
 
 export class PipeModelBuilder implements IModelBuilder<PipeModel> {
     private factory: IModelFactory;

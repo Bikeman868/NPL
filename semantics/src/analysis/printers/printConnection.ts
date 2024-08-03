@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { ConnectionModel } from '#model/ConnectionModel.js';
+import { ConnectionModel } from '#model/declarative/ConnectionModel.js';
 
 export function printConnection(this: ModelPrinter, model: ConnectionModel, indent: number) {
     this.printComments(model, indent);

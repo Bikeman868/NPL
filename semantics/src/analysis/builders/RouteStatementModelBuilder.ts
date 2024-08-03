@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { RouteStatementModel } from '#model/RouteStatementModel.js';
+import { RouteStatementModel } from '#model/statement/RouteStatementModel.js';
 
 export class RouteStatementModelBuilder implements IModelBuilder<RouteStatementModel> {
     private factory: IModelFactory;

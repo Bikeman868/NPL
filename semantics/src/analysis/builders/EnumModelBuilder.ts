@@ -1,9 +1,9 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { EnumModel } from '#model/EnumModel.js';
+import { EnumModel } from '#model/declarative/EnumModel.js';
 import { extractIdentifier, extractLineBreak, skipScopeBlock } from './utils.js';
-import { EnumValueModel } from '#model/EnumValueModel.js';
+import { EnumValueModel } from '#model/declarative/EnumValueModel.js';
 import { SemanticError } from '#errors/SemanticError.js';
 
 export class EnumModelBuilder implements IModelBuilder<EnumModel> {

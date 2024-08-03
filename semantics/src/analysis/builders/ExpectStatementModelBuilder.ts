@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { ExpectStatementModel } from '#model/ExpectStatementModel.js';
+import { ExpectStatementModel } from '#model/statement/ExpectStatementModel.js';
 
 export class ExpectStatementModelBuilder implements IModelBuilder<ExpectStatementModel> {
     private factory: IModelFactory;

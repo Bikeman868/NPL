@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { ClearStatementModel } from '#model/ClearStatementModel.js';
+import { ClearStatementModel } from '#model/statement/ClearStatementModel.js';
 
 export class ClearStatementModelBuilder implements IModelBuilder<ClearStatementModel> {
     private factory: IModelFactory;

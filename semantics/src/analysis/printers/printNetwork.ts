@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NetworkModel } from '#model/NetworkModel.js';
+import { NetworkModel } from '#model/declarative/NetworkModel.js';
 
 export function printNetwork(this: ModelPrinter, model: NetworkModel, indent: number) {
     this.printComments(model, indent, true);

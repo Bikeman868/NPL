@@ -1,6 +1,6 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
 import { EmitStatementModel } from '#model/EmitStatementModel.js';
-import { ExpectStatementModel } from '#model/ExpectStatementModel.js';
+import { ExpectStatementModel } from '#model/statement/ExpectStatementModel.js';
 import { TestStatementModel } from '#model/TestStatementModel.js';
 
 export function printTestStatement(this: ModelPrinter, model: TestStatementModel, indent: number) {

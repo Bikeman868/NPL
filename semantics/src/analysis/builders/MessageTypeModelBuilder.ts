@@ -1,7 +1,7 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { MessageTypeModel } from '#model/MessageTypeModel.js';
+import { MessageTypeModel } from '#model/declarative/MessageTypeModel.js';
 import { buildScopedStatements, extractIdentifier } from './utils.js';
 import { SemanticError } from '#errors/SemanticError.js';
 import { IToken } from 'npl-syntax';

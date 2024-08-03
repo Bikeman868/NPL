@@ -1,7 +1,7 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { ITokenStream } from 'semantics.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
-import { UsingModel } from '#model/UsingModel.js';
+import { UsingModel } from '#model/declarative/UsingModel.js';
 import { extractLineBreak, extractQualifiedIdentifier } from './utils.js';
 
 export class UsingModelBuilder implements IModelBuilder<UsingModel> {

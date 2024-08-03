@@ -1,5 +1,5 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
-import { NamespaceModel } from '#model/NamespaceModel.js';
+import { NamespaceModel } from '#model/declarative/NamespaceModel.js';
 
 export function printNamespace(this: ModelPrinter, model: NamespaceModel, indent: number) {
     this.printComments(model, indent, true);

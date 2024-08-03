@@ -1,59 +1,59 @@
-import { NamespaceModel } from '#model/NamespaceModel.js';
-import { SourceFileModel as SourceFileModel } from '#model/SourceFileModel.js';
-import { UsingModel } from '#model/UsingModel.js';
+import { NamespaceModel } from '#model/declarative/NamespaceModel.js';
+import { SourceFileModel as SourceFileModel } from '#model/declarative/SourceFileModel.js';
+import { UsingModel } from '#model/declarative/UsingModel.js';
 import { IModelFactory } from '../interfaces/IModelFactory.js';
 import { SourceFileModelBuilder } from './builders/SourceFileModelBuilder.js';
 import { NamespaceModelBuilder } from './builders/NamespaceModelBuilder.js';
 import { UsingModelBuilder } from './builders/UsingModelBuilder.js';
-import { NetworkModel } from '#model/NetworkModel.js';
+import { NetworkModel } from '#model/declarative/NetworkModel.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { ApplicationModel } from '#model/ApplicationModel.js';
-import { ConfigModel } from '#model/ConfigModel.js';
-import { ConstModel } from '#model/ConstModel.js';
-import { EnumModel } from '#model/EnumModel.js';
-import { MessageTypeModel } from '#model/MessageTypeModel.js';
+import { ApplicationModel } from '#model/declarative/ApplicationModel.js';
+import { ConfigModel } from '#model/declarative/ConfigModel.js';
+import { ConstModel } from '#model/declarative/ConstModel.js';
+import { EnumModel } from '#model/declarative/EnumModel.js';
+import { MessageTypeModel } from '#model/declarative/MessageTypeModel.js';
 import { ApplicationModelBuilder } from './builders/ApplicationModelBuilder.js';
 import { ConfigModelBuilder } from './builders/ConfigModelBuilder.js';
 import { ConstModelBuilder } from './builders/ConstModelBuilder.js';
 import { EnumModelBuilder } from './builders/EnumModelBuilder.js';
 import { MessageTypeModelBuilder } from './builders/MessageTypeModelBuilder.js';
-import { ConnectionModel } from '#model/ConnectionModel.js';
+import { ConnectionModel } from '#model/declarative/ConnectionModel.js';
 import { ConnectionModelBuilder } from './builders/ConnectionModelBuilder.js';
-import { ConnectionIngressModel } from '#model/ConnectionIngressModel.js';
-import { ConnectionEgressModel } from '#model/ConnectionEgressModel.js';
-import { EnumValueModel } from '#model/EnumValueModel.js';
-import { MessageFieldDefinitionModel } from '#model/MessageFieldDefinitionModel.js';
-import { ConfigFieldModel } from '#model/ConfigFieldModel.js';
+import { ConnectionIngressModel } from '#model/declarative/ConnectionIngressModel.js';
+import { ConnectionEgressModel } from '#model/declarative/ConnectionEgressModel.js';
+import { EnumValueModel } from '#model/declarative/EnumValueModel.js';
+import { MessageFieldDefinitionModel } from '#model/declarative/MessageFieldDefinitionModel.js';
+import { ConfigFieldModel } from '#model/declarative/ConfigFieldModel.js';
 import { NetworkModelBuilder } from './builders/NetworkModelBuilder.js';
 import { PipeModelBuilder } from './builders/PipeModelBuilder.js';
 import { ProcessModelBuilder } from './builders/ProcessModelBuilder.js';
-import { PipeModel } from '#model/PipeModel.js';
-import { ProcessModel } from '#model/ProcessModel.js';
-import { NetworkIngressModel } from '#model/NetworkIngressModel.js';
-import { NetworkEgressModel } from '#model/NetworkEgressModel.js';
-import { MessageDestinationModel } from '#model/MessageDestinationModel.js';
-import { AcceptModel } from '#model/AcceptModel.js';
+import { PipeModel } from '#model/declarative/PipeModel.js';
+import { ProcessModel } from '#model/declarative/ProcessModel.js';
+import { NetworkIngressModel } from '#model/declarative/NetworkIngressModel.js';
+import { NetworkEgressModel } from '#model/declarative/NetworkEgressModel.js';
+import { MessageDestinationModel } from '#model/declarative/MessageDestinationModel.js';
+import { AcceptModel } from '#model/declarative/AcceptModel.js';
 import { AcceptModelBuilder } from './builders/AcceptModelBuilder.js';
 import { AcceptStatementModel } from '#model/AcceptStatementModel.js';
 import { AcceptStatementModelBuilder } from './builders/AcceptStatementModelBuilder.js';
-import { CaptureStatementModel } from '#model/CaptureStatementModel.js';
-import { AppendStatementModel } from '#model/AppendStatementModel.js';
-import { ClearStatementModel } from '#model/ClearStatementModel.js';
-import { ElseifStatementModel } from '#model/ElseifStatementModel.js';
+import { CaptureStatementModel } from '#model/statement/CaptureStatementModel.js';
+import { AppendStatementModel } from '#model/statement/AppendStatementModel.js';
+import { ClearStatementModel } from '#model/statement/ClearStatementModel.js';
+import { ElseifStatementModel } from '#model/statement/ElseifStatementModel.js';
 import { ElseStatementModel } from '#model/ElseStatementModel.js';
 import { EmitStatementModel } from '#model/EmitStatementModel.js';
-import { ExpectStatementModel } from '#model/ExpectStatementModel.js';
-import { ForStatementModel } from '#model/ForStatementModel.js';
-import { IfStatementModel } from '#model/IfStatementModel.js';
-import { PrependStatementModel } from '#model/PrependStatementModel.js';
-import { RemoveStatementModel } from '#model/RemoveStatementModel.js';
-import { RouteStatementModel } from '#model/RouteStatementModel.js';
+import { ExpectStatementModel } from '#model/statement/ExpectStatementModel.js';
+import { ForStatementModel } from '#model/statement/ForStatementModel.js';
+import { IfStatementModel } from '#model/statement/IfStatementModel.js';
+import { PrependStatementModel } from '#model/statement/PrependStatementModel.js';
+import { RemoveStatementModel } from '#model/statement/RemoveStatementModel.js';
+import { RouteStatementModel } from '#model/statement/RouteStatementModel.js';
 import { RoutingStatementModel } from '#model/RoutingStatementModel.js';
-import { SetStatementModel } from '#model/SetStatementModel.js';
-import { TestModel } from '#model/TestModel.js';
+import { SetStatementModel } from '#model/statement/SetStatementModel.js';
+import { TestModel } from '#model/declarative/TestModel.js';
 import { TestStatementModel } from '#model/TestStatementModel.js';
-import { VarStatementModel } from '#model/VarStatementModel.js';
-import { WhileStatementModel } from '#model/WhileStatementModel.js';
+import { VarStatementModel } from '#model/statement/VarStatementModel.js';
+import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
 import { AppendStatementModelBuilder } from './builders/AppendStatementModelBuilder.js';
 import { CaptureStatementModelBuilder } from './builders/CaptureStatementModelBuilder.js';
 import { ClearStatementModelBuilder } from './builders/ClearStatementModelBuilder.js';
@@ -71,7 +71,7 @@ import { TestStatementModelBuilder } from './builders/TestStatementModelBuilder.
 import { SetStatementModelBuilder } from './builders/SetStatementModelBuilder.js';
 import { VarStatementModelBuilder } from './builders/VarStatementModelBuilder.js';
 import { WhileStatementModelBuilder } from './builders/WhileStatementModelBuilder.js';
-import { PipeRouteModel } from '#model/PipeRouteModel.js';
+import { PipeRouteModel } from '#model/declarative/PipeRouteModel.js';
 import { PipeRouteModelBuilder } from './builders/PipeRouteModelBuilder.js';
 
 export class ModelFactory implements IModelFactory {
@@ -292,7 +292,11 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyAppendStatementModel(): AppendStatementModel {
-        return {};
+        return {
+            statementType: 'append',
+            comments: [],
+            destinations: [],
+        };
     }
 
     emptyApplicationModel(): ApplicationModel {
@@ -305,11 +309,19 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyCaptureStatementModel(): CaptureStatementModel {
-        return {};
+        return {
+            statementType: 'capture',
+            comments: [],
+            messageType: '',
+            statements: [],
+        };
     }
 
     emptyClearStatementModel(): ClearStatementModel {
-        return {};
+        return {
+            statementType: 'clear',
+            comments: [],
+        };
     }
 
     emptyConfigModel(): ConfigModel {
@@ -364,7 +376,12 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyElseifStatementModel(): ElseifStatementModel {
-        return {};
+        return {
+            statementType: 'elseif',
+            comments: [],
+            expression: [],
+            statements: [],
+        };
     }
 
     emptyElseStatementModel(): ElseStatementModel {
@@ -390,21 +407,37 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyExpectStatementModel(): ExpectStatementModel {
-        return {};
+        return {
+            statementType: 'expect',
+            comments: [],
+            expression: [],
+        };
     }
 
     emptyForStatementModel(): ForStatementModel {
-        return {};
+        return {
+            statementType: 'for',
+            comments: [],
+            identifier: '',
+            iterationType: 'values',
+            expression: [],
+            statements: [],
+        };
     }
 
     emptyIfStatementModel(): IfStatementModel {
-        return {};
+        return {
+            statementType: 'if',
+            comments: [],
+            expression: [],
+            statements: [],
+        };
     }
 
     emptyMessageDestinationModel(): MessageDestinationModel {
         return {
             kind: undefined,
-            identifier: '',
+            qualifiedIdentifier: '',
             comments: [],
         };
     }
@@ -491,7 +524,11 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyPrependStatementModel(): PrependStatementModel {
-        return {};
+        return {
+            statementType: 'prepend',
+            comments: [],
+            destinations: [],
+        };
     }
 
     emptyProcessModel(): ProcessModel {
@@ -508,11 +545,19 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyRemoveStatementModel(): RemoveStatementModel {
-        return {};
+        return {
+            statementType: 'remove',
+            comments: [],
+            destinations: [],
+        };
     }
 
     emptyRouteStatementModel(): RouteStatementModel {
-        return {};
+        return {
+            statementType: 'route',
+            comments: [],
+            statements: [],
+        };
     }
 
     emptyRoutingStatementModel(): RoutingStatementModel {
@@ -524,7 +569,12 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptySetStatementModel(): SetStatementModel {
-        return {};
+        return {
+            statementType: 'set',
+            comments: [],
+            identifier: '',
+            expression: [],
+        };
     }
 
     emptySourceFileModel(): SourceFileModel {
@@ -559,11 +609,21 @@ export class ModelFactory implements IModelFactory {
     }
 
     emptyVarStatementModel(): VarStatementModel {
-        return {};
+        return {
+            statementType: 'var',
+            comments: [],
+            identifier: '',
+            expression: [],
+        };
     }
 
     emptyWhileStatementModel(): WhileStatementModel {
-        return {};
+        return {
+            statementType: 'while',
+            comments: [],
+            expression: [],
+            statements: [],
+        };
     }
 
     mergeIntoApplication(dest: ApplicationModel, src: ApplicationModel): void {

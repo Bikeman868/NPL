@@ -2,7 +2,7 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { extractIdentifier, skipScopeBlock } from './utils.js';
-import { AcceptModel } from '#model/AcceptModel.js';
+import { AcceptModel } from '#model/declarative/AcceptModel.js';
 
 export class AcceptModelBuilder implements IModelBuilder<AcceptModel> {
     private factory: IModelFactory;

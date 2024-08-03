@@ -1,14 +1,14 @@
 import { ModelPrinter } from '#analysis/ModelPrinter.js';
 import { AcceptStatementModel } from '#model/AcceptStatementModel.js';
-import { ElseifStatementModel } from '#model/ElseifStatementModel.js';
+import { ElseifStatementModel } from '#model/statement/ElseifStatementModel.js';
 import { ElseStatementModel } from '#model/ElseStatementModel.js';
 import { EmitStatementModel } from '#model/EmitStatementModel.js';
-import { ForStatementModel } from '#model/ForStatementModel.js';
-import { IfStatementModel } from '#model/IfStatementModel.js';
-import { RouteStatementModel } from '#model/RouteStatementModel.js';
-import { SetStatementModel } from '#model/SetStatementModel.js';
-import { VarStatementModel } from '#model/VarStatementModel.js';
-import { WhileStatementModel } from '#model/WhileStatementModel.js';
+import { ForStatementModel } from '#model/statement/ForStatementModel.js';
+import { IfStatementModel } from '#model/statement/IfStatementModel.js';
+import { RouteStatementModel } from '#model/statement/RouteStatementModel.js';
+import { SetStatementModel } from '#model/statement/SetStatementModel.js';
+import { VarStatementModel } from '#model/statement/VarStatementModel.js';
+import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
 
 export function printAcceptStatement(this: ModelPrinter, model: AcceptStatementModel, indent: number) {
     this.printComments(model, indent, true);
