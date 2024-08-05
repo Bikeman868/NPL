@@ -56,12 +56,17 @@ export function buildScopedStatements(
     extractLineBreak(tokens, '}', model);
 }
 
-// Expects the next token to be a link break that ends the definition
+// Expects the next token to be one or more line breaks
 export function extractLineBreak(tokens: ITokenStream, where: string, model?: { comments: string[] }): void {
     const token = tokens.next();
     if (token.tokenType != 'LineBreak') throw new SemanticError('line break after ' + where, tokens, token);
+    tokens.attachCommentsTo(model);
 
-    if (model) tokens.attachCommentsTo(model);
+    var nextToken = tokens.peek();
+    while(nextToken && nextToken.tokenType == 'LineBreak') {
+        tokens.next();
+        nextToken = tokens.peek();
+    }
 }
 
 // During debug session it can be helpful to substitute
@@ -104,7 +109,7 @@ function extractMathExpression(tokens: ITokenStream, token: IToken): MathExpress
     }
 }
 
-function extractMapLiteralExpression(tokens: ITokenStream, token: IToken): MapLiteralExpression {
+function extractMapLiteral(tokens: ITokenStream, token: IToken): MapLiteralExpression {
     const fields: LiteralField[] = [];
 
     var token = tokens.next();
@@ -136,7 +141,7 @@ function extractMapLiteralExpression(tokens: ITokenStream, token: IToken): MapLi
     return { fields };
 }
 
- function extractListLiteralExpression(tokens: ITokenStream, token: IToken): ListLiteralExpression {
+ function extractListLiteral(tokens: ITokenStream, token: IToken): ListLiteralExpression {
     const values: ExpressionModel[] = [];
 
     while(token.tokenType != 'EndListLiteral') {
@@ -144,11 +149,23 @@ function extractMapLiteralExpression(tokens: ITokenStream, token: IToken): MapLi
         if (token.tokenType != 'LineBreak')
             values.push(extractExpression(tokens, token));
     }
-    
+
     return { values };
 }
 
-function extractMessageExpression(tokens: ITokenStream, token: IToken): MessageLiteralExpression {
+function extractLiteralField(tokens: ITokenStream, token: IToken): LiteralField {
+    if (token.tokenType != 'Identifier')
+        throw new SemanticError('field name', tokens, token)
+    const field: LiteralField = {
+        comments: [],
+        fieldName: token.text,
+        fieldValue: extractExpression(tokens, tokens.next()),
+    }
+    tokens.attachCommentsTo(field);
+    return field;
+}
+
+function extractMessageLiteral(tokens: ITokenStream, token: IToken): MessageLiteralExpression {
     const fields: LiteralField[] = [];
     const originContext: LiteralField[] = [];
     const networkContext: LiteralField[] = [];
@@ -163,28 +180,34 @@ function extractMessageExpression(tokens: ITokenStream, token: IToken): MessageL
             token = tokens.next();
             continue;
         }
-        if (token.tokenType != 'Identifier')
-            throw new SemanticError('message field name', tokens, token)
-        const field: LiteralField = {
-            comments: [],
-            fieldName: token.text,
-            fieldValue: {
-                expressionType: 'math',
-                expression: {
-                    tokens: []
+
+        if (token.tokenType != 'Keyword')
+            throw new SemanticError('message, context or route', tokens, token)
+        
+        if (token.text == 'message') {
+            token = tokens.next();
+            if (token.tokenType == 'StartScope') {
+                extractLineBreak(tokens, 'message {');
+                token = tokens.next()
+                while (token.tokenType != 'EndScope') {
+                    const field = extractLiteralField(tokens, token);
+                    fields.push(field);
+                    token = tokens.next()
                 }
+                token = tokens.next()
+            } else {
+                const field = extractLiteralField(tokens, token);
+                fields.push(field);
             }
+        } else if (token.text == 'context') {
+            // TODO: Context
+        } else if (token.text == 'route') {
+            // TODO: Route
+        } else {
+            throw new SemanticError('message, context or route', tokens, token)
         }
-        token = tokens.next()
-        tokens.attachCommentsTo(field);
-        field.fieldValue = extractExpression(tokens, token);
-        fields.push(field);
-
-        token = tokens.next()
     }
-
-    // TODO: Context
-    // TODO: Route
+    extractLineBreak(tokens, 'message literal');
 
     return { 
         messageType, 
@@ -201,17 +224,17 @@ export function extractExpression(tokens: ITokenStream, token: IToken): Expressi
     if (token.tokenType == 'StartMessageLiteral') {
         return {
             expressionType: 'message',
-            expression: extractMessageExpression(tokens, token)
+            expression: extractMessageLiteral(tokens, token)
         }
     } else if (token.tokenType == 'StartMapLiteral') {
         return {
             expressionType: 'map',
-            expression: extractMapLiteralExpression(tokens, token)
+            expression: extractMapLiteral(tokens, token)
         }
     } else if (token.tokenType == 'StartListLiteral') {
         return {
             expressionType: 'list',
-            expression: extractListLiteralExpression(tokens, token)
+            expression: extractListLiteral(tokens, token)
         }
     } else {
         return {
