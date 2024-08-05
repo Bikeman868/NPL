@@ -6,7 +6,7 @@ export function printMessageType(this: ModelPrinter, model: MessageTypeModel, in
     if (model.fields.length == 1 && model.fields[0].comments.length == 0) {
         const field = model.fields[0];
         const fieldType = field.type.map((t) => t.text).join('');
-        if (field.lifecycle == 'current')
+        if (!field.lifecycle || field.lifecycle == 'current')
             this.printLine(`message ${model.identifier} ${fieldType} ${field.identifier}`, indent);
         else this.printLine(`message ${model.identifier} ${field.lifecycle} ${fieldType} ${field.identifier}`, indent);
     } else {
@@ -14,7 +14,8 @@ export function printMessageType(this: ModelPrinter, model: MessageTypeModel, in
         for (const field of model.fields) {
             const fieldType = field.type.map((t) => t.text).join('');
             this.printComments(field, indent + 1, false);
-            if (field.lifecycle == 'current') this.printLine(`${fieldType} ${field.identifier}`, indent + 1);
+            if (!field.lifecycle || field.lifecycle == 'current')
+                this.printLine(`${fieldType} ${field.identifier}`, indent + 1);
             else this.printLine(`${field.lifecycle} ${fieldType} ${field.identifier}`, indent + 1);
         }
         this.printLine('}', indent);

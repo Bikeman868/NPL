@@ -32,7 +32,7 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
 
         while (token.tokenType != 'EndScope') {
             if (token.tokenType != 'LineBreak') {
-                if (token.tokenType != 'Keyword') throw new SemanticError('Expecting } for connection', tokens, token);
+                if (token.tokenType != 'Keyword') throw new SemanticError('} for connection', tokens, token);
                 this.buildStatement(tokens, token);
             }
             token = tokens.next();
@@ -40,7 +40,7 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
 
         const lineBreakToken = tokens.next();
         if (lineBreakToken.tokenType != 'LineBreak')
-            throw new SemanticError('Expecting line break after connection definition', tokens, token);
+            throw new SemanticError('line break after connection definition', tokens, token);
     }
 
     private hasScopeBlock(tokens: ITokenStream): boolean {
@@ -53,13 +53,13 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
         while (token.tokenType == 'Keyword') {
             if (token.text == 'ingress') this.model.ingresses.push(this.buildIngressModel(tokens));
             else if (token.text == 'egress') this.model.egresses.push(this.buildEgressModel(tokens));
-            else throw new SemanticError('Expecting ingress or egress', tokens, token);
+            else throw new SemanticError('ingress or egress', tokens, token);
             token = tokens.next();
         }
         tokens.attachCommentsTo(this.model);
 
         if (token.tokenType != 'LineBreak')
-            throw new SemanticError('Expecting line break after connection definition', tokens, token);
+            throw new SemanticError('line break after connection definition', tokens, token);
 
         return false;
     }
@@ -71,17 +71,17 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
             const lineBreakToken = tokens.next();
             tokens.attachCommentsTo(ingress);
             if (lineBreakToken.tokenType != 'LineBreak')
-                throw new SemanticError('Expecting line break after ingress definition', tokens, lineBreakToken);
+                throw new SemanticError('line break after ingress definition', tokens, lineBreakToken);
         } else if (token.text == 'egress') {
             const egress = this.buildEgressModel(tokens);
             this.model.egresses.push(egress);
             const lineBreakToken = tokens.next();
             tokens.attachCommentsTo(egress);
             if (lineBreakToken.tokenType != 'LineBreak')
-                throw new SemanticError('Expecting line break after egress definition', tokens, lineBreakToken);
+                throw new SemanticError('line break after egress definition', tokens, lineBreakToken);
         } else if (token.text == 'config') {
             this.model.configs.push(this.factory.buildConfigModel(tokens));
-        } else throw new SemanticError('Expecting connection or config', tokens, token);
+        } else throw new SemanticError('connection or config', tokens, token);
     }
 
     private buildIngressModel(tokens: ITokenStream): ConnectionIngressModel {
@@ -105,20 +105,20 @@ export class ConnectionModelBuilder implements IModelBuilder<ConnectionModel> {
                     (messageTypeToken.text == '*' || messageTypeToken.text == 'empty'))
             )
         )
-            throw new SemanticError('Expecting message type identifier, empty or *', tokens, messageTypeToken);
+            throw new SemanticError('message type identifier, empty or *', tokens, messageTypeToken);
         model.messageType = messageTypeToken.text;
 
         let endpointToken = tokens.next();
         if (endpointToken.tokenType == 'StartScope') {
             while (endpointToken.tokenType != 'EndScope') {
                 if (endpointToken.tokenType != 'QualifiedIdentifier')
-                    throw new SemanticError('Expecting network endpoint identifier', tokens, endpointToken);
+                    throw new SemanticError('network endpoint identifier', tokens, endpointToken);
                 model.networkEndpoints.push(endpointToken.text);
                 endpointToken = tokens.next();
             }
         } else {
             if (endpointToken.tokenType != 'QualifiedIdentifier')
-                throw new SemanticError('Expecting network endpoint identifier', tokens, endpointToken);
+                throw new SemanticError('network endpoint identifier', tokens, endpointToken);
             model.networkEndpoints.push(endpointToken.text);
         }
     }

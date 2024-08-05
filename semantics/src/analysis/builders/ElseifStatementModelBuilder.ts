@@ -1,7 +1,7 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { extractIdentifier, skipScopeBlock } from './utils.js';
+import { extractExpression, skipScopeBlock } from './utils.js';
 import { ElseifStatementModel } from '#model/statement/ElseifStatementModel.js';
 
 export class ElseifStatementModelBuilder implements IModelBuilder<ElseifStatementModel> {
@@ -18,6 +18,9 @@ export class ElseifStatementModelBuilder implements IModelBuilder<ElseifStatemen
     }
 
     addTokens(tokens: ITokenStream): void {
+        const token = tokens.next();
+        tokens.attachCommentsTo(this.model);
+        this.model.expression = extractExpression(tokens, token);
         skipScopeBlock(tokens);
     }
 }

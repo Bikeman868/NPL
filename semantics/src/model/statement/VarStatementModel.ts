@@ -1,10 +1,10 @@
 import { Model } from '#model/Model.js';
 import { Named } from '#model/Named.js';
 import { Statement } from '#model/Statement.js';
-import { IToken } from 'npl-syntax';
+import { ExpressionModel } from './ExpressionModel.js';
 
 export type VarStatementModel = {
-    expression: IToken[];
+    expression: ExpressionModel;
 } & Model &
     Named &
     Statement;

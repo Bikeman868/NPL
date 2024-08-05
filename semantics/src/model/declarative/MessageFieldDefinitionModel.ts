@@ -1,6 +1,7 @@
-import { IToken } from 'npl-syntax';
 import { Model } from '../Model.js';
 import { Named } from '#model/Named.js';
+import { ExpressionModel } from '#model/statement/ExpressionModel.js';
+import { IToken } from 'npl-syntax';
 
 export type MessageFieldLifecycle = 'new' | 'current' | 'deprecated';
 

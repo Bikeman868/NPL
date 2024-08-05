@@ -1,5 +1,7 @@
 import { SemanticError } from '#errors/SemanticError.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
+import { ExpressionModel, ListLiteralExpression, LiteralField, MapLiteralExpression, MathExpression, MessageLiteralExpression } from '#model/statement/ExpressionModel.js';
+import { RouteStatementModel } from '#model/statement/RouteStatementModel.js';
 import { IToken, TokenType } from 'npl-syntax';
 
 // For situations where multiple statements are permitted within {} scope
@@ -57,7 +59,7 @@ export function buildScopedStatements(
 // Expects the next token to be a link break that ends the definition
 export function extractLineBreak(tokens: ITokenStream, where: string, model?: { comments: string[] }): void {
     const token = tokens.next();
-    if (token.tokenType != 'LineBreak') throw new SemanticError('Expecting line break after ' + where, tokens, token);
+    if (token.tokenType != 'LineBreak') throw new SemanticError('line break after ' + where, tokens, token);
 
     if (model) tokens.attachCommentsTo(model);
 }
@@ -67,7 +69,7 @@ export function extractLineBreak(tokens: ITokenStream, where: string, model?: { 
 export function skipScopeBlock(tokens: ITokenStream) {
     let token = tokens.next();
     if (token.tokenType == 'LineBreak') return;
-    if (token.tokenType != 'StartScope') throw new SemanticError('Expecting {', tokens, token);
+    if (token.tokenType != 'StartScope') throw new SemanticError('{', tokens, token);
 
     let depth = 0;
     while (true) {
@@ -76,8 +78,7 @@ export function skipScopeBlock(tokens: ITokenStream) {
         else if (token.tokenType == 'EndScope') {
             if (depth == 0) {
                 token = tokens.next();
-                if (token.tokenType != 'LineBreak')
-                    throw new SemanticError('Expecting line break after }', tokens, token);
+                if (token.tokenType != 'LineBreak') throw new SemanticError('line break after }', tokens, token);
                 return;
             } else {
                 depth--;
@@ -86,48 +87,148 @@ export function skipScopeBlock(tokens: ITokenStream) {
     }
 }
 
-// Sets the comments and expression properties of a model by analysing the
-// token stream.
-export function buildExpression(
-    tokens: ITokenStream,
-    model: {
-        comments: string[];
-        expression: IToken[];
-    },
-): void {
+function extractMathExpression(tokens: ITokenStream, token: IToken): MathExpression {
+    const tokenList: IToken[] = [];
     let depth = 0;
     while (true) {
-        const token = tokens.next();
         if (token.tokenType == 'LineBreak') {
             if (depth == 0) {
-                tokens.attachCommentsTo(model);
-                return;
+                return { tokens: tokenList };
             }
-        } else if (
-            token.tokenType == 'StartScope' ||
-            token.tokenType == 'StartMessageLiteral' ||
-            token.tokenType == 'StartMapLiteral'
-        )
+        } else if (token.tokenType == 'StartCallParams')
             depth++;
-        else if (
-            token.tokenType == 'EndScope' ||
-            token.tokenType == 'EndMessageLiteral' ||
-            token.tokenType == 'EndMapLiteral'
-        )
+        else if (token.tokenType == 'EndCallParams')
             depth--;
-        model.expression.push(token);
+        tokenList.push(token);
+        token = tokens.next();
+    }
+}
+
+function extractMapLiteralExpression(tokens: ITokenStream, token: IToken): MapLiteralExpression {
+    const fields: LiteralField[] = [];
+
+    var token = tokens.next();
+    while(token.tokenType != 'EndMapLiteral') {
+        if (token.tokenType == 'LineBreak') {
+            token = tokens.next();
+            continue;
+        }
+        if (token.tokenType != 'Identifier')
+            throw new SemanticError('field name', tokens, token)
+        const field: LiteralField = {
+            comments: [],
+            fieldName: token.text,
+            fieldValue: {
+                expressionType: 'math',
+                expression: {
+                    tokens: []
+                }
+            }
+        }
+        token = tokens.next()
+        tokens.attachCommentsTo(field);
+        field.fieldValue = extractExpression(tokens, token);
+        fields.push(field);
+
+        token = tokens.next()
+    }
+
+    return { fields };
+}
+
+ function extractListLiteralExpression(tokens: ITokenStream, token: IToken): ListLiteralExpression {
+    const values: ExpressionModel[] = [];
+
+    while(token.tokenType != 'EndListLiteral') {
+        token = tokens.next();
+        if (token.tokenType != 'LineBreak')
+            values.push(extractExpression(tokens, token));
+    }
+    
+    return { values };
+}
+
+function extractMessageExpression(tokens: ITokenStream, token: IToken): MessageLiteralExpression {
+    const fields: LiteralField[] = [];
+    const originContext: LiteralField[] = [];
+    const networkContext: LiteralField[] = [];
+    const messageContext: LiteralField[] = [];
+    const route: RouteStatementModel[] = [];
+
+    const messageType = token.text;
+    var token = tokens.next();
+
+    while(token.tokenType != 'EndMessageLiteral') {
+        if (token.tokenType == 'LineBreak') {
+            token = tokens.next();
+            continue;
+        }
+        if (token.tokenType != 'Identifier')
+            throw new SemanticError('message field name', tokens, token)
+        const field: LiteralField = {
+            comments: [],
+            fieldName: token.text,
+            fieldValue: {
+                expressionType: 'math',
+                expression: {
+                    tokens: []
+                }
+            }
+        }
+        token = tokens.next()
+        tokens.attachCommentsTo(field);
+        field.fieldValue = extractExpression(tokens, token);
+        fields.push(field);
+
+        token = tokens.next()
+    }
+
+    // TODO: Context
+    // TODO: Route
+
+    return { 
+        messageType, 
+        fields,
+        originContext,
+        networkContext,
+        messageContext,
+        route
+    };
+}
+
+// Extracts an expression from the token stream.
+export function extractExpression(tokens: ITokenStream, token: IToken): ExpressionModel {
+    if (token.tokenType == 'StartMessageLiteral') {
+        return {
+            expressionType: 'message',
+            expression: extractMessageExpression(tokens, token)
+        }
+    } else if (token.tokenType == 'StartMapLiteral') {
+        return {
+            expressionType: 'map',
+            expression: extractMapLiteralExpression(tokens, token)
+        }
+    } else if (token.tokenType == 'StartListLiteral') {
+        return {
+            expressionType: 'list',
+            expression: extractListLiteralExpression(tokens, token)
+        }
+    } else {
+        return {
+            expressionType: 'math',
+            expression: extractMathExpression(tokens, token)
+        }
     }
 }
 
 export function extractIdentifier(tokens: ITokenStream): string {
     const token = tokens.next();
-    if (token.tokenType != 'Identifier') throw new SemanticError('Expecting an identifier', tokens, token);
+    if (token.tokenType != 'Identifier') throw new SemanticError('an identifier', tokens, token);
     return token.text;
 }
 
 export function extractQualifiedIdentifier(tokens: ITokenStream): string {
     const token = tokens.next();
-    if (token.tokenType != 'QualifiedIdentifier')
-        throw new SemanticError('Expecting a qualified identifier', tokens, token);
+    if (token.tokenType != 'QualifiedIdentifier') throw new SemanticError('a qualified identifier', tokens, token);
     return token.text;
 }

@@ -25,10 +25,10 @@ export class ApplicationModelBuilder implements IModelBuilder<ApplicationModel> 
     }
 
     buildStatement(tokens: ITokenStream, token: IToken): void {
-        if (token.tokenType != 'Keyword') throw new SemanticError('Expecting a keyword', tokens, token);
+        if (token.tokenType != 'Keyword') throw new SemanticError('a keyword', tokens, token);
 
         if (token.text == 'connection') this.model.connections.push(this.factory.buildConnectionModel(tokens));
         else if (token.text == 'config') this.model.configs.push(this.factory.buildConfigModel(tokens));
-        else throw new SemanticError('Expecting connection or config', tokens, token);
+        else throw new SemanticError('connection or config', tokens, token);
     }
 }

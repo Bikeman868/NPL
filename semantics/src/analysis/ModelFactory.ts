@@ -67,6 +67,7 @@ import { PipeRouteModelBuilder } from './builders/PipeRouteModelBuilder.js';
 import { ElseStatementModel } from '#model/statement/ElseStatementModel.js';
 import { EmitStatementModel } from '#model/statement/EmitStatementModel.js';
 import { TestModel } from '#model/declarative/TestModel.js';
+import { ExpressionModel } from '#model/statement/ExpressionModel.js';
 
 export class ModelFactory implements IModelFactory {
     public config = {
@@ -255,6 +256,9 @@ export class ModelFactory implements IModelFactory {
             identifier: '',
             comments: [],
             messageType: '',
+            configs: [],
+            constants: [],
+            enums: [],
             statements: [],
         };
     }
@@ -304,7 +308,7 @@ export class ModelFactory implements IModelFactory {
         return {
             fieldName: '',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
         };
     }
 
@@ -339,7 +343,7 @@ export class ModelFactory implements IModelFactory {
         return {
             identifier: '',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
         };
     }
 
@@ -347,7 +351,7 @@ export class ModelFactory implements IModelFactory {
         return {
             statementType: 'elseif',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
             statements: [],
         };
     }
@@ -363,7 +367,7 @@ export class ModelFactory implements IModelFactory {
         return {
             statementType: 'emit',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
             await: undefined,
         };
     }
@@ -387,8 +391,17 @@ export class ModelFactory implements IModelFactory {
         return {
             statementType: 'expect',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
         };
+    }
+
+    emptyExpressionModel(): ExpressionModel {
+        return {
+            expressionType: 'math',
+            expression: {
+                tokens: [],
+            },
+        }
     }
 
     emptyForStatementModel(): ForStatementModel {
@@ -397,7 +410,7 @@ export class ModelFactory implements IModelFactory {
             comments: [],
             identifier: '',
             iterationType: 'values',
-            expression: [],
+            expression: this.emptyExpressionModel(),
             statements: [],
         };
     }
@@ -406,7 +419,7 @@ export class ModelFactory implements IModelFactory {
         return {
             statementType: 'if',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
             statements: [],
         };
     }
@@ -532,6 +545,7 @@ export class ModelFactory implements IModelFactory {
     emptyRouteStatementModel(): RouteStatementModel {
         return {
             statementType: 'route',
+            identifier: '',
             comments: [],
             statements: [],
         };
@@ -542,7 +556,7 @@ export class ModelFactory implements IModelFactory {
             statementType: 'set',
             comments: [],
             identifier: '',
-            expression: [],
+            expression: this.emptyExpressionModel(),
         };
     }
 
@@ -574,7 +588,7 @@ export class ModelFactory implements IModelFactory {
             statementType: 'var',
             comments: [],
             identifier: '',
-            expression: [],
+            expression: this.emptyExpressionModel(),
         };
     }
 
@@ -582,7 +596,7 @@ export class ModelFactory implements IModelFactory {
         return {
             statementType: 'while',
             comments: [],
-            expression: [],
+            expression: this.emptyExpressionModel(),
             statements: [],
         };
     }

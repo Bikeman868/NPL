@@ -1,8 +1,8 @@
-import { IToken } from 'npl-syntax';
 import { Model } from '../Model.js';
 import { Statement } from '../Statement.js';
+import { ExpressionModel } from './ExpressionModel.js';
 
 export type ExpectStatementModel = {
-    expression: IToken[];
+    expression: ExpressionModel;
 } & Model &
     Statement;

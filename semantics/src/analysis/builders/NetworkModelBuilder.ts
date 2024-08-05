@@ -7,8 +7,7 @@ import { IToken } from 'npl-syntax';
 import { SemanticError } from '#errors/SemanticError.js';
 import { NetworkIngressModel } from '#model/declarative/NetworkIngressModel.js';
 import { NetworkEgressModel } from '#model/declarative/NetworkEgressModel.js';
-import { DestinationKind, MessageDestinationModel } from '#model/declarative/MessageDestinationModel.js';
-import { ModelFactory } from 'semantics.js';
+import { MessageDestinationModel } from '#model/declarative/MessageDestinationModel.js';
 
 export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
     private factory: IModelFactory;
@@ -29,8 +28,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
     }
 
     buildStatement(tokens: ITokenStream, token: IToken): void {
-        if (token.tokenType != 'Keyword')
-            throw new SemanticError('Expecting a netwoek statement keyword', tokens, token);
+        if (token.tokenType != 'Keyword') throw new SemanticError('a network statement keyword', tokens, token);
 
         if (token.text == 'const') this.model.constants.push(this.factory.buildConstModel(tokens));
         else if (token.text == 'config') this.model.configs.push(this.factory.buildConfigModel(tokens));
@@ -40,12 +38,7 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
         else if (token.text == 'process') this.model.processes.push(this.factory.buildProcessModel(tokens));
         else if (token.text == 'ingress') this.model.ingresses.push(this.buildNetworkIngressModel(tokens));
         else if (token.text == 'egress') this.model.egresses.push(this.buildNetworkEgressModel(tokens));
-        else
-            throw new SemanticError(
-                'Expecting const config, enum, message, ingress egress, pipe or process',
-                tokens,
-                token,
-            );
+        else throw new SemanticError('const, config, enum, message, ingress egress, pipe or process', tokens, token);
     }
 
     private buildNetworkIngressModel(tokens: ITokenStream): NetworkIngressModel {
@@ -73,11 +66,10 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
     private buildDestination(tokens: ITokenStream, token: IToken): MessageDestinationModel {
         const destination = this.factory.emptyMessageDestinationModel();
 
-        if (token.tokenType != 'Keyword')
-            throw new SemanticError('Expecting a destination type keyword', tokens, token);
+        if (token.tokenType != 'Keyword') throw new SemanticError('a destination type keyword', tokens, token);
 
         if (token.text == 'network' || token.text == 'process' || token.text == 'pipe') destination.kind = token.text;
-        else throw new SemanticError('Expecting process, pipe or network keyword', tokens, token);
+        else throw new SemanticError('process, pipe or network keyword', tokens, token);
 
         destination.qualifiedIdentifier = extractQualifiedIdentifier(tokens);
         extractLineBreak(tokens, 'message destination', destination);
@@ -112,11 +104,9 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
     private buildMessageType(tokens: ITokenStream, token: IToken): string {
         if (token.tokenType == 'Keyword') {
             if (token.text == '*' || token.text == 'empty') return token.text;
-        }
+        } else if (token.tokenType == 'QualifiedIdentifier') return token.text;
 
-        if (token.tokenType == 'QualifiedIdentifier') return token.text;
-
-        throw new SemanticError('Expecting a message type identifier', tokens, token);
+        throw new SemanticError('a message type identifier', tokens, token);
     }
 
     private buildNetworkEntryPointName(tokens: ITokenStream): string {
@@ -125,6 +115,6 @@ export class NetworkModelBuilder implements IModelBuilder<NetworkModel> {
 
         if (nameToken.tokenType == 'Keyword' && nameToken.text == 'default') return 'default';
 
-        throw new SemanticError('Expecting network entry point name or "default"', tokens, nameToken);
+        throw new SemanticError('network entry point name or "default"', tokens, nameToken);
     }
 }

@@ -18,7 +18,7 @@ export class SourceFileModelBuilder implements IModelBuilder<SourceFileModel> {
     }
 
     addTokens(tokens: ITokenStream): void {
-        const expecting = 'Expecting "using" or "namespace" keyword';
+        const expecting = 'using or namespace keyword';
         while (tokens.peek()) {
             const token = tokens.next();
             if (token.tokenType == 'Keyword') {

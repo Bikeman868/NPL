@@ -18,7 +18,12 @@ export class TestModelBuilder implements IModelBuilder<TestModel> {
     }
 
     addTokens(tokens: ITokenStream): void {
+        const token = tokens.peek();
+        if (token?.tokenType == 'StringLiteral') {
+            this.model.name = token.text;
+            tokens.next();
+        }
+
         skipScopeBlock(tokens);
-        tokens.attachCommentsTo(this.model);
     }
 }

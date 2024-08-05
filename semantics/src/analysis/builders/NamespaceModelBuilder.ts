@@ -25,7 +25,7 @@ export class NamespaceModelBuilder implements IModelBuilder<NamespaceModel> {
     }
 
     buildStatement(tokens: ITokenStream, token: IToken): void {
-        if (token.tokenType != 'Keyword') throw new SemanticError('Expecting a keyword', tokens, token);
+        if (token.tokenType != 'Keyword') throw new SemanticError('a keyword', tokens, token);
 
         if (token.text == 'using') this.model.usings.push(this.factory.buildUsingModel(tokens));
         else if (token.text == 'const') this.model.constants.push(this.factory.buildConstModel(tokens));
@@ -36,11 +36,6 @@ export class NamespaceModelBuilder implements IModelBuilder<NamespaceModel> {
             this.factory.addNetwork(this.model.networks, this.factory.buildNetworkModel(tokens));
         else if (token.text == 'application')
             this.factory.addApplication(this.model.applications, this.factory.buildApplicationModel(tokens));
-        else
-            throw new SemanticError(
-                'Expecting using, const, config, enum, message, network or application',
-                tokens,
-                token,
-            );
+        else throw new SemanticError('using, const, config, enum, message, network or application', tokens, token);
     }
 }

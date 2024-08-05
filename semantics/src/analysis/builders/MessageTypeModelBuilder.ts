@@ -33,8 +33,7 @@ export class MessageTypeModelBuilder implements IModelBuilder<MessageTypeModel> 
         token = this.buildFieldType(tokens, token, field);
         token = this.buildFieldIdentifier(tokens, token, field);
 
-        if (token.tokenType != 'LineBreak')
-            throw new SemanticError('Expecting line break after field identifier', tokens, token);
+        if (token.tokenType != 'LineBreak') throw new SemanticError('line break after field identifier', tokens, token);
 
         tokens.attachCommentsTo(field);
     }
@@ -44,7 +43,7 @@ export class MessageTypeModelBuilder implements IModelBuilder<MessageTypeModel> 
             field.type.push(token);
             token = tokens.next();
         }
-        if (field.type.length == 0) throw new SemanticError('Expecting field type', tokens, token);
+        if (field.type.length == 0) throw new SemanticError('field type', tokens, token);
 
         return token;
     }
@@ -54,12 +53,13 @@ export class MessageTypeModelBuilder implements IModelBuilder<MessageTypeModel> 
 
         if (token.text == 'new') field.lifecycle = 'new';
         else if (token.text == 'deprecated') field.lifecycle = 'deprecated';
+        else field.lifecycle = 'current';
 
         return tokens.next();
     }
 
     buildFieldIdentifier(tokens: ITokenStream, token: IToken, field: MessageFieldDefinitionModel): IToken {
-        if (token.tokenType != 'Identifier') throw new SemanticError('Expecting a field name', tokens, token);
+        if (token.tokenType != 'Identifier') throw new SemanticError('a field name', tokens, token);
         field.identifier = token.text;
         return tokens.next();
     }

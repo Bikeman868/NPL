@@ -1,4 +1,4 @@
-import { IToken, TokenType } from 'npl-syntax';
+import { TokenType } from 'npl-syntax';
 import { printAccept } from './printers/printAccept.js';
 import { printAppendStatement } from './printers/printAppendStatement.js';
 import { printApplication } from './printers/printApplication.js';
@@ -38,6 +38,7 @@ import { printUsing } from './printers/printUsing.js';
 import { printVarStatement } from './printers/printVarStatement.js';
 import { printWhileStatement } from './printers/printWhileStatement.js';
 import { printStatement } from './printers/printStatement.js';
+import { ExpressionModel, MapLiteralExpression, MathExpression, MessageLiteralExpression } from '#model/statement/ExpressionModel.js';
 
 // This class is internal to this package, because it is intended for testing an debugging
 // code within this package. There is an npl-formatter package that can output formatted
@@ -85,21 +86,39 @@ export class ModelPrinter {
         if (model.comments.length) this.printBlankLine();
     }
 
-    protected formatExpression(expression: IToken[]): string {
+    protected formatExpression(expression: ExpressionModel): string {
         const typesToPrintText: TokenType[] = [
             'StringLiteral',
+            'BooleanLiteral',
+            'NumberLiteral',
             'Identifier',
             'QualifiedIdentifier',
-            'BooleanLiteral',
             'Keyword',
-            'Type',
-            'StartMessageLiteral',
         ];
 
         let result = '';
-        for (const token of expression) {
-            if (token.tokenType in typesToPrintText) result += `${token.tokenType} (${token.text}) `;
-            else result += `${token.tokenType} `;
+        switch (expression.expressionType) {
+            case 'message':
+                const messageExpression = expression.expression as MessageLiteralExpression;
+                result += `${messageExpression.messageType} {\nmessage {\n`
+                for (const field of messageExpression.fields)
+                    result += `${field.fieldName} ${this.formatExpression(field.fieldValue)}\n`
+                result += '}\n}'
+                break;
+            case 'map':
+                const mapExpression = expression.expression as MapLiteralExpression;
+                result += `{\n`
+                for (const field of mapExpression.fields)
+                    result += `${field.fieldName} ${this.formatExpression(field.fieldValue)}\n`
+                result += '}'
+                break;
+            case 'math':
+                const mathExpression = expression.expression as MathExpression;
+                for (const token of mathExpression.tokens) {
+                    if (typesToPrintText.includes(token.tokenType)) result += `${token.tokenType}(${token.text}) `;
+                    else result += `${token.tokenType} `;
+                }
+                break;
         }
         return result;
     }

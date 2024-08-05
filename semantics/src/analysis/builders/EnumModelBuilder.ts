@@ -43,8 +43,7 @@ export class EnumModelBuilder implements IModelBuilder<EnumModel> {
         } else if (token.tokenType == 'Identifier') {
             tokens.attachCommentsTo(this.model);
             while (token.tokenType != 'LineBreak') {
-                if (token.tokenType != 'Identifier')
-                    throw new SemanticError('Expecting an enum value identifier', tokens, token);
+                if (token.tokenType != 'Identifier') throw new SemanticError('an enum value identifier', tokens, token);
                 const enumValue: EnumValueModel = {
                     identifier: token.text,
                     comments: [],
@@ -54,7 +53,7 @@ export class EnumModelBuilder implements IModelBuilder<EnumModel> {
                 this.model.values.push(enumValue);
             }
         } else {
-            throw new SemanticError('Expecting a list of enum values', tokens, token);
+            throw new SemanticError('a list of enum values', tokens, token);
         }
     }
 }

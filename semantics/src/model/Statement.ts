@@ -1,3 +1,5 @@
+import { Model } from './Model.js';
+
 // Properties that all statement models have
 export type Statement = {
     statementType:
@@ -16,4 +18,4 @@ export type Statement = {
         | 'set'
         | 'var'
         | 'while';
-};
+} & Model;

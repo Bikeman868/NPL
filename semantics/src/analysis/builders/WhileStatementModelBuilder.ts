@@ -1,7 +1,7 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { extractIdentifier, skipScopeBlock } from './utils.js';
+import { extractExpression, skipScopeBlock } from './utils.js';
 import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
 
 export class WhileStatementModelBuilder implements IModelBuilder<WhileStatementModel> {
@@ -18,6 +18,10 @@ export class WhileStatementModelBuilder implements IModelBuilder<WhileStatementM
     }
 
     addTokens(tokens: ITokenStream): void {
+        const token = tokens.next();
+        tokens.attachCommentsTo(this.model);
+        this.model.expression = extractExpression(tokens, token);
+
         skipScopeBlock(tokens);
     }
 }

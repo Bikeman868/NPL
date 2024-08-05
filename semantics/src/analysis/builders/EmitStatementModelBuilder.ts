@@ -1,7 +1,7 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { extractIdentifier, skipScopeBlock } from './utils.js';
+import { extractExpression } from './utils.js';
 import { EmitStatementModel } from '#model/statement/EmitStatementModel.js';
 
 export class EmitStatementModelBuilder implements IModelBuilder<EmitStatementModel> {
@@ -18,6 +18,8 @@ export class EmitStatementModelBuilder implements IModelBuilder<EmitStatementMod
     }
 
     addTokens(tokens: ITokenStream): void {
-        skipScopeBlock(tokens);
+        const token = tokens.next();
+        tokens.attachCommentsTo(this.model);
+        this.model.expression = extractExpression(tokens, token);
     }
 }
