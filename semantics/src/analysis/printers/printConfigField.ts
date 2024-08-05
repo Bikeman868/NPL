@@ -3,5 +3,9 @@ import { ConfigFieldModel } from '#model/declarative/ConfigFieldModel.js';
 
 export function printConfigField(this: ModelPrinter, model: ConfigFieldModel, indent: number) {
     this.printComments(model, indent, false);
-    this.printLine(`${model.fieldName} ${this.formatExpression(model.expression)}`, indent);
+    
+    this.print(model.fieldName, indent);
+    this.print(' ', indent)
+    this.printExpression(model.expression, indent);
+    this.flushLine();
 }

@@ -3,14 +3,16 @@ import { EmitStatementModel } from '#model/statement/EmitStatementModel.js';
 
 export function printEmitStatement(this: ModelPrinter, model: EmitStatementModel, indent: number) {
     this.printComments(model, indent, true);
+
+    this.print('emit ', indent);
+    this.printExpression(model.expression, indent);
+    
     if (model.await) {
-        this.printLine(
-            `emit ${this.formatExpression(model.expression)} await ${model.await.messageType} ${
-                model.await.identifier
-            }`,
-            indent,
-        );
-    } else {
-        this.printLine(`emit ${this.formatExpression(model.expression)}`, indent);
+        this.print(' await ', indent);
+        this.print(model.await.messageType, indent);
+        this.print(' ', indent);
+        this.print(model.await.identifier, indent);
     }
+
+    this.flushLine();
 }

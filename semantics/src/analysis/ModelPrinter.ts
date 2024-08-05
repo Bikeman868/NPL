@@ -45,13 +45,27 @@ import { ExpressionModel, MapLiteralExpression, MathExpression, MessageLiteralEx
 // code, but it depends on this package, making development awkward. This class lets us
 // quickly print any model to check for correct behavior
 export class ModelPrinter {
-    // Utility functions
+    private line: string = '';
 
-    protected printLine(line: string, indent: number): void {
-        console.log('  '.repeat(indent) + line);
+    protected flushLine(): void {
+        if (this.line) {
+            console.log(this.line);
+            this.line = '';
+        }
+    }
+
+    protected print(text: string, indent: number) {
+        if (this.line) this.line += text
+        else this.line = '  '.repeat(indent) + text;
+    }
+
+    protected printLine(text: string, indent: number): void {
+        this.flushLine();
+        console.log('  '.repeat(indent) + this.line + text);
     }
 
     protected printBlankLine() {
+        this.flushLine();
         console.log();
     }
 
@@ -86,7 +100,7 @@ export class ModelPrinter {
         if (model.comments.length) this.printBlankLine();
     }
 
-    protected formatExpression(expression: ExpressionModel): string {
+    protected printExpression(expression: ExpressionModel, indent: number): void {
         const typesToPrintText: TokenType[] = [
             'StringLiteral',
             'BooleanLiteral',
@@ -96,31 +110,54 @@ export class ModelPrinter {
             'Keyword',
         ];
 
-        let result = '';
         switch (expression.expressionType) {
             case 'message':
                 const messageExpression = expression.expression as MessageLiteralExpression;
-                result += `${messageExpression.messageType} {\nmessage {\n`
-                for (const field of messageExpression.fields)
-                    result += `${field.fieldName} ${this.formatExpression(field.fieldValue)}\n`
-                result += '}\n}'
+                this.print(messageExpression.messageType, indent);
+                this.print(' {', indent);
+                if (messageExpression.fields.length > 0) {
+                    this.flushLine();
+                    if (messageExpression.fields.length == 1) {
+                        const field = messageExpression.fields[0];
+                        this.print('message ', indent + 1);
+                        this.print(field.fieldName, indent + 1)
+                        this.print(' ', indent + 1)
+                        this.printExpression(field.fieldValue, indent + 1)
+                        this.flushLine()
+                    } else {
+                        this.printLine('message {', indent + 1)
+                        for (const field of messageExpression.fields) {
+                            this.flushLine();
+                            this.print(field.fieldName, indent + 2)
+                            this.print(' ', indent + 2)
+                            this.printExpression(field.fieldValue, indent + 2)
+                        }
+                        this.flushLine();
+                        this.printLine('}', indent + 1)
+                    }
+                }
+                this.print('}', indent);
                 break;
             case 'map':
                 const mapExpression = expression.expression as MapLiteralExpression;
-                result += `{\n`
-                for (const field of mapExpression.fields)
-                    result += `${field.fieldName} ${this.formatExpression(field.fieldValue)}\n`
-                result += '}'
+                this.print('{', indent)
+                for (const field of mapExpression.fields) {
+                    this.flushLine();
+                    this.print(field.fieldName, indent + 1)
+                    this.print(' ', indent + 1)
+                    this.printExpression(field.fieldValue, indent + 1)
+                }
+                this.flushLine();
+                this.print('}', indent);
                 break;
             case 'math':
                 const mathExpression = expression.expression as MathExpression;
                 for (const token of mathExpression.tokens) {
-                    if (typesToPrintText.includes(token.tokenType)) result += `${token.tokenType}(${token.text}) `;
-                    else result += `${token.tokenType} `;
+                    if (typesToPrintText.includes(token.tokenType)) this.print(`${token.tokenType}(${token.text}) `, indent);
+                    else this.print(`${token.tokenType} `, indent);
                 }
                 break;
         }
-        return result;
     }
 
     // Model printing
