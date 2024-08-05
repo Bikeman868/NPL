@@ -4,7 +4,8 @@ import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { ConfigModel } from '#model/declarative/ConfigModel.js';
 import { SemanticError } from '#errors/SemanticError.js';
 import { IToken } from 'npl-syntax';
-import { buildScopedStatements, extractExpression } from './utils.js';
+import { buildScopedStatements } from './utils.js';
+import { extractExpression } from './ExpressionBuilder.js';
 
 export class ConfigModelBuilder implements IModelBuilder<ConfigModel> {
     private factory: IModelFactory;

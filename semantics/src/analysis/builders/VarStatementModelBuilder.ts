@@ -1,8 +1,9 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { extractExpression, extractIdentifier } from './utils.js';
+import { extractIdentifier } from './utils.js';
 import { VarStatementModel } from '#model/statement/VarStatementModel.js';
+import { extractExpression } from './ExpressionBuilder.js';
 
 export class VarStatementModelBuilder implements IModelBuilder<VarStatementModel> {
     private factory: IModelFactory;

@@ -2,7 +2,8 @@ import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
 import { ConstModel } from '#model/declarative/ConstModel.js';
-import { extractExpression, extractIdentifier } from './utils.js';
+import { extractIdentifier } from './utils.js';
+import { extractExpression } from './ExpressionBuilder.js';
 
 export class ConstModelBuilder implements IModelBuilder<ConstModel> {
     private factory: IModelFactory;

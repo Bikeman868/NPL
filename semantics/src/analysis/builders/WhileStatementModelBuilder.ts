@@ -1,8 +1,9 @@
 import { IModelBuilder } from '#interfaces/IModelBuilder.js';
 import { IModelFactory } from '../../interfaces/IModelFactory.js';
 import { ITokenStream } from '#interfaces/ITokenStream.js';
-import { extractExpression, skipScopeBlock } from './utils.js';
+import { skipScopeBlock } from './utils.js';
 import { WhileStatementModel } from '#model/statement/WhileStatementModel.js';
+import { extractExpression } from './ExpressionBuilder.js';
 
 export class WhileStatementModelBuilder implements IModelBuilder<WhileStatementModel> {
     private factory: IModelFactory;
